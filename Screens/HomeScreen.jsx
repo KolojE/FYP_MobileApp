@@ -1,4 +1,5 @@
 import { StyleSheet, View, Text, ScrollView, TouchableOpacity } from "react-native";
+import RecentReport from "../.expo/Components/RecentReport";
 
 
 
@@ -37,7 +38,12 @@ export default function HomeScreen() {
                 <Text style={{fontSize:10,color:"blue"}}>See All</Text>
                 </TouchableOpacity>
             </View>
-            <View style={styles.informationContainer}>
+            <View style={styles.recentReportsContainer}>
+                <RecentReport/>
+                <RecentReport/>
+                <RecentReport/>
+                <RecentReport/>
+                <RecentReport/>
             </View>
 
         </ScrollView>
@@ -87,7 +93,7 @@ const styles = StyleSheet.create(
             maxWidth: "60%",
             fontSize: 10,
         },
-        informationContainer:
+        recentReportsContainer:
         {
             marginTop: 5,
             marginBottom: 10,
