@@ -1,3 +1,4 @@
+import { Entypo} from '@expo/vector-icons';
 import { createBottomTabNavigator} from "@react-navigation/bottom-tabs";
 import { StyleSheet } from "react-native";
 import HomeScreen from "./HomeScreen";
@@ -10,13 +11,32 @@ export default function LandingScreen()
 
 return(
     <Tab.Navigator  screenOptions={{
-        headerStyle:styles.header
-        ,headerTitle:"App Logo",
+        headerShown:false,
+        tabBarActiveTintColor:"#e91e63",
+        headerTitle:"App Logo",
     }
     }>
-        <Tab.Screen name="Home" component={HomeScreen}/>
-        <Tab.Screen name="Report" component={ReportScreen}/>
-        <Tab.Screen name="Chat" component={HomeScreen}/>
+        <Tab.Screen name="Home" component={HomeScreen} options={{
+            tabBarIcon:({})=>
+            {
+                return <Entypo name='home' size={22}/>
+            }
+        }} />
+        <Tab.Screen name="Report" component={ReportScreen}
+         options={{
+            tabBarIcon:({})=>
+            {
+                return <Entypo name='circle-with-plus' size={22}/>
+            }
+         }}
+        />
+        <Tab.Screen name="Chat" component={HomeScreen}
+        options={{
+            tabBarIcon:({})=>{
+                return <Entypo name='chat' size={22}/>
+            }
+        }}
+        />
     </Tab.Navigator>
 );
 
