@@ -3,7 +3,7 @@ import { createBottomTabNavigator} from "@react-navigation/bottom-tabs";
 import { StyleSheet } from "react-native";
 import HomeScreen from "./HomeScreen";
 import ReportScreen from "./ReportScreen";
-
+import ChatScreen from './ChatScreen';
 const Tab = createBottomTabNavigator();
 
 export default function LandingScreen()
@@ -30,7 +30,7 @@ return(
             }
          }}
         />
-        <Tab.Screen name="Chat" component={HomeScreen}
+        <Tab.Screen name="Chat" component={ChatScreen}
         options={{
             tabBarIcon:({})=>{
                 return <Entypo name='chat' size={22}/>

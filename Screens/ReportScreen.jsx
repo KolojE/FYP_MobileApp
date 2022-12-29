@@ -1,5 +1,5 @@
 import {ScrollView, View,Text, StyleSheet } from "react-native"
-import ReportType from "../.expo/Components/ReportType"
+import ReportType from "../Components/ReportType"
 import { FontAwesome } from '@expo/vector-icons';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 export default function ReportScreen()
@@ -9,7 +9,7 @@ return(
             <View style={styles.titleContainer}>
                 <Text style={{ fontWeight: "bold", fontSize: 24 }}>Report Incident</Text>
             </View>
-        <View style={{alignItems:"center",marginTop:"10%",flexDirection:"row",flexWrap:"wrap"}}>
+        <View style={{justifyContent:"center",marginTop:"10%",flexDirection:"row",flexWrap:"wrap"}}>
             <ReportType 
             image={
               <FontAwesome name="fire" size={50} color="black" />

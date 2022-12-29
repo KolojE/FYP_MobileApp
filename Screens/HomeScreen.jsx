@@ -1,5 +1,5 @@
 import { StyleSheet, View, Text, ScrollView, TouchableOpacity } from "react-native";
-import RecentReport from "../.expo/Components/RecentReport";
+import RecentReport from "../Components/RecentReport";
 
 
 
@@ -7,7 +7,7 @@ const LatestUpdated = { report_id: "R011024", report_title: "WildFire", report_s
 
 export default function HomeScreen() {
     return (
-        <ScrollView contentContainerStyle={styles.window}>
+        <ScrollView contentContainerStyle={styles.window}r>
 
             <View style={styles.titleContainer}>
                 <Text style={{ fontWeight: "bold", fontSize: 24 }}>Dashboard</Text>
