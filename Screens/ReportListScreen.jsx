@@ -17,7 +17,7 @@ export default function ReportListScreen(props) {
         style={{
           alignItems: "center",
           justifyContent: "center",
-          paddingTop: "8%",
+          paddingTop: "7%",
           paddingBottom: "5%",
           backgroundColor: "#89CFF0",
           width: "100%",
@@ -41,21 +41,15 @@ export default function ReportListScreen(props) {
       </View>
       <ScrollView contentContainerStyle={{ alignItems: "center" }}>
         <View style={{ width: "95%" }}>
-          <ReportList />
-          <ReportList />
-          <ReportList />
-          <ReportList />
-          <ReportList />
-          <ReportList />
-          <ReportList />
-          <ReportList />
-          <ReportList />
-          <ReportList />
-          <ReportList />
-          <ReportList />
-          <ReportList />
-          <ReportList />
-          <ReportList />
+          <ReportList navigation={props.navigation}/>
+          <ReportList navigation={props.navigation}/>
+          <ReportList navigation={props.navigation}/>
+          <ReportList navigation={props.navigation}/>
+          <ReportList navigation={props.navigation}/>
+          <ReportList navigation={props.navigation}/>
+          <ReportList navigation={props.navigation}/>
+          <ReportList navigation={props.navigation}/>
+          <ReportList navigation={props.navigation}/>
         </View>
       </ScrollView>
     </View>

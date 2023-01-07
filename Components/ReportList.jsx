@@ -1,9 +1,9 @@
 import React from "react";
 import { View, TouchableOpacity, Text } from "react-native";
 
-export default function ReportList() {
+export default function ReportList(props) {
   return (
-    <TouchableOpacity
+    <TouchableOpacity onPress={()=>{props.navigation.navigate("report")}}
       style={{
         height: 45,
         borderBottomWidth: 0.2,

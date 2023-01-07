@@ -2,10 +2,10 @@ import { Entypo } from "@expo/vector-icons";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { StyleSheet } from "react-native";
 import HomeScreen from "./HomeScreen";
-import ReportScreen from "./ReportScreen";
+import AddReportScreen from "./AddReportScreen";
 import ChatScreen from "./ChatScreen";
-import { NavigationContainer } from "@react-navigation/native";
 import ReportListScreen from "./ReportListScreen";
+import ReportScreen from "./ReportScreen";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -14,6 +14,7 @@ export default function LandingScreen() {
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="dashBoard" component={TabNavigationScreen} />
       <Stack.Screen name="reportList" component={ReportListScreen} />
+      <Stack.Screen name="report" component={ReportScreen}/>
     </Stack.Navigator>
   );
 }
@@ -38,7 +39,7 @@ function TabNavigationScreen() {
       />
       <Tab.Screen
         name="Report"
-        component={ReportScreen}
+        component={AddReportScreen}
         options={{
           tabBarIcon: ({}) => {
             return <Entypo name="circle-with-plus" size={22} />;
