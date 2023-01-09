@@ -4,9 +4,12 @@ import {
   Text,
   ScrollView,
   TouchableOpacity,
+  Modal,
 } from "react-native";
 import RecentReport from "../Components/RecentReport";
-
+import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
+import React from "react";
+import ProfileModal from "../Modal/ProfileModal";
 const LatestUpdated = {
   report_id: "R011024",
   report_title: "WildFire",
@@ -16,11 +19,41 @@ const LatestUpdated = {
 };
 
 export default function HomeScreen(props) {
+
+  const [profileModal, setProfileModal] = React.useState(false);
   return (
-    <ScrollView contentContainerStyle={styles.window} r>
+    <ScrollView contentContainerStyle={styles.window} >
       <View style={styles.titleContainer}>
-        <Text style={{ fontWeight: "bold", fontSize: 24 }}>Dashboard</Text>
+        <Text style={{ fontWeight: "bold", color: "white", fontSize: 24, position: "absolute", bottom: "20%", marginLeft: "18%" }}>Dashboard</Text>
       </View>
+      <View style={{ width: "90%", marginTop: "5%" }} >
+        <Text style={{ fontSize: 10, color: "#8F8F8F" }}>Profile</Text>
+        <View style={{ backgroundColor: "#b0cbde", flexDirection: "row", paddingTop: 10, paddingBottom: 10, borderRadius: 15, alignItems: "center" }}>
+          <View style={{ marginLeft: "5%" }}>
+            <MaterialCommunityIcons name="face-man-profile" size={34} color="black" />
+          </View>
+
+          <View style={{ flex: 2, marginLeft: "5%" }}>
+            <View style={{ flexDirection: "row", alignItems: "center" }}>
+              <Text style={{ fontSize: 12 }}>Ng Wen Sing</Text>
+              <TouchableOpacity onPress={() => {
+                setProfileModal(true);
+              }
+
+              }>
+                <MaterialIcons name="edit" size={12} color="black" />
+              </TouchableOpacity>
+            </View>
+            <Text style={{ fontSize: 10 }}>ID: U11252</Text>
+            <Text style={{ fontSize: 10 }}>Organization: MOE</Text>
+          </View>
+          <View style={{ flex: 2, paddingRight: "3%" }}>
+            <Text style={{ fontSize: 10 }}>Total Reports : 21</Text>
+            <Text style={{ fontSize: 10 }}>Report Resolved: 10</Text>
+          </View>
+        </View>
+      </View>
+
       <TouchableOpacity
         style={{ position: "relative", width: "90%", marginTop: "10%" }}
       >
@@ -76,7 +109,7 @@ export default function HomeScreen(props) {
                 minHeight: 80,
               }}
             >
-              The issue has been resolved and consider as save
+              The issue has been resolved
             </Text>
           </View>
           <Text
@@ -84,7 +117,7 @@ export default function HomeScreen(props) {
               position: "absolute",
               bottom: 12,
               right: 20,
-              color: "#45FF4C",
+              color: "#C8E6C9",
             }}
           >
             Resolved
@@ -95,7 +128,7 @@ export default function HomeScreen(props) {
       <View
         style={{
           width: "85%",
-          marginTop: 50,
+          marginTop: "15%",
           marginBottom: 5,
           flexDirection: "row",
         }}
@@ -117,19 +150,24 @@ export default function HomeScreen(props) {
         <RecentReport />
         <RecentReport />
       </View>
-    </ScrollView>
+      <Modal statusBarTranslucent={true} visible={profileModal} animationType={"slide"}>
+        <ProfileModal setProfileModal={setProfileModal} />
+      </Modal>
+    </ScrollView >
   );
 }
 
 const styles = StyleSheet.create({
   window: {
-    overflow: "scroll",
     minHeight: "100%",
     alignItems: "center",
   },
   titleContainer: {
-    width: "90%",
-    marginTop: "15%",
+    backgroundColor: "#050e2d",
+    width: "100%",
+    height: "10%",
+    borderBottomEndRadius: 100,
+    marginRight: "15%"
   },
   latestUpdateContainer: {
     width: "100%",
@@ -142,7 +180,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.23,
     shadowRadius: 1,
     elevation: 5,
-    backgroundColor: "#497CFF",
+    backgroundColor: "#239ed9",
   },
   latestDetailsText: {
     width: "40%",
@@ -156,7 +194,7 @@ const styles = StyleSheet.create({
   },
   recentReportsContainer: {
     marginTop: 5,
-    marginBottom: 10,
+    marginBottom: "30%",
     width: "90%",
     borderRadius: 15,
     shadowColor: "#000",

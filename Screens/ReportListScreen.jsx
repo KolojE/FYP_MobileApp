@@ -1,16 +1,18 @@
-import { AntDesign, SimpleLineIcons } from "@expo/vector-icons";
-import { useLinkProps } from "@react-navigation/native";
+import { AntDesign, Ionicons } from "@expo/vector-icons";
 import React from "react";
 import {
   ScrollView,
   View,
   Text,
-  Touchable,
   TouchableOpacity,
 } from "react-native";
-import ReportList from "../Components/ReportList";
+import { Modal } from "react-native";
+import ReportListContainer from "../Components/ReportListContainer";
+import ReportScreen from "./ReportScreen";
 
 export default function ReportListScreen(props) {
+
+  const [ReportModal, SetReportModal] = React.useState(false);
   return (
     <View style={{ height: "100%", width: "100%" }}>
       <View
@@ -19,39 +21,43 @@ export default function ReportListScreen(props) {
           justifyContent: "center",
           paddingTop: "7%",
           paddingBottom: "5%",
-          backgroundColor: "#89CFF0",
+          backgroundColor: "#162147",
           width: "100%",
           flexDirection: "row",
+          borderBottomEndRadius: 20,
+          borderBottomStartRadius: 30,
         }}
       >
         <TouchableOpacity
-          style={{ marginLeft: "5%", flex: 3 }}
+          style={{ marginLeft: "5%" }}
           onPress={() => {
             props.navigation.goBack();
           }}
         >
-          <AntDesign name="back" size={18} color="black" />
+          <AntDesign name="back" size={18} color="white" />
         </TouchableOpacity>
-        <Text style={{ flex: 3, fontWeight: "bold", fontSize: 16 }}>
+        <Text style={{ color: "white", marginLeft: "15%", fontWeight: "bold", fontSize: 16 }}>
           Reports
         </Text>
-        <TouchableOpacity style={{ flex: 1 }}>
-          <SimpleLineIcons name="magnifier" size={16} color="black" />
+        <TouchableOpacity style={{ marginLeft: "auto", marginRight: "10%" }}>
+          <Ionicons name="filter" size={18} color="white" />
         </TouchableOpacity>
       </View>
       <ScrollView contentContainerStyle={{ alignItems: "center" }}>
         <View style={{ width: "95%" }}>
-          <ReportList navigation={props.navigation}/>
-          <ReportList navigation={props.navigation}/>
-          <ReportList navigation={props.navigation}/>
-          <ReportList navigation={props.navigation}/>
-          <ReportList navigation={props.navigation}/>
-          <ReportList navigation={props.navigation}/>
-          <ReportList navigation={props.navigation}/>
-          <ReportList navigation={props.navigation}/>
-          <ReportList navigation={props.navigation}/>
+          <ReportListContainer SetReportModal={SetReportModal} />
+          <ReportListContainer SetReportModal={SetReportModal} />
+          <ReportListContainer SetReportModal={SetReportModal} />
+          <ReportListContainer SetReportModal={SetReportModal} />
         </View>
       </ScrollView>
+      <Modal statusBarTranslucent={true} visible={ReportModal}
+        animationType="slide"
+      >
+        <ReportScreen
+          SetReportModal={SetReportModal}
+        />
+      </Modal>
     </View>
   );
 }

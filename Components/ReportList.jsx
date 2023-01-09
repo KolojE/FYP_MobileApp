@@ -3,14 +3,12 @@ import { View, TouchableOpacity, Text } from "react-native";
 
 export default function ReportList(props) {
   return (
-    <TouchableOpacity onPress={()=>{props.navigation.navigate("report")}}
+    <TouchableOpacity onPress={() => { props.SetReportModal(true) }}
       style={{
         height: 45,
         borderBottomWidth: 0.2,
         borderColor: "grey",
-        borderStyle: "dotted",
         justifyContent: "center",
-        minHeight: 80,
       }}
     >
       <View style={{ flexDirection: "row" }}>

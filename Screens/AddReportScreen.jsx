@@ -2,18 +2,16 @@ import { ScrollView, View, Text, StyleSheet } from "react-native";
 import ReportType from "../Components/ReportType";
 import { FontAwesome } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-export default function ReportScreen() {
+export default function AddReportScreen() {
   return (
-    <ScrollView contentContainerStyle={styles.window}>
+    <ScrollView contentContainerStyle={styles.window} >
       <View style={styles.titleContainer}>
-        <Text style={{ fontWeight: "bold", fontSize: 24 }}>
-          Report Incident
-        </Text>
+        <Text style={{ fontWeight: "bold", color: "white", fontSize: 24, position: "absolute", bottom: "20%", marginLeft: "18%" }}>Report Incident</Text>
       </View>
       <View
         style={{
           justifyContent: "center",
-          marginTop: "10%",
+          marginTop: "5%",
           flexDirection: "row",
           flexWrap: "wrap",
         }}
@@ -76,13 +74,15 @@ export default function ReportScreen() {
 
 const styles = StyleSheet.create({
   window: {
-    overflow: "scroll",
     minHeight: "100%",
-    width: "100%",
     alignItems: "center",
   },
   titleContainer: {
-    width: "90%",
-    marginTop: "15%",
+    backgroundColor: "#050e2d",
+    width: "100%",
+    height: "9%",
+    borderBottomEndRadius: 100,
+    marginRight: "15%"
   },
+
 });
