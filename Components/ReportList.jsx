@@ -19,7 +19,7 @@ export default function ReportList(props) {
           </Text>
         </View>
         <View style={{ flex: 2, height: "100%", justifyContent: "center" }}>
-          <Text>Water Floord</Text>
+          <Text>Flood</Text>
         </View>
         <View
           style={{

@@ -33,7 +33,7 @@ export default function AddReportScreen(props) {
           image={
             <MaterialCommunityIcons name="waterfall" size={50} color="black" />
           }
-          label={"Water Floor"}
+          label={"Flood"}
           color={"blue"}
         />
         <ReportType
@@ -50,7 +50,7 @@ export default function AddReportScreen(props) {
           image={
             <MaterialCommunityIcons name="waterfall" size={50} color="black" />
           }
-          label={"Water Floor"}
+          label={"Floord"}
           color={"blue"}
         />
         <ReportType

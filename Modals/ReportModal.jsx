@@ -25,7 +25,7 @@ export default function ReportModal(props) {
                 <View style={{}}>
                     <Text style={{ margin: 5, fontSize: 8, color: "grey" }}>Report Title</Text>
                     <View style={{ backgroundColor: "white", padding: 10, width: "100%", flexDirection: "row" }}>
-                        <Text style={{ marginLeft: 10 }}>Water Floor</Text>
+                        <Text style={{ marginLeft: 10 }}>Flood</Text>
                         <MaterialCommunityIcons style={{ marginLeft: "auto", marginRight: 10 }} name="waterfall" size={20} color="black" />
                     </View>
                 </View>
