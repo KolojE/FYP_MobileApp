@@ -5,7 +5,7 @@ import HomeScreen from "./HomeScreen";
 import AddReportScreen from "./AddReportScreen";
 import ChatScreen from "./ChatScreen";
 import ReportListScreen from "./ReportListScreen";
-import ReportScreen from "./ReportScreen";
+import ReportFormScreen from "./ReportFormScreen";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -14,7 +14,7 @@ export default function LandingScreen() {
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="dashBoard" component={TabNavigationScreen} />
       <Stack.Screen name="reportList" component={ReportListScreen} />
-      <Stack.Screen name="report" component={ReportScreen}/>
+      <Stack.Screen name="reportForm" component={ReportFormScreen} />
     </Stack.Navigator>
   );
 }
@@ -32,7 +32,7 @@ function TabNavigationScreen() {
         name="Home"
         component={HomeScreen}
         options={{
-          tabBarIcon: ({}) => {
+          tabBarIcon: ({ }) => {
             return <Entypo name="home" size={22} />;
           },
         }}
@@ -41,7 +41,7 @@ function TabNavigationScreen() {
         name="Report"
         component={AddReportScreen}
         options={{
-          tabBarIcon: ({}) => {
+          tabBarIcon: ({ }) => {
             return <Entypo name="circle-with-plus" size={22} />;
           },
         }}
@@ -50,7 +50,7 @@ function TabNavigationScreen() {
         name="Chat"
         component={ChatScreen}
         options={{
-          tabBarIcon: ({}) => {
+          tabBarIcon: ({ }) => {
             return <Entypo name="chat" size={22} />;
           },
         }}

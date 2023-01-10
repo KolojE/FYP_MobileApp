@@ -9,7 +9,7 @@ import {
 import RecentReport from "../Components/RecentReport";
 import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import React from "react";
-import ProfileModal from "../Modal/ProfileModal";
+import ProfileModal from "../Modals/ProfileModal";
 const LatestUpdated = {
   report_id: "R011024",
   report_title: "WildFire",

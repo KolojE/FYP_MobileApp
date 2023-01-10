@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity } from "react-native";
 export default function ReportType(props) {
   return (
     <View style={{ width: 150 }}>
-      <TouchableOpacity style={{ width: 120 }}>
+      <TouchableOpacity style={{ width: 120 }} onPress={() => { props.navigation.navigate("reportForm") }}>
         <View
           style={{
             margin: 10,

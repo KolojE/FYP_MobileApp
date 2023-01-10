@@ -2,7 +2,8 @@ import { ScrollView, View, Text, StyleSheet } from "react-native";
 import ReportType from "../Components/ReportType";
 import { FontAwesome } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-export default function AddReportScreen() {
+import { MaterialIcons } from '@expo/vector-icons';
+export default function AddReportScreen(props) {
   return (
     <ScrollView contentContainerStyle={styles.window} >
       <View style={styles.titleContainer}>
@@ -14,12 +15,14 @@ export default function AddReportScreen() {
           marginTop: "5%",
           flexDirection: "row",
           flexWrap: "wrap",
+          marginBottom: "30%"
         }}
       >
         <ReportType
           image={<FontAwesome name="fire" size={50} color="black" />}
           label={"Wild Fire"}
           color={"red"}
+          navigation={props.navigation}
         />
         <ReportType
           image={<FontAwesome name="road" size={50} color="black" />}
@@ -62,9 +65,9 @@ export default function AddReportScreen() {
         />
         <ReportType
           image={
-            <MaterialCommunityIcons name="waterfall" size={50} color="black" />
+            <MaterialIcons name="drafts" size={50} color="black" />
           }
-          label={"Water Floor"}
+          label={"Drafts"}
           color={"blue"}
         />
       </View>

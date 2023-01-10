@@ -1,17 +1,14 @@
 import React, { useEffect } from "react";
-import { View, ScrollView, Text, StyleSheet, TouchableOpacity, Image, Animated } from "react-native";
+import { View, ScrollView, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
 import { AntDesign } from '@expo/vector-icons';
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import EvidencePhoto from "../Components/EvidencePhoto";
 
 
-export default function ReportScreen(props) {
+export default function ReportModal(props) {
 
-    useEffect(() => {
-        Animated.timing()
-    });
     return (
-        <Animated.ScrollView contentContainerStyle={styles.window}>
+        <ScrollView contentContainerStyle={styles.window}>
             <View style={styles.titleContainer}>
                 <TouchableOpacity style={{ marginRight: "auto" }} onPress={() => { props.SetReportModal(false) }}>
                     <AntDesign name="down" size={24} color="black" />
@@ -80,7 +77,7 @@ export default function ReportScreen(props) {
                     </View>
                 </View>
             </View>
-        </Animated.ScrollView >
+        </ScrollView >
     );
 }
 

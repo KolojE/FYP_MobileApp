@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import { Modal } from "react-native";
 import ReportListContainer from "../Components/ReportListContainer";
-import ReportScreen from "./ReportScreen";
+import ReportScreen from "../Modals/ReportModal";
 
 export default function ReportListScreen(props) {
 
