@@ -1,61 +1,33 @@
-import { Entypo } from "@expo/vector-icons";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { StyleSheet } from "react-native";
-import HomeScreen from "./HomeScreen";
-import AddReportScreen from "./AddReportScreen";
-import ChatScreen from "./ChatScreen";
-import ReportListScreen from "./ReportListScreen";
-import ReportFormScreen from "./ReportFormScreen";
+import ReportListScreen from "./ComplainantScreens/ReportListScreen";
+import ReportFormScreen from "./ComplainantScreens/ReportFormScreen";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-const Tab = createBottomTabNavigator();
+import { roles, user } from "../utils/user";
+import ComplainantMainScreen from "./ComplainantScreens/MainScreen";
+import AdminMainScreen from "./AdminScreens/MainScreen";
+
+
 const Stack = createNativeStackNavigator();
 export default function LandingScreen() {
+
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="dashBoard" component={TabNavigationScreen} />
-      <Stack.Screen name="reportList" component={ReportListScreen} />
-      <Stack.Screen name="reportForm" component={ReportFormScreen} />
-    </Stack.Navigator>
-  );
-}
+      {user.role == roles.complainant &&
+        <>
+          <Stack.Screen name="dashBoard" component={ComplainantMainScreen} />
+          <Stack.Screen name="reportList" component={ReportListScreen} />
+          <Stack.Screen name="reportForm" component={ReportFormScreen} />
+        </>
+      }
+      {user.role == roles.admin &&
+        <>
+          <Stack.Screen name="dashBoard" component={AdminMainScreen} />
+          <Stack.Screen name="reportList" component={ReportListScreen} />
+          <Stack.Screen name="reportForm" component={ReportFormScreen} />
+        </>
+      }
 
-function TabNavigationScreen() {
-  return (
-    <Tab.Navigator
-      screenOptions={{
-        headerShown: false,
-        tabBarActiveTintColor: "#e91e63",
-        headerTitle: "App Logo",
-      }}
-    >
-      <Tab.Screen
-        name="Home"
-        component={HomeScreen}
-        options={{
-          tabBarIcon: ({ }) => {
-            return <Entypo name="home" size={22} />;
-          },
-        }}
-      />
-      <Tab.Screen
-        name="Report"
-        component={AddReportScreen}
-        options={{
-          tabBarIcon: ({ }) => {
-            return <Entypo name="circle-with-plus" size={22} />;
-          },
-        }}
-      />
-      <Tab.Screen
-        name="Chat"
-        component={ChatScreen}
-        options={{
-          tabBarIcon: ({ }) => {
-            return <Entypo name="chat" size={22} />;
-          },
-        }}
-      />
-    </Tab.Navigator>
+    </Stack.Navigator >
   );
 }
 

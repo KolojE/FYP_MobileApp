@@ -4,31 +4,46 @@ import {
   StyleSheet,
   TextInput,
   TouchableOpacity,
-  View,
+  View, Text
 } from "react-native";
 import ChatBuble from "../Components/ChatBuble";
 import { Ionicons } from "@expo/vector-icons";
-export default function ChatScreen() {
+import { SafeAreaView } from "react-native-safe-area-context";
+import { roles, user } from "../utils/user";
+export default function ChatScreen(props) {
   return (
-    <View style={{ width: "100%", height: "100%" }}>
-      <ScrollView style={{ marginTop: 50 }}>
-        <ChatBuble
-          reply={true}
-          msg={"Hi ,report received, thank for your report"}
-        />
-        <ChatBuble reply={false} msg={"may i know the progress?"} />
-        <ChatBuble
-          reply={true}
-          msg={"The progress will be updated in few days Thank you"}
-        />
-      </ScrollView>
+    <SafeAreaView style={{ height: "100%" }}>
+      {user.role == roles.admin &&
+        <>
+          <View style={{ flexDirection: "row", alignItems: "center", width: "100%", paddingTop: "2%", paddingBottom: "2%", borderBottomWidth: 0.5 }}>
+            <TouchableOpacity
+              onPress={() => { props.setChatRoomModal(false) }}           >
+              <Ionicons style={{ marginLeft: "5%" }} name="arrow-back" size={30} />
+            </TouchableOpacity>
+            <Text style={{ marginLeft: "5%", fontSize: 16, fontWeight: "bold" }}>Ali</Text>
+          </View>
+        </>}
+      <View style={{ width: "100%" }}>
+        <ScrollView style={{ marginTop: 20 }} contentContainerStyle={{}}>
+          <ChatBuble
+            reply={true}
+            msg={"Hi ,report received, thank for your report"}
+          />
+          <ChatBuble reply={false} msg={"may i know the progress?"} />
+          <ChatBuble
+            reply={true}
+            msg={"The progress will be updated in few days Thank you"}
+          />
+        </ScrollView>
 
+      </View>
       <View
         style={{
           ...style.inputContainer,
+          marginTop: "auto",
           flexDirection: "row",
           width: "100%",
-          height: "10%",
+          height: 60,
           backgroundColor: "white",
           bottom: 0,
           position: "absolute",
@@ -52,7 +67,7 @@ export default function ChatScreen() {
           <Ionicons name="send" size={20} color="black" />
         </TouchableOpacity>
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
 
