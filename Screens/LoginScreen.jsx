@@ -42,11 +42,9 @@ export default function LoginScreen({ navigation }) {
 }
 
 
-const height = Dimensions.get("window");
 const styles = StyleSheet.create({
     background:
     {
-        ...height,
         width: "100%",
         backgroundColor: '#050e2d',
 

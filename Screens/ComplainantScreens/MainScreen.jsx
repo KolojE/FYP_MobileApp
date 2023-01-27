@@ -1,6 +1,6 @@
 import react from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { Entypo } from "@expo/vector-icons";
+import { Entypo, Ionicons } from "@expo/vector-icons";
 import HomeScreen from "./HomeScreen";
 import AddReportScreen from "./AddReportScreen";
 import ChatScreen from "../ChatScreen";

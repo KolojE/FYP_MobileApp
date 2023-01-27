@@ -2,8 +2,9 @@ import react from "react";
 import ChatScreen from "../ChatScreen";
 import ChatRoomList from "./ChatRoomList";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { Entypo } from "@expo/vector-icons";
+import { Entypo, Ionicons } from "@expo/vector-icons";
 import HomeScreen from "./HomeScreen";
+import SettingScreen from "./SettingScreen";
 const Tab = createBottomTabNavigator();
 
 export default function MainScreen() {
@@ -24,6 +25,15 @@ export default function MainScreen() {
                 }}
             />
             <Tab.Screen
+                name="Reports"
+                component={SettingScreen}
+                options={{
+                    tabBarIcon: ({ }) => {
+                        return <Ionicons name="documents" size={22} />;
+                    },
+                }}
+            />
+            <Tab.Screen
                 name="Chat Room"
                 component={ChatRoomList}
                 options={{
@@ -33,6 +43,15 @@ export default function MainScreen() {
                 }}
             />
 
+            <Tab.Screen
+                name="Setting"
+                component={SettingScreen}
+                options={{
+                    tabBarIcon: ({ }) => {
+                        return <Ionicons name="settings" size={22} />;
+                    },
+                }}
+            />
         </Tab.Navigator>
     )
 }
