@@ -5,6 +5,7 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Entypo, Ionicons } from "@expo/vector-icons";
 import HomeScreen from "./HomeScreen";
 import SettingScreen from "./SettingScreen";
+import ReportsScreen from "./ReportsScreen";
 const Tab = createBottomTabNavigator();
 
 export default function MainScreen() {
@@ -26,7 +27,7 @@ export default function MainScreen() {
             />
             <Tab.Screen
                 name="Reports"
-                component={SettingScreen}
+                component={ReportsScreen}
                 options={{
                     tabBarIcon: ({ }) => {
                         return <Ionicons name="documents" size={22} />;

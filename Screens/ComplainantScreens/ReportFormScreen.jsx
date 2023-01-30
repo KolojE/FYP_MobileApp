@@ -160,7 +160,7 @@ export default function ReportFormScreen(props) {
                 {
                     openTimePicker &&
                     <RNDateTimePicker
-                        testID="Date Of Occurence"
+                        testID="Time Of Occurence"
                         value={date}
                         mode={"time"}
                         onChange={(event, date) => {

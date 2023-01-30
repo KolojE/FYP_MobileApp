@@ -21,9 +21,7 @@ export default function HomeScreen(props) {
                     <View style={{ alignItems: "center" }}>
                         <VictoryPie width={300} height={300} style={{ labels: { fontSize: 10 } }} colorScale={["navy", "tomato", "grey"]} data={[{ x: 20, y: 20 }, { x: 10, y: 10 }, { x: 1, y: 1 }]} />
                         <Text style={{ marginLeft: "auto" }}>Total report : 31</Text>
-                    </View>
-                    <View style={{ marginStart: "5%" }}>
-                        <VictoryLegend itemsPerRow={3} title={"Report Type"} data={[{ name: "flood" }, { name: "fire wild", }, { name: "road crack" }]} gutter={20} colorScale={["navy", "tomato", "grey"]} height={150} orientation={"horizontal"} />
+                        <VictoryLegend width={300} itemsPerRow={3} title={"Report Type"} height={100} data={[{ name: "flood" }, { name: "fire wild" }, { name: "road crack" }]} gutter={20} colorScale={["navy", "tomato", "grey"]} orientation={"horizontal"} />
                     </View>
                 </View>
                 <RecentReportList navigation={props.navigation} />

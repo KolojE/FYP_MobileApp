@@ -125,7 +125,7 @@ export default function HomeScreen(props) {
             </Text>
           </View>
         </TouchableOpacity>
-        <RecentReportList />
+        <RecentReportList navigation={props.navigation} />
         <Modal statusBarTranslucent={true} visible={profileModal} animationType={"slide"}>
           <ProfileModal setProfileModal={setProfileModal} />
         </Modal>
