@@ -27,7 +27,7 @@ export default function LoginScreen({ navigation }) {
                     <TouchableOpacity style={{ ...styles.input, marginTop: 50, width: "50%", backgroundColor: "#4d8ef7", paddingTop: 10, paddingBottom: 10 }} onPress={login}>
                         <Text style={{ fontWeight: "bold", textAlign: "center", color: "white" }}>Login</Text>
                     </TouchableOpacity>
-                    <Text style={{ fontSize: 10 }}>No account yet ? <Text onPress={() => { Alert.alert("redirected to signup page") }} style={{ color: "#9757ff" }}>Sign up</Text> here !</Text>
+                    <Text style={{ fontSize: 10, marginTop: 20 }}>No account yet ? <Text onPress={() => { navigation.navigate("Register") }} style={{ color: "#9757ff" }}>Sign up</Text> here !</Text>
                 </View>
 
             </View>

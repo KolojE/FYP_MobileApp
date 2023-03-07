@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, TextInput } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from "react-native-safe-area-context";
+import { roles, user } from "../utils/user";
 export default function ProfileModal(props) {
 
     const [editPassword, setEditPassword] = React.useState(false);
@@ -62,6 +63,16 @@ export default function ProfileModal(props) {
                                     <Text style={{ fontSize: 14, color: "white", fontWeight: "bold" }}>Save Change</Text>
                                 </TouchableOpacity>
                             </>
+                        }
+                        {
+                            user.role === roles.admin &&
+                            <View style={{ marginTop: 100, backgroundColor: "#91f2ab", padding: 10, borderRadius: 100 }}>
+                                <TouchableOpacity>
+                                    <Text>
+                                        Activate
+                                    </Text>
+                                </TouchableOpacity>
+                            </View>
                         }
                     </View>
                 </View>

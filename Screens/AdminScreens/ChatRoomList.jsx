@@ -13,17 +13,8 @@ export default function ChatRoomList() {
 
                 <Title title={"Chat Rooms"} />
                 <View style={{ marginTop: "3%" }}>
-                    <ChatRoom setChatRoomModal={setChatRoomModal} />
-                    <ChatRoom />
-                    <ChatRoom />
-                    <ChatRoom />
-                    <ChatRoom />
-                    <ChatRoom />
-                    <ChatRoom />
-                    <ChatRoom />
-                    <ChatRoom />
-                    <ChatRoom />
-                    <ChatRoom />
+                    <ChatRoom setChatRoomModal={setChatRoomModal} name={"Alex"} lastMessage={"It is already resolved."} time={"6:03 pm"} />
+                    <ChatRoom setChatRoomModal={setChatRoomModal} name={"Jessy"} lastMessage={"Yes."} time={"10:00 am"} />
                 </View>
             </ScrollView>
             <Modal animationType="slide" visible={chatRoomModal} >

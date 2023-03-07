@@ -1,5 +1,6 @@
 import { AntDesign } from "@expo/vector-icons";
 import RNDateTimePicker from "@react-native-community/datetimepicker";
+import { Picker } from "@react-native-picker/picker";
 import React from "react";
 import { View, Text, TextInput, TouchableOpacity } from "react-native";
 import TagSelector from "../Components/TagSelector";
@@ -19,8 +20,8 @@ export default function FilterModal(props) {
                 <Text style={{ fontSize: 26 }}>Filter</Text>
             </TouchableOpacity>
             <View style={{ alignSelf: "center" }}>
-                <Text style={{ marginTop: "5%", fontSize: 10, color: "grey" }}>Date Range</Text>
-                <View style={{ marginTop: "5%", flexDirection: "row", alignItems: "center", borderRadius: 100, padding: 10, borderWidth: 1, width: "80%" }}>
+                <Text style={{ marginTop: "5%", fontSize: 16, color: "black", fontWeight: "500" }}>Select A Date Range</Text>
+                <View style={{ marginTop: "5%", flexDirection: "row", alignItems: "center", borderRadius: 20, padding: 10, borderWidth: 1, width: "80%" }}>
                     <TouchableOpacity onPress={() => { setFromDatePicker(true) }} style={{ flex: 1, alignItems: "center", borderRightWidth: 1 }}>
                         <Text style={{ fontSize: 10 }}>From</Text>
                         <View >
@@ -34,14 +35,39 @@ export default function FilterModal(props) {
                         </View>
                     </TouchableOpacity>
                 </View>
+                <Text style={{ marginTop: "5%", fontSize: 16, color: "black", fontWeight: "500" }}>Select Tags</Text>
                 <View style={{ marginTop: "10%", maxWidth: "80%" }}>
                     <Text style={{ fontSize: 10, color: "grey" }}>Report Types</Text>
                     <View style={{ flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between", marginTop: "5%" }}>
-                        <TagSelector tagName={"Wild Fire"} style={{ borderWidth: 1, padding: 10, borderRadius: 100, backgroundColor: "#b1fcff" }} selected />
-                        <TagSelector tagName={"Flood"} style={{ borderWidth: 1, padding: 10, borderRadius: 100, backgroundColor: "#b1fcff" }} />
-                        <TagSelector tagName={"Road Crack"} style={{ borderWidth: 1, padding: 10, borderRadius: 100, backgroundColor: "#b1fcff" }} />
+                        <TagSelector tagName={"Wild Fire"} style={{ borderWidth: 1, padding: 10, borderRadius: 100, }} />
+                        <TagSelector tagName={"Flood"} style={{ borderWidth: 1, padding: 10, borderRadius: 100, }} />
+                        <TagSelector tagName={"Road Crack"} style={{ borderWidth: 1, padding: 10, borderRadius: 100 }} />
                     </View>
                 </View>
+                <View style={{ marginTop: "10%", maxWidth: "80%" }}>
+                    <Text style={{ fontSize: 10, color: "grey" }}>Report Status</Text>
+                    <View style={{ flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between", marginTop: "5%" }}>
+                        <TagSelector tagName={"Pending"} style={{ borderWidth: 1, padding: 10, borderRadius: 100 }} />
+                        <TagSelector tagName={"Resolved"} style={{ borderWidth: 1, padding: 10, borderRadius: 100 }} selectedStyle={{ backgroundColor: "#b1fcff" }} selected />
+                    </View>
+                </View>
+                <View style={{ marginTop: "10%", maxWidth: "80%" }}>
+                    <Text style={{ fontSize: 10, color: "grey" }}>Report Serverity</Text>
+                    <View style={{ flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between", marginTop: "5%" }}>
+                        <TagSelector tagName={"Critical"} style={{ borderWidth: 1, padding: 10, borderRadius: 100 }} />
+                        <TagSelector tagName={"Moderate"} style={{ borderWidth: 1, padding: 10, borderRadius: 100 }} selectedStyle={{ backgroundColor: "#b1fcff" }} selected />
+                        <TagSelector tagName={"Minor"} style={{ borderWidth: 1, padding: 10, borderRadius: 100 }} />
+                    </View>
+                </View>
+                <Text style={{ marginTop: "5%", fontSize: 16, color: "black", fontWeight: "500" }}>Sort By</Text>
+                <Picker >
+                    <Picker.Item label="Serverity" />
+                    <Picker.Item label="Types" />
+                    <Picker.Item label="Status" />
+                    <Picker.Item label="Date (Descending)" />
+                    <Picker.Item label="Date (Ascending)" />
+                </Picker>
+
             </View>
             {
                 fromDatePicker &&

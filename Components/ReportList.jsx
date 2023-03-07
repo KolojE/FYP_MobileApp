@@ -1,9 +1,9 @@
 import React from "react";
 import { View, TouchableOpacity, Text } from "react-native";
 
-export default function ReportList(props) {
+export default function ReportList({ SetReportModal, date, reportId, reportName, status }) {
   return (
-    <TouchableOpacity onPress={() => { props.SetReportModal(true) }}
+    <TouchableOpacity onPress={() => { SetReportModal(true) }}
       style={{
         height: 45,
         borderBottomWidth: 0.2,
@@ -13,13 +13,13 @@ export default function ReportList(props) {
     >
       <View style={{ flexDirection: "row" }}>
         <View style={{ justifyContent: "center", flex: 1 }}>
-          <Text style={{ fontSize: 12, color: "#00000" }}>#R0152141</Text>
+          <Text style={{ fontSize: 12, color: "#00000" }}>{reportId}</Text>
           <Text style={{ fontSize: 8, color: "#828282" }}>
-            10 jan 2022 21:32
+            {date}
           </Text>
         </View>
         <View style={{ flex: 2, height: "100%", justifyContent: "center" }}>
-          <Text>Flood</Text>
+          <Text>{reportName}</Text>
         </View>
         <View
           style={{
@@ -29,7 +29,7 @@ export default function ReportList(props) {
             alignItems: "center",
           }}
         >
-          <Text style={{ fontSize: 10 }}>Status</Text>
+          <Text style={{ fontSize: 10 }}>{status}</Text>
         </View>
       </View>
     </TouchableOpacity>

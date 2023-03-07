@@ -4,6 +4,7 @@ import { AntDesign } from '@expo/vector-icons';
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import EvidencePhoto from "../Components/EvidencePhoto";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { roles, user } from "../utils/user";
 
 
 export default function ReportModal(props) {
@@ -80,6 +81,17 @@ export default function ReportModal(props) {
                         </View>
                     </View>
                 </View>
+
+                {user.role === roles.admin
+
+                    &&
+
+                    <TouchableOpacity style={{ alignSelf: "center", padding: 10, alignItems: "center", backgroundColor: "#b0cbde", borderRadius: 100, width: "20%", marginBottom: 10, borderWidth: 1 }} >
+                        <View style={{ flexDirection: "row", alignItems: "center" }}>
+                            <AntDesign name="edit" />
+                        </View>
+                    </TouchableOpacity>
+                }
             </ScrollView >
         </SafeAreaView>
     );
