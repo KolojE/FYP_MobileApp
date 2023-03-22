@@ -10,7 +10,7 @@ export default function FilterModal(props) {
     const [fromDatePicker, setFromDatePicker] = React.useState(false);
     const [toDatePicker, setToDatePicker] = React.useState(false);
 
-    const [fromDate, setFromDate] = React.useState();
+    const [fromDate, setFromDate] = React.useState<Date>();
     const [toDate, setToDate] = React.useState(new Date());
     return (
 
@@ -39,24 +39,17 @@ export default function FilterModal(props) {
                 <View style={{ marginTop: "10%", maxWidth: "80%" }}>
                     <Text style={{ fontSize: 10, color: "grey" }}>Report Types</Text>
                     <View style={{ flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between", marginTop: "5%" }}>
-                        <TagSelector tagName={"Wild Fire"} style={{ borderWidth: 1, padding: 10, borderRadius: 100, }} />
-                        <TagSelector tagName={"Flood"} style={{ borderWidth: 1, padding: 10, borderRadius: 100, }} />
-                        <TagSelector tagName={"Road Crack"} style={{ borderWidth: 1, padding: 10, borderRadius: 100 }} />
+                        <TagSelector tagName={"Wild Fire"} style={{ borderWidth: 1, padding: 10, borderRadius: 100, }} tagValue={undefined} selected={undefined} selectedStyle={undefined} />
                     </View>
                 </View>
                 <View style={{ marginTop: "10%", maxWidth: "80%" }}>
                     <Text style={{ fontSize: 10, color: "grey" }}>Report Status</Text>
                     <View style={{ flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between", marginTop: "5%" }}>
-                        <TagSelector tagName={"Pending"} style={{ borderWidth: 1, padding: 10, borderRadius: 100 }} />
-                        <TagSelector tagName={"Resolved"} style={{ borderWidth: 1, padding: 10, borderRadius: 100 }} selectedStyle={{ backgroundColor: "#b1fcff" }} selected />
                     </View>
                 </View>
                 <View style={{ marginTop: "10%", maxWidth: "80%" }}>
                     <Text style={{ fontSize: 10, color: "grey" }}>Report Serverity</Text>
                     <View style={{ flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between", marginTop: "5%" }}>
-                        <TagSelector tagName={"Critical"} style={{ borderWidth: 1, padding: 10, borderRadius: 100 }} />
-                        <TagSelector tagName={"Moderate"} style={{ borderWidth: 1, padding: 10, borderRadius: 100 }} selectedStyle={{ backgroundColor: "#b1fcff" }} selected />
-                        <TagSelector tagName={"Minor"} style={{ borderWidth: 1, padding: 10, borderRadius: 100 }} />
                     </View>
                 </View>
                 <Text style={{ marginTop: "5%", fontSize: 16, color: "black", fontWeight: "500" }}>Sort By</Text>
@@ -74,7 +67,7 @@ export default function FilterModal(props) {
                 <RNDateTimePicker value={new Date()}
                     onChange={(event, newDate) => {
                         setFromDatePicker(false);
-                        setFromDate(() => { return newDate })
+                        setFromDate(() => newDate)
                     }}
                     maximumDate={toDate}
 

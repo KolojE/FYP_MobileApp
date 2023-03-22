@@ -2,6 +2,7 @@ import { Ionicons, AntDesign } from "@expo/vector-icons";
 import React from "react";
 import { View, Text, Touchable, TouchableOpacity, Modal } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { SettingOption } from "../../Components/SettingOption";
 import FormListModal from "../../Modals/FormListModal";
 import MemeberListModal from "../../Modals/MemberListModal";
 import ProfileModal from "../../Modals/ProfileModal";
@@ -24,30 +25,10 @@ export default function SettingScreen(props) {
             </View>
             <View style={{ backgroundColor: "white", position: "absolute", alignSelf: "center", height: "45%", width: "85%", borderRadius: 30, top: "40%" }}>
                 <View style={{ width: "90%", alignSelf: "center", height: "100%", justifyContent: "center" }}>
-                    <TouchableOpacity onPress={() => { setProfileModal(true) }} style={{ marginBottom: "10%", borderBottomWidth: 0.3, height: "10%" }}>
-                        <View style={{ flexDirection: 'row', alignItems: "center" }}>
-                            <Text>Profile</Text>
-                            <AntDesign name="right" style={{ marginLeft: "auto", marginRight: "5%" }} />
-                        </View>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={{ marginBottom: "10%", borderBottomWidth: 0.3, height: "10%" }}>
-                        <View style={{ flexDirection: 'row', alignItems: "center" }}>
-                            <Text>Organization Profile</Text>
-                            <AntDesign name="right" style={{ marginLeft: "auto", marginRight: "5%" }} />
-                        </View>
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={() => { setFormListModal(true) }} style={{ marginBottom: "10%", borderBottomWidth: 0.3, height: "10%" }}>
-                        <View style={{ flexDirection: 'row', alignItems: "center" }}>
-                            <Text>Report Forms</Text>
-                            <AntDesign name="right" style={{ marginLeft: "auto", marginRight: "5%" }} />
-                        </View>
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={() => { setMemberListModal(true) }} style={{ marginBottom: "10%", borderBottomWidth: 0.3, height: "10%" }}>
-                        <View style={{ flexDirection: 'row', alignItems: "center" }}>
-                            <Text>Memebers</Text>
-                            <AntDesign name="right" style={{ marginLeft: "auto", marginRight: "5%" }} />
-                        </View>
-                    </TouchableOpacity>
+                    <SettingOption label={"Company Profile"}  setModal={setProfileModal}/>
+                    <SettingOption label={"Profile"}  setModal={setProfileModal}/>
+                    <SettingOption label={"Report Forms"}  setModal={setFormListModal}/>
+                    <SettingOption label={"Members"}  setModal={setMemberListModal}/>
                 </View>
             </View>
             <Modal visible={memberListModal} animationType="slide">

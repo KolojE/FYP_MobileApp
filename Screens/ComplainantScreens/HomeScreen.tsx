@@ -84,7 +84,7 @@ export default function HomeScreen(props) {
               </View>
               <View style={{ position: "absolute", right: 20 }}>
                 <Text
-                  style={{ fontSizea: 16, color: "#F8F8F8", fontWeight: "700" }}
+                  style={{ fontSize: 16, color: "#F8F8F8", fontWeight: "700" }}
                 >
                   #R0112204
                 </Text>

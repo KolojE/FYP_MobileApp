@@ -5,16 +5,16 @@ import {
 } from "@expo/vector-icons";
 import IconTextInput from "../Components/IconTextInput";
 import Form from "../Components/Form";
-export default function FormListModal(props) {
 
+export default function FormListModal(props) {
     return (
         <View style={styles.searchContainer}>
             <View style={{ width: "100%", flexDirection: "row", alignItems: "center" }}>
                 <AntDesign onPress={() => { props.setFormListModal(false) }} name="down" size={24} style={{ marginRight: "auto", marginLeft: "5%", marginTop: "5%" }} />
-                <AntDesign name="plus" size={24} style={{ marginLeft: "auto", marginRight: "5%", marginTop: "5%" }} />
+                <AntDesign onPress={()=>{props.setFormListModal(false);props.navigation.navigate("formBuilder")}} name="plus" size={24} style={{ marginLeft: "auto", marginRight: "5%", marginTop: "5%" }} />
             </View>
             <View style={{ flexDirection: "row" }}>
-                <IconTextInput icon={<Entypo name="magnifying-glass" style={{ marginRight: 10 }} />} placeholder="Search" style={styles.searchBox} />
+                <IconTextInput icon={<Entypo name="magnifying-glass" style={{ marginRight: 10 }} />} placeholder="Search" style={styles.searchBox} editable={undefined} />
             </View>
             <ScrollView style={{ width: "100%" }} contentContainerStyle={{ width: "100%", alignItems: 'center' }}>
                 <Form formIcon={<FontAwesome name="fire" size={30} />} formName={"wild fire"} formStatus={"active"} formCreatedOn={"2023-01-03"} />

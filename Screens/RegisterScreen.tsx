@@ -13,10 +13,10 @@ export default function RegisterScreen() {
             </View>
             <View style={styles.RegisterContainer}>
                 <Text style={styles.Title}>Registration</Text>
-                <IconTextInput icon={<Ionicons name="person" style={styles.Icon} />} placeholder="User Name" style={styles.IconTextInput} />
-                <IconTextInput icon={<FontAwesome name="envelope" style={styles.Icon} />} placeholder="Email" style={styles.IconTextInput} />
-                <IconTextInput icon={<FontAwesome5 name="key" style={styles.Icon} />} placeholder="Password" style={styles.IconTextInput} />
-                <IconTextInput icon={<MaterialCommunityIcons name="form-textbox-password" style={styles.Icon} />} placeholder="Organization Passcode" style={styles.IconTextInput} />
+                <IconTextInput icon={<Ionicons name="person" style={styles.Icon} />} placeholder="User Name" style={styles.IconTextInput} editable={true} />
+                <IconTextInput icon={<FontAwesome name="envelope" style={styles.Icon} />} placeholder="Email" style={styles.IconTextInput} editable={true} />
+                <IconTextInput icon={<FontAwesome5 name="key" style={styles.Icon} />} placeholder="Password" style={styles.IconTextInput} editable={true} />
+                <IconTextInput icon={<MaterialCommunityIcons name="form-textbox-password" style={styles.Icon} />} placeholder="Organization Passcode" style={styles.IconTextInput} editable={undefined} />
                 <IconTextInput icon={<Octicons name="organization" style={styles.Icon} />} placeholder="Organization Name" style={{ ...styles.IconTextInput, height: "15%", backgroundColor: "#b5b3b3" }} editable={false} />
                 <TouchableOpacity style={{ ...styles.input, marginTop: "2%", width: "50%", backgroundColor: "#4d8ef7", paddingTop: 10, paddingBottom: 10 }}>
                     <Text style={{ fontWeight: "bold", textAlign: "center", color: "white" }}>Register</Text>

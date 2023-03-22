@@ -5,6 +5,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { roles, user } from "../utils/user";
 import ComplainantMainScreen from "./ComplainantScreens/MainScreen";
 import AdminMainScreen from "./AdminScreens/MainScreen";
+import { FormBuilderScreen } from "./AdminScreens/FormBuilderScreen";
 
 
 const Stack = createNativeStackNavigator();
@@ -24,6 +25,7 @@ export default function LandingScreen() {
           <Stack.Screen name="dashBoard" component={AdminMainScreen} />
           <Stack.Screen name="reportList" component={ReportListScreen} />
           <Stack.Screen name="reportForm" component={ReportFormScreen} />
+          <Stack.Screen name="formBuilder" component={FormBuilderScreen} />
         </>
       }
 

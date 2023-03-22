@@ -10,7 +10,7 @@ export default function MemeberListModal(props) {
         <View style={styles.searchContainer}>
             <AntDesign onPress={() => { props.setMemberListModal(false) }} name="down" size={24} style={{ marginRight: "auto", marginLeft: "5%", marginTop: "5%" }} />
             <View style={{ flexDirection: "row" }}>
-                <IconTextInput icon={<Entypo name="magnifying-glass" style={{ marginRight: 10 }} />} placeholder="Search" style={styles.searchBox} />
+                <IconTextInput icon={<Entypo name="magnifying-glass" style={{ marginRight: 10 }} />} placeholder="Search" style={styles.searchBox} editable={true} />
             </View>
             <ScrollView style={{ width: "100%" }} contentContainerStyle={{ width: "100%", alignItems: 'center' }}>
                 <Text style={{ color: "grey", marginVertical: "5%" }}>Deactivated Members</Text>
