@@ -35,7 +35,7 @@ export default function SettingScreen(props) {
                 <MemeberListModal setMemberListModal={setMemberListModal} />
             </Modal>
             <Modal visible={formListModal} animationType="slide">
-                <FormListModal setFormListModal={setFormListModal} />
+                <FormListModal setFormListModal={setFormListModal} navigation={props.navigation}/>
             </Modal>
             <Modal visible={profileModal} animationType="slide">
                 <ProfileModal setProfileModal={setProfileModal} />

@@ -14,7 +14,6 @@ export default function ReportsScreen() {
     const data = [{ x: 1, y: 4 }, { x: 2, y: 3 }, { x: 4, y: 5 }, { x: 3, y: 6 }, { x: 5, y: 1 }, { x: 6, y: 1 }, { x: 7, y: 0 }];
     return (
         <SafeAreaView>
-
             <ScrollView>
                 <Title title={"Reports"} />
                 <View style={{ alignItems: "center" }}>

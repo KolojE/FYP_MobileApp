@@ -90,7 +90,6 @@ export default function ReportFormScreen(props) {
                         <ScrollView horizontal={true} style={{ marginTop: "3%" }} contentContainerStyle={{ alignItems: "center" }}>
                             <TouchableOpacity onPress={async () => {
                                 const result = await ImagePicker.launchCameraAsync({
-
                                 })
                             }}
                             >

@@ -17,7 +17,7 @@ export default function Form({ formName, formStatus, formIcon, formCreatedOn }) 
         </View>
         <View style={{ flexDirection: "row", alignSelf: "center", marginLeft: "auto" }}>
             <Entypo name="edit" size={20} style={{ padding: 5 }} onPress={() => { }} />
-            <Entypo name="trash" size={20} style={{ padding: 5 }} onPress={{}} />
+            <Entypo name="trash" size={20} style={{ padding: 5 }} onPress={() => { }} />
         </View>
     </View>)
 }
