@@ -9,36 +9,55 @@ import Form from "../Components/Form";
 export default function FormListModal(props) {
     return (
         <View style={styles.searchContainer}>
-            <View style={{ width: "100%", flexDirection: "row", alignItems: "center" }}>
-                <AntDesign onPress={() => { props.setFormListModal(false) }} name="down" size={24} style={{ marginRight: "auto", marginLeft: "5%", marginTop: "5%" }} />
-                <AntDesign onPress={()=>{props.setFormListModal(false);props.navigation.navigate("formBuilder")}} name="plus" size={24} style={{ marginLeft: "auto", marginRight: "5%", marginTop: "5%" }} />
+            <View style={styles.rowContainer}>
+                <AntDesign onPress={() => { props.setFormListModal(false) }} name="down" size={24} style={styles.iconStyle} />
+                <AntDesign onPress={() => { props.setFormListModal(false); props.navigation.navigate("formBuilder") }} name="plus" size={24} style={[styles.iconStyle, styles.iconMarginLeft]} />
             </View>
-            <View style={{ flexDirection: "row" }}>
-                <IconTextInput icon={<Entypo name="magnifying-glass" style={{ marginRight: 10 }} />} placeholder="Search" style={styles.searchBox} editable={undefined} />
+            <View style={styles.rowContainer}>
+                <IconTextInput icon={<Entypo name="magnifying-glass" style={styles.iconStyle} />} placeholder="Search" style={styles.searchBox} editable={undefined} />
             </View>
-            <ScrollView style={{ width: "100%" }} contentContainerStyle={{ width: "100%", alignItems: 'center' }}>
+            <ScrollView style={styles.scrollViewContainer} contentContainerStyle={styles.scrollViewContentContainer}>
                 <Form formIcon={<FontAwesome name="fire" size={30} />} formName={"wild fire"} formStatus={"active"} formCreatedOn={"2023-01-03"} />
                 <Form formIcon={<FontAwesome name="road" size={30} />} formName={"road crack"} formStatus={"active"} formCreatedOn={"2023-01-03"} />
                 <Form formIcon={<MaterialCommunityIcons name="waterfall" size={30} />} formName={"flood"} formStatus={"active"} formCreatedOn={"2023-01-03"} />
             </ScrollView>
             <Modal visible={false}>
             </Modal>
-        </View>)
+        </View>
+
+    )
 
 
 }
 const styles = StyleSheet.create({
     searchContainer: {
-        width: "100%",
-        alignItems: "center"
+        backgroundColor: '#fff',
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: '100%',
+    },
+    rowContainer: {
+        width: '90%',
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginTop: "3%",
+        justifyContent: "center",
+    },
+    iconStyle: {
+
+        marginRight: '3%',
+    },
+    iconMarginLeft: {
+        marginLeft: 'auto',
     },
     searchBox: {
-        borderWidth: 1,
-        width: "90%",
-        marginTop: "5%",
-        borderRadius: 100,
-        paddingLeft: 10,
-        paddingTop: 2,
-        paddingBottom: 2,
-    }
+        flexDirection: 'row',
+    },
+    scrollViewContainer: {
+        width: '100%',
+    },
+    scrollViewContentContainer: {
+        width: '100%',
+        alignItems: 'center',
+    },
 });
