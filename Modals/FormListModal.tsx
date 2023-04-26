@@ -1,28 +1,46 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { View, Text, StyleSheet, ScrollView, Modal } from "react-native";
 import {
     AntDesign, Entypo, FontAwesome, MaterialCommunityIcons
 } from "@expo/vector-icons";
 import IconTextInput from "../Components/IconTextInput";
+import IForm from "../api/Models/Form";
+import { getForms } from "../api/user";
 import Form from "../Components/Form";
 
 export default function FormListModal(props) {
+
+
+    const [forms, setForms] = React.useState<IForm[]>([]);
+    const [formListElement, setFormListelement] = React.useState<JSX.Element[]>([]);
+
+    useEffect(() => {
+        getForms().then((res) => {
+            setForms(res);
+        });
+    }, [])
+
+    useEffect(() => {
+            setFormListelement(forms.map((res, index) => {
+                const creationDate = new Date(res.creationDate);
+                return <Form key={index} formID={res._id} formName={res.name} formStatus={res.activation_Status} formIcon={null} formCreatedOn={creationDate.toLocaleDateString()}  navigation={props.navigation} setModal={props.setFormListModal} setForms={setForms}/>
+            }))
+    }, [forms])
+
+
+    2
     return (
         <View style={styles.searchContainer}>
             <View style={styles.rowContainer}>
                 <AntDesign onPress={() => { props.setFormListModal(false) }} name="down" size={24} style={styles.iconStyle} />
-                <AntDesign onPress={() => { props.setFormListModal(false); props.navigation.navigate("formBuilder") }} name="plus" size={24} style={[styles.iconStyle, styles.iconMarginLeft]} />
+                <AntDesign onPress={() => { props.setFormListModal(false);  props.navigation.navigate("formBuilder");  }} name="plus" size={24} style={[styles.iconStyle, styles.iconMarginLeft]} />
             </View>
             <View style={styles.rowContainer}>
                 <IconTextInput icon={<Entypo name="magnifying-glass" style={styles.iconStyle} />} placeholder="Search" style={styles.searchBox} editable={undefined} />
             </View>
             <ScrollView style={styles.scrollViewContainer} contentContainerStyle={styles.scrollViewContentContainer}>
-                <Form formIcon={<FontAwesome name="fire" size={30} />} formName={"wild fire"} formStatus={"active"} formCreatedOn={"2023-01-03"} />
-                <Form formIcon={<FontAwesome name="road" size={30} />} formName={"road crack"} formStatus={"active"} formCreatedOn={"2023-01-03"} />
-                <Form formIcon={<MaterialCommunityIcons name="waterfall" size={30} />} formName={"flood"} formStatus={"active"} formCreatedOn={"2023-01-03"} />
+                {formListElement.length > 0 && formListElement}
             </ScrollView>
-            <Modal visible={false}>
-            </Modal>
         </View>
 
     )

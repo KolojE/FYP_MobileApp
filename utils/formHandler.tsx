@@ -2,23 +2,10 @@ import RNDateTimePicker from "@react-native-community/datetimepicker";
 import React from "react";
 import { Text, TextInput, TouchableOpacity, StyleSheet, View } from "react-native";
 import CheckBox from "@react-native-community/checkbox";
-
-export enum type {
-    Text = "Text",
-    Date = "Date",
-    Time = "Time",
-    Checkbox = "Checkbox",
-
-}
+import { IField,inputType } from "../api/Models/Form";
 
 
-export type field = {
-    label: String,
-    Type: type,
-}
-
-
-export function FieldRenderer(field: field) {
+export function FieldRenderer(field: IField) {
     const [datePicker, setDatePicker] = React.useState<boolean>(false);
     const [date, setDate] = React.useState<Date>(new Date());
 
@@ -27,8 +14,8 @@ export function FieldRenderer(field: field) {
         setDatePicker(false);
     };
 
-    switch (field.Type) {
-        case type.Text:
+    switch (field.inputType) {
+        case inputType.Text:
             return (
                 <View style={styles.container}>
                     <Text style={styles.label}>{field.label}</Text>
@@ -37,7 +24,7 @@ export function FieldRenderer(field: field) {
                     </View>
                 </View>
             );
-        case type.Date:
+        case inputType.Date:
             return (
                 <View style={styles.container}>
                     <Text style={styles.label}>{field.label}</Text>
@@ -65,7 +52,7 @@ export function FieldRenderer(field: field) {
                     )}
                 </View>
             );
-        case type.Time:
+        case inputType.Time:
             return (
                 <View style={styles.container}>
                     <Text style={styles.label}>{field.label}</Text>
@@ -96,15 +83,6 @@ export function FieldRenderer(field: field) {
                             }
                         />
                     )}
-                </View>
-            );
-        case type.Checkbox:
-            return (
-                <View style={[styles.container, styles.checkboxContainer]}>
-                    <View style={styles.checkbox}>
-                        <CheckBox />
-                    </View>
-                    <Text style={styles.label}>{field.label}</Text>
                 </View>
             );
 

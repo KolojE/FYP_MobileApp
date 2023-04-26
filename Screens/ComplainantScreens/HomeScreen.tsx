@@ -7,11 +7,15 @@ import {
   Modal,
 } from "react-native";
 import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
-import React from "react";
+import React, { useEffect } from "react";
 import Title from "../../Components/Title"
 import ProfileModal from "../../Modals/ProfileModal";
 import { SafeAreaView } from "react-native-safe-area-context";
 import RecentReportList from "../../Components/RecenReportList";
+import  IUser from "../../api/Models/User";
+import { getLoggedInUserInfo } from "../../api/user";
+import IOrganization from "../../api/Models/Organization";
+
 const LatestUpdated = {
   report_id: "R011024",
   report_title: "WildFire",
@@ -23,7 +27,22 @@ const LatestUpdated = {
 export default function HomeScreen(props) {
 
   const [profileModal, setProfileModal] = React.useState(false);
-  return (
+  const [loggedInUser, setLoggedInUser] = React.useState<IUser>();
+  const [organization, setOrganization] = React.useState<IOrganization>();
+
+  useEffect(() => {
+    getLoggedInUserInfo().then((res) => {
+      console.log(res)
+      setLoggedInUser(res.loggedInUser);
+      setOrganization(res.organization);
+    }, (rej) => {
+      console.log("something went wrong" + rej)
+    })
+  }, [])
+
+
+
+  return organization && loggedInUser ? (
     <SafeAreaView>
       <ScrollView contentContainerStyle={styles.window} >
         <Title title={"Dashboard"} />
@@ -36,7 +55,7 @@ export default function HomeScreen(props) {
 
             <View style={{ flex: 2, marginLeft: "5%" }}>
               <View style={{ flexDirection: "row", alignItems: "center" }}>
-                <Text style={{ fontSize: 12 }}>Ng Wen Sing</Text>
+                <Text style={{ fontSize: 12 }}>{loggedInUser ? loggedInUser.name : ""}</Text>
                 <TouchableOpacity onPress={() => {
                   setProfileModal(true);
                 }
@@ -45,8 +64,8 @@ export default function HomeScreen(props) {
                   <MaterialIcons name="edit" size={12} color="black" />
                 </TouchableOpacity>
               </View>
-              <Text style={{ fontSize: 10 }}>ID: U11252</Text>
-              <Text style={{ fontSize: 10 }}>Organization: MOE</Text>
+              <Text style={{ fontSize: 10 }}>ID: {loggedInUser ? loggedInUser.ID : ""}</Text>
+              <Text style={{ fontSize: 10 }}>Organization: {organization.name}</Text>
             </View>
             <View style={{ flex: 2, paddingRight: "3%" }}>
               <Text style={{ fontSize: 10 }}>Total Reports : 21</Text>
@@ -54,84 +73,89 @@ export default function HomeScreen(props) {
             </View>
           </View>
         </View>
-
-        <TouchableOpacity
-          style={{ position: "relative", width: "90%", marginTop: "10%" }}
-        >
-          <View style={styles.latestUpdateContainer}>
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                width: "100%",
-              }}
-            >
-              <View style={{ paddingLeft: 14 }}>
-                <Text
-                  style={{
-                    color: "white",
-                    fontWeight: "700",
-                    fontSize: 10,
-                    paddingTop: 12,
-                    paddingBottom: 3,
-                  }}
-                >
-                  Latest Update
-                </Text>
-                <Text style={{ fontSize: 8, color: "#f8f8f8" }}>
-                  20 jan 2022 08:31
-                </Text>
-              </View>
-              <View style={{ position: "absolute", right: 20 }}>
-                <Text
-                  style={{ fontSize: 16, color: "#F8F8F8", fontWeight: "700" }}
-                >
-                  #R0112204
-                </Text>
-              </View>
-            </View>
-            <View style={{ paddingLeft: 14, paddingTop: 10, paddingBottom: 40 }}>
-              <Text
-                style={{
-                  color: "#F8F8F8",
-                  fontWeight: "700",
-                  fontSize: 16,
-                  paddingBottom: 10,
-                }}
-              >
-                WirldFire
-              </Text>
-              <Text
-                style={{
-                  color: "#F8F8F8",
-                  fontWeight: "500",
-                  fontSize: 11,
-                  paddingRight: 10,
-                  minHeight: 80,
-                }}
-              >
-                The issue has been resolved
-              </Text>
-            </View>
-            <Text
-              style={{
-                position: "absolute",
-                bottom: 12,
-                right: 20,
-                color: "#C8E6C9",
-              }}
-            >
-              Resolved
-            </Text>
-          </View>
-        </TouchableOpacity>
+        <LatestUpdatedComponent />
         <RecentReportList navigation={props.navigation} />
         <Modal statusBarTranslucent={true} visible={profileModal} animationType={"slide"}>
-          <ProfileModal setProfileModal={setProfileModal} />
+          <ProfileModal user={loggedInUser} setProfileModal={setProfileModal} editable={false} />
         </Modal>
       </ScrollView >
     </SafeAreaView>
-  );
+  ) : <></>
+}
+
+export function LatestUpdatedComponent() {
+  return (
+    <TouchableOpacity
+      style={{ position: "relative", width: "90%", marginTop: "10%" }}
+    >
+      <View style={styles.latestUpdateContainer}>
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            width: "100%",
+          }}
+        >
+          <View style={{ paddingLeft: 14 }}>
+            <Text
+              style={{
+                color: "white",
+                fontWeight: "700",
+                fontSize: 10,
+                paddingTop: 12,
+                paddingBottom: 3,
+              }}
+            >
+              Latest Update
+            </Text>
+            <Text style={{ fontSize: 8, color: "#f8f8f8" }}>
+              20 jan 2022 08:31
+            </Text>
+          </View>
+          <View style={{ position: "absolute", right: 20 }}>
+            <Text
+              style={{ fontSize: 16, color: "#F8F8F8", fontWeight: "700" }}
+            >
+              #R0112204
+            </Text>
+          </View>
+        </View>
+        <View style={{ paddingLeft: 14, paddingTop: 10, paddingBottom: 40 }}>
+          <Text
+            style={{
+              color: "#F8F8F8",
+              fontWeight: "700",
+              fontSize: 16,
+              paddingBottom: 10,
+            }}
+          >
+            WirldFire
+          </Text>
+          <Text
+            style={{
+              color: "#F8F8F8",
+              fontWeight: "500",
+              fontSize: 11,
+              paddingRight: 10,
+              minHeight: 80,
+            }}
+          >
+            The issue has been resolved
+          </Text>
+        </View>
+        <Text
+          style={{
+            position: "absolute",
+            bottom: 12,
+            right: 20,
+            color: "#C8E6C9",
+          }}
+        >
+          Resolved
+        </Text>
+      </View>
+    </TouchableOpacity>
+  )
 }
 
 const styles = StyleSheet.create({

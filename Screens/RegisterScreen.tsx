@@ -9,7 +9,7 @@ export default function RegisterScreen() {
     return (
         <SafeAreaView style={styles.background}>
             <View style={styles.LogoContainer}>
-                <Image source={require("../DemoIamge/logo.png")} style={styles.Logo} />
+                <Image source={require("../DemoImage/logo.png")} style={styles.Logo} />
             </View>
             <View style={styles.RegisterContainer}>
                 <Text style={styles.Title}>Registration</Text>

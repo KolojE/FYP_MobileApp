@@ -1,31 +1,73 @@
 import { AntDesign } from "@expo/vector-icons";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useReducer, useState } from "react";
 import { TextInput, View, StyleSheet, Text, Modal, BackHandler, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { FieldSelectionModal } from "../../Modals/FieldSelectionModal";
-import { field, FieldRenderer } from "../../utils/formHandler";
+import { FieldRenderer } from "../../utils/formHandler";
+import IForm, { IField } from "../../api/Models/Form";
+import { addNewForm, updateForm } from "../../api/admin";
+import { getForm } from "../../api/user";
 
-export function FormBuilderScreen() {
+
+export function FormBuilderScreen(props){
+
+    const params= props.route.params;
+
     const [addFieldModal, setAddFieldModal] = useState(false);
-    const [formField, setFormField] = useState([]);
-    const [fields, setFields] = React.useState<Array<field>>([]);
+    const [formFieldElement, setFormFieldElements] = useState([]);
+    const [fields, setFields] = React.useState<Array<IField>>([]);
     const [formName, setFormName] = useState('');
+
+useEffect(()=>{
+
+        if(params?.formID  )
+        {
+            getForm(params.formID).then((res)=>{
+                setFormName(res.name);
+                setFields(res.fields);
+            },(rej)=>{
+                console.log(rej)
+            });
+        }
+},[])
 
     useEffect(() => {
         const formFieldElements = fields.map((field, index) => (
-            <FieldRenderer key={index} Type={field.Type} label={field.label} />
+            <FieldRenderer key={index} inputType={field.inputType} label={field.label} required={true} />
         ));
-        setFormField(formFieldElements);
+        setFormFieldElements(formFieldElements);
+
     }, [fields]);
 
     const handleAddField = (field) => {
         setFields([...fields, field]);
     };
 
+    const onSaveButtonClicked =()=>{
+        if(params?.formID)
+        {
+            console.log("form Update")
+            updateForm({fields:fields,activation_Status:true,name:formName,_id:params.formID})
+            props.navigation.navigate("dashBoard")
+            return;
+            
+        }
+
+        addNewForm({fields:fields,activation_Status:false,name:formName})
+            props.navigation.goBack()
+    }
+    
+    const onAddFieldButtonClicked = ()=>{
+        setAddFieldModal(true)
+    }
+
     return (
         <SafeAreaView style={styles.container}>
             <View style={styles.header}>
-                <TouchableOpacity onPress={() => setAddFieldModal(true)}>
+                <TouchableOpacity style={styles.saveButton} onPress={onSaveButtonClicked} >
+                    <AntDesign name="save" size={24} color="#fff" />
+                </TouchableOpacity>
+                <TouchableOpacity onPress={onAddFieldButtonClicked}>
                     <AntDesign name="plus" size={24} color="#fff" />
                 </TouchableOpacity>
             </View>
@@ -38,7 +80,7 @@ export function FormBuilderScreen() {
                         onChangeText={setFormName}
                     />
                 </View>
-                <View style={styles.formFields}>{formField}</View>
+                <View style={styles.formFields}>{formFieldElement}</View>
             </View>
             <Modal transparent={true} visible={addFieldModal}>
                 <FieldSelectionModal setModal={setAddFieldModal} updateField={handleAddField} />
@@ -74,4 +116,7 @@ const styles = StyleSheet.create({
     formFields: {
         marginTop: 20,
     },
+    saveButton:{
+        marginRight:"auto",
+    }
 });

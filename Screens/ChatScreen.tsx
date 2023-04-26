@@ -9,11 +9,11 @@ import {
 import ChatBuble from "../Components/ChatBuble";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { roles, user } from "../utils/user";
+import { roles } from "../api/Models/User";
 export default function ChatScreen(props) {
   return (
     <SafeAreaView style={{ height: "100%" }}>
-      {user.role == roles.admin &&
+      {props.user.role == roles.admin &&
         <>
           <View style={{ flexDirection: "row", alignItems: "center", width: "100%", paddingTop: "2%", paddingBottom: "2%", borderBottomWidth: 0.5 }}>
             <TouchableOpacity

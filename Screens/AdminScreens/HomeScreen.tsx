@@ -1,9 +1,8 @@
 import React from "react";
 import { ScrollView, View, Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { TextSize, VictoryBar, VictoryChart, VictoryLegend, VictoryPie, VictoryTheme } from "victory-native";
+import { VictoryLegend, VictoryPie } from "victory-native";
 import RecentReportList from "../../Components/RecenReportList";
-import RecentReport from "../../Components/RecentReport";
 import Title from "../../Components/Title";
 
 const data = [{}]

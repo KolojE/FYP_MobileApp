@@ -4,14 +4,13 @@ import { AntDesign } from '@expo/vector-icons';
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import EvidencePhoto from "../Components/EvidencePhoto";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { roles, user } from "../utils/user";
+import { roles } from "../api/Models/User";
 
 
 export default function ReportModal(props) {
 
     return (
         <SafeAreaView>
-
             <ScrollView contentContainerStyle={styles.window}>
                 <View style={styles.titleContainer}>
                     <TouchableOpacity style={{ marginRight: "auto" }} onPress={() => { props.SetReportModal(false) }}>
@@ -44,7 +43,7 @@ export default function ReportModal(props) {
                             <Text style={{ fontSize: 10, marginBottom: 10 }}>1 JAN 2023 9:07 am</Text>
                             <Text style={{ marginLeft: 10, fontSize: 12, fontWeight: "bold", marginBottom: 10 }} >Location</Text>
                             <Text style={{ fontSize: 10, marginBottom: 10 }}>Part of Block 3503, Jalan Teknokrat 5 ,Cyberjaya 63000</Text>
-                            <Image style={{ width: "100%", height: 200, marginBottom: 10 }} source={require("../DemoIamge/mapDemo.png")} />
+                            <Image style={{ width: "100%", height: 200, marginBottom: 10 }} source={require("../DemoImage/mapDemo.png")} />
                             <Text style={{ marginLeft: 10, fontSize: 12, fontWeight: "bold", marginBottom: 10 }} >Evidence Photos</Text>
                             <Text></Text>
                             <ScrollView horizontal={true} >
@@ -82,7 +81,7 @@ export default function ReportModal(props) {
                     </View>
                 </View>
 
-                {user.role === roles.admin
+                {props.user.role === roles.admin
 
                     &&
 

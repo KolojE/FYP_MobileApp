@@ -12,7 +12,7 @@ export default function LocationPickerModal(props) {
                     <AntDesign style={{ marginLeft: "auto", marginRight: "5%" }} name="search1" size={24} color="black" />
                 </View>
                 <View style={{ height: "100%", position: "absolute" }}>
-                    <Image source={require("../DemoIamge/mapDemo.png")} style={{ height: "100%" }} />
+                    <Image source={require("../DemoImage/mapDemo.png")} style={{ height: "100%" }} />
                 </View>
                 <TouchableOpacity onPress={() => { props.setOpenLocationPicker(false) }} style={{ backgroundColor: "#050e2d", width: "30%", height: "5%", zIndex: 1, alignItems: "center", justifyContent: "center", borderRadius: 100, marginTop: "auto", marginBottom: "5%" }}>
                     <Text style={{ color: "white", fontWeight: "bold" }}>Confirm</Text>

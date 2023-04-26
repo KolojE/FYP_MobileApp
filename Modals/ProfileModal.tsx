@@ -1,20 +1,38 @@
-import React from "react";
+import React, { useContext } from "react";
 import { View, Text, TouchableOpacity, TextInput } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from "react-native-safe-area-context";
-import { roles, user } from "../utils/user";
-export default function ProfileModal(props) {
+import IUser, { roles } from "../api/Models/User";
+import LoggedInUserContext from "../Contexts/LoggedInUserContext";
 
+
+type Profile =
+    {
+        setProfileModal: Function,
+        user: IUser,
+        editable:boolean,
+
+    }
+export default function ProfileModal({ setProfileModal, user, editable }: Profile) {
+
+    const LoggedInUser = useContext(LoggedInUserContext);
     const [editPassword, setEditPassword] = React.useState(false);
+
+    const onBackButtonPressed = () => {
+        setProfileModal((prev) => {
+            return {
+                ...prev, visible: false
+            }
+        })
+    }
+
     return (
         <SafeAreaView>
 
             <View style={{ height: "100%" }}>
                 <View style={{ height: "30%", width: "100%" }}>
-                    <TouchableOpacity onPress={() => {
-                        props.setProfileModal(false);
-                    }}>
+                    <TouchableOpacity onPress={onBackButtonPressed}>
                         <View style={{ marginTop: "8%", marginLeft: "2%" }}>
                             <Ionicons name="arrow-back" size={24} color="black" />
                         </View>
@@ -29,43 +47,28 @@ export default function ProfileModal(props) {
                         </View>
                     </View>
                     <View style={{ marginTop: "5%", height: "80%", width: "100%", alignItems: "center" }}>
-                        <View style={{ width: "80%", height: "30%" }}>
-                            <Text style={{ width: "100%", fontSize: 10, color: "grey" }}>Organization ID</Text>
-                            <Text style={{ height: "40%", width: "100%", fontSize: 12, color: "grey", borderBottomColor: "grey", borderBottomWidth: 1 }}>OR125232</Text>
-                        </View>
-                        <View style={{ width: "80%", height: "30%" }}>
-                            <Text style={{ width: "100%", fontSize: 10, color: "grey" }}>Organization Name</Text>
-                            <Text style={{ height: "40%", width: "100%", fontSize: 12, color: "grey", borderBottomColor: "grey", borderBottomWidth: 1 }}>MOE</Text>
-                        </View>
-                        <View style={{ width: "80%", height: "30%" }}>
-                            <Text style={{ width: "100%", fontSize: 10, color: "grey" }}>User Name</Text>
-                            <TextInput style={{ height: "40%", width: "100%", fontSize: 12, borderBottomColor: "black", borderBottomWidth: 1 }} value={"Ng Wen Sing"} />
-                        </View>
-                        <View style={{ width: "80%", height: "30%" }}>
-                            <Text style={{ width: "100%", fontSize: 10, color: "grey" }}>Mobile Number</Text>
-                            <TextInput style={{ height: "40%", width: "100%", fontSize: 12, borderBottomColor: "black", borderBottomWidth: 1 }} value={"+601110871337"} />
-                        </View>
-                        <View style={{ width: "80%", height: "30%" }}>
-                            <Text style={{ width: "100%", fontSize: 10, color: "grey" }}>Email</Text>
-                            <TextInput style={{ height: "40%", width: "100%", fontSize: 12, borderBottomColor: "black", borderBottomWidth: 1 }} value={"Wenkimao927@gmail.com"} />
-                        </View>
-                        <View style={{ width: "80%", height: "30%" }}>
-                            <Text style={{ width: "100%", fontSize: 10, color: "grey" }}>Password</Text>
-                            <TextInput onFocus={() => { setEditPassword(true) }} style={{ height: "40%", width: "100%", fontSize: 12, borderBottomColor: "black", borderBottomWidth: 1 }} secureTextEntry={true} value={"Wensing0831."} />
-                        </View>
+                        <Field label={'Organization ID'} value={user.organization.ID} editable={false} />
+                        <Field label={'Organization Name'} value={user.organization.name} editable={false} />
+                        <Field label={'Email'} value={user.email} editable={false} />
+                        <Field label={'User Name'} value={user.name} editable={editable} />
+                        <Field label={'Mobile Number'} value={user.contact?.phoneNo} editable={editable} />
+
                         {
-                            editPassword && <>
-                                < View style={{ width: "80%", height: "30%" }}>
-                                    <Text style={{ width: "100%", fontSize: 10, color: "grey" }}>Confirm Password</Text>
-                                    <TextInput style={{ height: "40%", width: "100%", fontSize: 12, borderBottomColor: "black", borderBottomWidth: 1 }} secureTextEntry={true} value={"Wensing0831."} />
-                                </View>
-                                <TouchableOpacity style={{ marginTop: "5%", backgroundColor: "#239ed9", padding: "3%", borderRadius: 100 }} onPress={() => { setEditPassword(false) }}>
-                                    <Text style={{ fontSize: 14, color: "white", fontWeight: "bold" }}>Save Change</Text>
-                                </TouchableOpacity>
+                            LoggedInUser._id===user._id &&
+                            <>
+                                <Field label={'Change Password'} value={""} editable={true} passwordField={true} />
+                                {
+                                    editPassword && <>
+                                        <Field label={'Confirm Password'} value={""} editable={true} passwordField={true} />
+                                        <TouchableOpacity style={{ marginTop: "5%", backgroundColor: "#239ed9", padding: "3%", borderRadius: 100 }} onPress={() => { setEditPassword(false) }}>
+                                            <Text style={{ fontSize: 14, color: "white", fontWeight: "bold" }}>Save Change</Text>
+                                        </TouchableOpacity>
+                                    </>
+                                }
                             </>
                         }
                         {
-                            user.role === roles.admin &&
+                            LoggedInUser.role === roles.admin &&
                             <View style={{ marginTop: 100, backgroundColor: "#91f2ab", padding: 10, borderRadius: 100 }}>
                                 <TouchableOpacity>
                                     <Text>
@@ -79,4 +82,11 @@ export default function ProfileModal(props) {
             </View >
         </SafeAreaView>
     )
+
+    function Field({ label, value, editable, passwordField = false }) {
+        return <View style={{ width: "80%", height: "30%" }}>
+            <Text style={{ width: "100%", fontSize: 10, color: "grey" }}>{label}</Text>
+            <TextInput editable={editable} onFocus={passwordField ? () => { setEditPassword(true) } : () => { return }} style={{ height: "40%", width: "100%", fontSize: 12, color: "grey", borderBottomColor: "grey", borderBottomWidth: 1 }}>{value}</TextInput>
+        </View>
+    }
 }

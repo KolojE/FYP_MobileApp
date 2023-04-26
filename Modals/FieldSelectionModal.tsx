@@ -1,11 +1,10 @@
 import { Picker } from "@react-native-picker/picker";
 import React from "react";
 import { Text, StyleSheet, TextInput, View, TouchableOpacity, Dimensions } from "react-native";
-import { field, type } from "../utils/formHandler";
-const { height } = Dimensions.get('window');
+import { IField, inputType } from "../api/Models/Form";
 
 export function FieldSelectionModal({ setModal, updateField }) {
-    const [newField, setNewField] = React.useState<field>({ label: "", Type: type.Text });
+    const [newField, setNewField] = React.useState<IField>({ label: "", inputType: inputType.Text,required:true });
 
     return (
         <View style={styles.modalContainer}>
@@ -20,14 +19,14 @@ export function FieldSelectionModal({ setModal, updateField }) {
                 />
                 <Picker
                     style={styles.picker}
-                    selectedValue={newField.Type}
-                    onValueChange={(value: type) =>
-                        setNewField((prev) => ({ ...prev, Type: value }))
+                    selectedValue={newField.inputType}
+                    onValueChange={(value: inputType) =>
+
+                        setNewField((prev) => ({ ...prev, inputType: value }))
                     }
                 >
-                    <Picker.Item label="Text" value={type.Text} />
-                    <Picker.Item label="Date" value={type.Date} />
-                    <Picker.Item label="Checkbox" value={type.Checkbox} />
+                    <Picker.Item label="Text" value={inputType.Text} />
+                    <Picker.Item label="Date" value={inputType.Date} />
                 </Picker>
                 <View style={styles.btnContainer}>
                     <TouchableOpacity

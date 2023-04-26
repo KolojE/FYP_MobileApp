@@ -2,25 +2,24 @@ import { StyleSheet } from "react-native";
 import ReportListScreen from "./ComplainantScreens/ReportListScreen";
 import ReportFormScreen from "./ComplainantScreens/ReportFormScreen";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { roles, user } from "../utils/user";
 import ComplainantMainScreen from "./ComplainantScreens/MainScreen";
 import AdminMainScreen from "./AdminScreens/MainScreen";
 import { FormBuilderScreen } from "./AdminScreens/FormBuilderScreen";
-
+import { roles } from "../api/Models/User";
 
 const Stack = createNativeStackNavigator();
-export default function LandingScreen() {
-
+export default function LandingScreen({LoggedInUser}) {
+ 
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-      {user.role == roles.complainant &&
+      {LoggedInUser.role == roles.complainant &&
         <>
           <Stack.Screen name="dashBoard" component={ComplainantMainScreen} />
           <Stack.Screen name="reportList" component={ReportListScreen} />
           <Stack.Screen name="reportForm" component={ReportFormScreen} />
         </>
       }
-      {user.role == roles.admin &&
+      {LoggedInUser.role == roles.admin &&
         <>
           <Stack.Screen name="dashBoard" component={AdminMainScreen} />
           <Stack.Screen name="reportList" component={ReportListScreen} />
