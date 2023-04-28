@@ -4,19 +4,26 @@ import { TextInput, View, StyleSheet, Text, Modal, BackHandler, TouchableOpacity
 import { SafeAreaView } from "react-native-safe-area-context";
 import { FieldSelectionModal } from "../../Modals/FieldSelectionModal";
 import { FieldRenderer } from "../../utils/formHandler";
-import IForm, { IField } from "../../api/Models/Form";
+import { IField, inputType } from "../../api/Models/Form";
 import { addNewForm, updateForm } from "../../api/admin";
 import { getForm } from "../../api/user";
 
 
-export function FormBuilderScreen(props){
+export function FormBuilderScreen({route,navigation}) {
 
-    const params= props.route.params;
+    const params = route.params;
 
     const [addFieldModal, setAddFieldModal] = useState(false);
-    const [formFieldElement, setFormFieldElements] = useState([]);
+    const [formFieldElements, setFormFieldElements] = useState([]);
     const [fields, setFields] = React.useState<Array<IField>>([]);
     const [formName, setFormName] = useState('');
+
+    const defaultFieldElements = [
+        <FieldRenderer inputType={inputType.Date} label="Date of Occurence" required={false}/>,
+        <FieldRenderer inputType={inputType.Time} label="Time of Occurence" required={false}/>,
+        <FieldRenderer inputType={inputType.Map} label="Location" required={false}/>,
+    ]
+
 
 useEffect(()=>{
 
@@ -48,13 +55,13 @@ useEffect(()=>{
         {
             console.log("form Update")
             updateForm({fields:fields,activation_Status:true,name:formName,_id:params.formID})
-            props.navigation.navigate("dashBoard")
+            navigation.navigate("dashBoard")
             return;
             
         }
 
         addNewForm({fields:fields,activation_Status:false,name:formName})
-            props.navigation.goBack()
+            navigation.goBack()
     }
     
     const onAddFieldButtonClicked = ()=>{
@@ -80,7 +87,14 @@ useEffect(()=>{
                         onChangeText={setFormName}
                     />
                 </View>
-                <View style={styles.formFields}>{formFieldElement}</View>
+                <View>
+                <Text>Default Fields</Text>
+                <View style={styles.formFields}>{defaultFieldElements}</View>
+                </View>
+                <View>
+                <Text>Custom Fields</Text>
+                <View style={styles.formFields}>{formFieldElements}</View>
+                </View>
             </View>
             <Modal transparent={true} visible={addFieldModal}>
                 <FieldSelectionModal setModal={setAddFieldModal} updateField={handleAddField} />

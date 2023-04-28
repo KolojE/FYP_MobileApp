@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import {
   ScrollView,
   StyleSheet,
@@ -10,14 +10,18 @@ import ChatBuble from "../Components/ChatBuble";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { roles } from "../api/Models/User";
-export default function ChatScreen(props) {
+import AuthContext from "../Contexts/LoggedInUserContext";
+export default function ChatScreen({setChatRoomModal}) {
+
+const loggedInUser = useContext(AuthContext).loggedInUser;
+
   return (
     <SafeAreaView style={{ height: "100%" }}>
-      {props.user.role == roles.admin &&
+      {loggedInUser.role == roles.admin &&
         <>
           <View style={{ flexDirection: "row", alignItems: "center", width: "100%", paddingTop: "2%", paddingBottom: "2%", borderBottomWidth: 0.5 }}>
             <TouchableOpacity
-              onPress={() => { props.setChatRoomModal(false) }}           >
+              onPress={() => { setChatRoomModal(false) }}           >
               <Ionicons style={{ marginLeft: "5%" }} name="arrow-back" size={30} />
             </TouchableOpacity>
             <Text style={{ marginLeft: "5%", fontSize: 16, fontWeight: "bold" }}>Ali</Text>

@@ -1,12 +1,24 @@
-import react from "react";
+import { useContext } from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { Entypo, Ionicons } from "@expo/vector-icons";
+import { Entypo} from "@expo/vector-icons";
 import HomeScreen from "./HomeScreen";
 import AddReportScreen from "./AddReportScreen";
 import ChatScreen from "../ChatScreen";
+import { TouchableOpacity } from "react-native";
+import AuthContext from "../../Contexts/LoggedInUserContext";
+import { deleteItemAsync } from "expo-secure-store";
+import LoginScreen from "../LoginScreen";
+
 const Tab = createBottomTabNavigator();
 
+
 export default function MainScreen() {
+
+    const setLoggedInUser = useContext(AuthContext).setLoggedInUser
+    const onLogoutButtonPressed = () => {
+        deleteItemAsync("jwt");
+        setLoggedInUser(false)
+    }
     return (
         <Tab.Navigator
             screenOptions={{
@@ -39,6 +51,13 @@ export default function MainScreen() {
                     tabBarIcon: ({ }) => {
                         return <Entypo name="chat" size={22} />;
                     },
+                }}
+            />
+            <Tab.Screen
+                name="Logout"
+                component={LoginScreen}
+                options={{
+                    tabBarIcon:()=> {return <TouchableOpacity style={{flex:1,alignItems:"center",justifyContent:"center"}} onPress={()=>onLogoutButtonPressed()}><Entypo name="log-out" size={22}/></TouchableOpacity>},
                 }}
             />
         </Tab.Navigator>

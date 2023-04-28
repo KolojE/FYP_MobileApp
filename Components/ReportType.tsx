@@ -1,9 +1,17 @@
 import React from "react";
 import { View, Text, TouchableOpacity } from "react-native";
-export default function ReportType(props) {
+
+type ReportTypeProps = {
+navigation:Function,
+label:string,
+color:string,
+image:string,
+
+}
+export default function ReportType({navigation,label,color,image,formID}) {
   return (
     <View style={{ width: 150 }}>
-      <TouchableOpacity style={{ width: 120 }} onPress={() => { props.navigation.navigate("reportForm") }}>
+      <TouchableOpacity style={{ width: 120 }} onPress={() => { navigation.navigate("reportForm",{formID}) }}>
         <View
           style={{
             margin: 10,
@@ -15,7 +23,7 @@ export default function ReportType(props) {
         >
           <View
             style={{
-              backgroundColor: props.color,
+              backgroundColor: color,
               borderRadius: 20,
               justifyContent: "center",
               alignItems: "center",
@@ -23,10 +31,10 @@ export default function ReportType(props) {
               height: 120,
             }}
           >
-            {props.image}
+            {image}
           </View>
           <Text style={{ fontWeight: "700", marginTop: 10 }}>
-            {props.label}
+            {label}
           </Text>
         </View>
       </TouchableOpacity>

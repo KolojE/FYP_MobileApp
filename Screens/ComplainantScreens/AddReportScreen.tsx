@@ -1,11 +1,33 @@
 import { ScrollView, View, Text, StyleSheet } from "react-native";
 import ReportType from "../../Components/ReportType";
-import { FontAwesome } from "@expo/vector-icons";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { MaterialIcons } from '@expo/vector-icons';
 import { SafeAreaView } from "react-native-safe-area-context";
 import Title from "../../Components/Title";
-export default function AddReportScreen(props) {
+import React from "react";
+import { getForms } from "../../api/user";
+import IForm from "../../api/Models/Form";
+
+export default function AddReportScreen({ navigation }) {
+
+  const [reportForms, setReportForms] = React.useState<IForm[]>([]);
+  const [reprotFormElements, setReportFormElements] = React.useState<JSX.Element[]>([])
+  React.useEffect(() => {
+    getForms().then(forms => {
+      setReportForms(forms)
+    }
+    )
+  }, [])
+
+  React.useEffect(() => {
+    setReportFormElements((prev) => {
+      return reportForms.map((reportForm, index) => {
+        console.log("ID : " + reportForm._id)
+        return <ReportType color={"blue"} label={reportForm.name} formID={reportForm._id} image={null} navigation={navigation} key={index} />
+      })
+    })
+  }, [reportForms])
+
+  
+
   return (
     <SafeAreaView>
       <ScrollView contentContainerStyle={styles.window} >
@@ -16,59 +38,9 @@ export default function AddReportScreen(props) {
             flexDirection: "row",
             flexWrap: "wrap",
           }}
-        >
-          <ReportType
-            image={<FontAwesome name="fire" size={50} color="black" />}
-            label={"Wild Fire"}
-            color={"red"}
-            navigation={props.navigation}
-          />
-          <ReportType
-            image={<FontAwesome name="road" size={50} color="black" />}
-            label={"Road Crack"}
-            color={"orange"}
-          />
-          <ReportType
-            image={
-              <MaterialCommunityIcons name="waterfall" size={50} color="black" />
-            }
-            label={"Flood"}
-            color={"blue"}
-          />
-          <ReportType
-            image={<FontAwesome name="fire" size={50} color="black" />}
-            label={"Wild Fire"}
-            color={"red"}
-          />
-          <ReportType
-            image={<FontAwesome name="road" size={50} color="black" />}
-            label={"Road Crack"}
-            color={"orange"}
-          />
-          <ReportType
-            image={
-              <MaterialCommunityIcons name="waterfall" size={50} color="black" />
-            }
-            label={"Floord"}
-            color={"blue"}
-          />
-          <ReportType
-            image={<FontAwesome name="fire" size={50} color="black" />}
-            label={"Wild Fire"}
-            color={"red"}
-          />
-          <ReportType
-            image={<FontAwesome name="road" size={50} color="black" />}
-            label={"Road Crack"}
-            color={"orange"}
-          />
-          <ReportType
-            image={
-              <MaterialIcons name="drafts" size={50} color="black" />
-            }
-            label={"Drafts"}
-            color={"blue"}
-          />
+        >{
+            reprotFormElements
+          }
         </View>
       </ScrollView>
     </SafeAreaView>

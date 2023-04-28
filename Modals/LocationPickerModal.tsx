@@ -2,7 +2,7 @@ import React from "react";
 import { View, TextInput, Image, Text, TouchableOpacity } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 
-export default function LocationPickerModal(props) {
+export default function LocationPickerModal({setOpenLocationPicker}) {
     return (
         <View style={{ height: "100%" }}>
             <View style={{ height: "100%", width: "100%", alignItems: "center" }}>
@@ -14,7 +14,7 @@ export default function LocationPickerModal(props) {
                 <View style={{ height: "100%", position: "absolute" }}>
                     <Image source={require("../DemoImage/mapDemo.png")} style={{ height: "100%" }} />
                 </View>
-                <TouchableOpacity onPress={() => { props.setOpenLocationPicker(false) }} style={{ backgroundColor: "#050e2d", width: "30%", height: "5%", zIndex: 1, alignItems: "center", justifyContent: "center", borderRadius: 100, marginTop: "auto", marginBottom: "5%" }}>
+                <TouchableOpacity onPress={() => { setOpenLocationPicker(false) }} style={{ backgroundColor: "#050e2d", width: "30%", height: "5%", zIndex: 1, alignItems: "center", justifyContent: "center", borderRadius: 100, marginTop: "auto", marginBottom: "5%" }}>
                     <Text style={{ color: "white", fontWeight: "bold" }}>Confirm</Text>
                 </TouchableOpacity>
             </View>

@@ -1,10 +1,10 @@
 import { View, StyleSheet, Image, Text, TextInput, TouchableOpacity, Alert, Dimensions } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useState } from "react"
-import { authenticate } from "../api/authentication";
 
 
 export default function LoginScreen({ navigation, onLogin }) {
+
     const [loginForm, setLoginForm] = useState({ identifier: "", password: "" });
 
     const handleEmailUsernameChange = (newIdentifier) => {
@@ -19,7 +19,13 @@ export default function LoginScreen({ navigation, onLogin }) {
         })
     };
 
-    const onLoginButtonPressed = ()=>{onLogin(loginForm)}
+    const onLoginButtonPressed = async ()=>{
+
+    !await onLogin(loginForm)&&
+    alert("Password / Email incorrect ! Please try again!");
+
+
+}
 
 
     return (

@@ -1,22 +1,25 @@
 import React, { useContext } from "react";
-import { View, Text, TouchableOpacity, TextInput } from "react-native";
+import { View, Text, TouchableOpacity, TextInput, StyleSheet, StyleSheetProperties } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from "react-native-safe-area-context";
 import IUser, { roles } from "../api/Models/User";
-import LoggedInUserContext from "../Contexts/LoggedInUserContext";
+import AuthContext from "../Contexts/LoggedInUserContext";
+import { activateMember, deleteDeactivatedMember } from "../api/admin";
+import IComplainant from "../api/Models/Complainant";
 
 
 type Profile =
     {
+        reRenderCallback?: Function,
         setProfileModal: Function,
-        user: IUser,
-        editable:boolean,
+        user: IComplainant | IUser,
+        editable: boolean,
 
     }
-export default function ProfileModal({ setProfileModal, user, editable }: Profile) {
+export default function ProfileModal({ reRenderCallback, setProfileModal, user, editable }: Profile) {
 
-    const LoggedInUser = useContext(LoggedInUserContext);
+    const LoggedInUser = useContext(AuthContext).loggedInUser;
     const [editPassword, setEditPassword] = React.useState(false);
 
     const onBackButtonPressed = () => {
@@ -26,7 +29,29 @@ export default function ProfileModal({ setProfileModal, user, editable }: Profil
             }
         })
     }
+    const onActivationButtonPress = () => {
+        activateMember(user._id,!activation)
+        setProfileModal((prev) => {
+            reRenderCallback();
+            return {
+                ...prev, visible: false
+            }
+        })
+    }
+    const onRemoveButtonPress = () => {
+        deleteDeactivatedMember(user._id)
+        setProfileModal((prev) => {
+            reRenderCallback();
+            return {
+                ...prev, visible: false
+            }
+        })
+    }
 
+    const activation ="activation" in user && user.activation
+    
+
+    const activationButtonStyle =  activation? { backgroundColor: "#ff3d3d" } : { backgroundColor: "#91f2ab" }
     return (
         <SafeAreaView>
 
@@ -54,7 +79,7 @@ export default function ProfileModal({ setProfileModal, user, editable }: Profil
                         <Field label={'Mobile Number'} value={user.contact?.phoneNo} editable={editable} />
 
                         {
-                            LoggedInUser._id===user._id &&
+                            LoggedInUser._id === user._id &&
                             <>
                                 <Field label={'Change Password'} value={""} editable={true} passwordField={true} />
                                 {
@@ -69,12 +94,25 @@ export default function ProfileModal({ setProfileModal, user, editable }: Profil
                         }
                         {
                             LoggedInUser.role === roles.admin &&
-                            <View style={{ marginTop: 100, backgroundColor: "#91f2ab", padding: 10, borderRadius: 100 }}>
-                                <TouchableOpacity>
-                                    <Text>
-                                        Activate
-                                    </Text>
-                                </TouchableOpacity>
+                            <View style={{ flexDirection: "row" }}>
+                                <View style={{ marginTop: 100, margin: 20, padding: 10, borderRadius: 100, ...activationButtonStyle }}>
+                                    <TouchableOpacity onPress={onActivationButtonPress}>
+                                        <Text>
+                                            {activation? "Deactivate" : "Activate"}
+                                        </Text>
+                                    </TouchableOpacity>
+                                </View>
+
+                                {
+                                    !activation &&
+                                    <View style={{ marginTop: 100, margin: 20, padding: 10, borderRadius: 100, backgroundColor: "#ff3d3d" }}>
+                                        <TouchableOpacity onPress={onRemoveButtonPress}>
+                                            <Text>
+                                                Remove
+                                            </Text>
+                                        </TouchableOpacity>
+                                    </View>
+                                }
                             </View>
                         }
                     </View>

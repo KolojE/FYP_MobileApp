@@ -6,20 +6,26 @@ import ComplainantMainScreen from "./ComplainantScreens/MainScreen";
 import AdminMainScreen from "./AdminScreens/MainScreen";
 import { FormBuilderScreen } from "./AdminScreens/FormBuilderScreen";
 import { roles } from "../api/Models/User";
+import React, { useContext } from "react";
+import AuthContext from "../Contexts/LoggedInUserContext";
+import { useNavigation } from "@react-navigation/native";
 
 const Stack = createNativeStackNavigator();
-export default function LandingScreen({LoggedInUser}) {
- 
+export default function LandingScreen({route}) {
+const navigation = useNavigation()
+
+ const auth= useContext(AuthContext)
+console.log(auth)
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-      {LoggedInUser.role == roles.complainant &&
+      {auth.loggedInUser.role == roles.complainant &&
         <>
           <Stack.Screen name="dashBoard" component={ComplainantMainScreen} />
           <Stack.Screen name="reportList" component={ReportListScreen} />
           <Stack.Screen name="reportForm" component={ReportFormScreen} />
         </>
       }
-      {LoggedInUser.role == roles.admin &&
+      {auth.loggedInUser.role == roles.admin &&
         <>
           <Stack.Screen name="dashBoard" component={AdminMainScreen} />
           <Stack.Screen name="reportList" component={ReportListScreen} />

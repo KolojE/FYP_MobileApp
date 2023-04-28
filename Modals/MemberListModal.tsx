@@ -6,6 +6,7 @@ import Member from "../Components/Member";
 import ProfileModal from "./ProfileModal";
 import { viewMembers } from "../api/admin";
 import IComplainant from "../api/Models/Complainant";
+import { FieldRenderer } from "../utils/formHandler";
 
 
 export default function MemeberListModal(props) {
@@ -18,28 +19,12 @@ export default function MemeberListModal(props) {
     const [deactivatedMemberElements, setDeactivatedMemberElements] = React.useState<Array<JSX.Element>>([]);
     const [profileModal, setProfileModal] = React.useState({
         visible: false,
-        modal: <ProfileModal editable={false} setProfileModal={undefined} user={undefined} />
+        modal: <ProfileModal reRenderCallback={Renderer} editable={false} setProfileModal={undefined} user={undefined} />
     });
     React.useEffect(() => {
-        const activatedMembers_: Array<IComplainant> = []
-        const deactivatedMembers_: Array<IComplainant> = []
-
-        viewMembers().then((members) => {
-            members.forEach((member) => {
-                if (member.activation) {
-                    activatedMembers_.push(member);
-                }
-                else {
-                    deactivatedMembers_.push(member);
-                }
-            })
-            setMembers(members);
-            setActivatedMembers(activatedMembers_);
-            setDeactivatedMembers(deactivatedMembers_);
-        }, (rej) => {
-            console.log(rej)
-        })
+        Renderer()
     }, [])
+
 
     React.useEffect(() => {
 
@@ -68,8 +53,31 @@ export default function MemeberListModal(props) {
             return {
                 ...prev,
                 visible: true,
-                modal: <ProfileModal editable={false} setProfileModal={setProfileModal} user={member} />
+                modal: <ProfileModal
+                    editable={false} reRenderCallback={Renderer} setProfileModal={setProfileModal} user={member} />
             }
+        })
+    }
+
+    function Renderer() {
+
+        const activatedMembers_: Array<IComplainant> = []
+        const deactivatedMembers_: Array<IComplainant> = []
+
+        viewMembers().then((members) => {
+            members.forEach((member) => {
+                if (member.activation) {
+                    activatedMembers_.push(member);
+                }
+                else {
+                    deactivatedMembers_.push(member);
+                }
+            })
+            setMembers(members);
+            setActivatedMembers(activatedMembers_);
+            setDeactivatedMembers(deactivatedMembers_);
+        }, (rej) => {
+            console.log(rej)
         })
     }
 
@@ -80,8 +88,13 @@ export default function MemeberListModal(props) {
                 <IconTextInput icon={<Entypo name="magnifying-glass" style={{ marginRight: 10 }} />} placeholder="Search" style={styles.searchBox} editable={true} />
             </View>
             <ScrollView style={{ width: "100%" }} contentContainerStyle={{ width: "100%", alignItems: 'center' }}>
-                <Text style={{ color: "grey", marginVertical: "5%" }}>Deactivated Members</Text>
-                {deactivatedMemberElements}
+                {
+                    deactivatedMembers.length > 0 &&
+                    <>
+                        <Text style={{ color: "grey", marginVertical: "5%" }}>Deactivated Members</Text>
+                        {deactivatedMemberElements}
+                    </>
+                }
                 <Text style={{ color: "grey", marginVertical: "5%" }}>Activated Members</Text>
                 {activatedMemberElements}
             </ScrollView>

@@ -10,7 +10,6 @@ export default function ChatRoomList() {
     return (
         <SafeAreaView>
             <ScrollView>
-
                 <Title title={"Chat Rooms"} />
                 <View style={{ marginTop: "3%" }}>
                     <ChatRoom setChatRoomModal={setChatRoomModal} name={"Alex"} lastMessage={"It is already resolved."} time={"6:03 pm"} />

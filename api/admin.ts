@@ -69,7 +69,7 @@ export async function viewMembers(): Promise<Array<IComplainant>> {
             members.push({
                 ...member,
                 ...user,
-                compID:member.ID
+                compID: member.ID
             })
         })
         console.log(res.data.members)
@@ -79,4 +79,31 @@ export async function viewMembers(): Promise<Array<IComplainant>> {
     }
 }
 
-export async function activateMember()
+export async function activateMember(id: string, activationStatus: boolean) {
+    console.log(id)
+    try {
+        const res = await axios.post(`${api_url}/admin/memberActivation`, {
+            id: id,
+            activation: activationStatus,
+        });
+
+        console.log(res.data);
+    }
+    catch (err) {
+        errorHandler(err);
+    }
+
+}
+
+export async function deleteDeactivatedMember(id: string) {
+    try {
+        const res=await axios.delete(`${api_url}/admin/deleteMember`,{
+            params:{
+                _id:id
+            }
+        })
+    }
+    catch (err) {
+        errorHandler(err)
+    }
+}

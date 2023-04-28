@@ -32,6 +32,6 @@ if(err instanceof AxiosError)
     console.error(axiosError_.toString());
 }
 else{
-    new Error(err);
+    console.error(JSON.stringify(err,null,2))
 }
 }

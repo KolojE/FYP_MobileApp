@@ -1,12 +1,15 @@
 import RNDateTimePicker from "@react-native-community/datetimepicker";
 import React from "react";
-import { Text, TextInput, TouchableOpacity, StyleSheet, View } from "react-native";
-import CheckBox from "@react-native-community/checkbox";
+import { Text, TextInput, TouchableOpacity, StyleSheet, View, Modal, ScrollView } from "react-native";
 import { IField,inputType } from "../api/Models/Form";
-
+import LocationPickerModal from "../Modals/LocationPickerModal";
+import * as ImagePicker from "expo-image-picker";
+import EvidencePhoto from "../Components/EvidencePhoto";
+import { AntDesign } from "@expo/vector-icons";
 
 export function FieldRenderer(field: IField) {
     const [datePicker, setDatePicker] = React.useState<boolean>(false);
+    const [locationPicker,setLocationPicker] = React.useState<boolean>(false);
     const [date, setDate] = React.useState<Date>(new Date());
 
     const onDateChange = (event: Event, date: Date) => {
@@ -85,6 +88,41 @@ export function FieldRenderer(field: IField) {
                     )}
                 </View>
             );
+            case inputType.Map:
+            return(
+                <View style={styles.container}>
+                    <Text style={styles.label}>{field.label}</Text>
+                    <TouchableOpacity onPress={() => setLocationPicker(true)}>
+                        <View style={styles.inputContainer}>
+                            <TextInput
+                                style={styles.input}
+                                editable={false}
+                                value={""}
+                            />
+                        </View>
+                    </TouchableOpacity>
+                    {locationPicker&& (
+                        <Modal animationType="slide">
+                        <LocationPickerModal setOpenLocationPicker={setLocationPicker} />
+                        </Modal>
+                    )}
+                </View>
+            )
+            case inputType.Photo:
+                return (
+     <View style={{ marginBottom: "5%" }}>
+                        <Text style={{ width: "100%", fontSize: 10, color: "grey" }}>Photos 4/10</Text>
+                        <ScrollView horizontal={true} style={{ marginTop: "3%" }} contentContainerStyle={{ alignItems: "center" }}>
+                            <TouchableOpacity onPress={async () => {
+                                const result = await ImagePicker.launchCameraAsync({
+                                })
+                            }}
+                            >
+                                <AntDesign name="plussquareo" size={50} color="black" style={{ height: 100, width: 100, textAlign: "center", textAlignVertical: "center" }} />
+                            </TouchableOpacity>
+                        </ScrollView>
+                    </View>
+                )
 
     }
 }
