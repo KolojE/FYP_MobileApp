@@ -12,9 +12,12 @@ import Title from "../../Components/Title"
 import ProfileModal from "../../Modals/ProfileModal";
 import { SafeAreaView } from "react-native-safe-area-context";
 import RecentReportList from "../../Components/RecenReportList";
-import  IUser from "../../api/Models/User";
+import IUser from "../../api/Models/User";
 import { getLoggedInUserInfo } from "../../api/user";
 import IOrganization from "../../api/Models/Organization";
+import { IReport } from "../../api/Models/Report";
+import errorHandler from "../../api/errorHandler/axiosError";
+import { getReport } from "../../api/complainant";
 
 const LatestUpdated = {
   report_id: "R011024",
@@ -24,22 +27,31 @@ const LatestUpdated = {
   report_update_details: "The status changed to resolved ",
 };
 
-export default function HomeScreen(props) {
+export default function HomeScreen({navigation}) {
 
   const [profileModal, setProfileModal] = React.useState(false);
   const [loggedInUser, setLoggedInUser] = React.useState<IUser>();
   const [organization, setOrganization] = React.useState<IOrganization>();
+  const [reports, setReports] = React.useState<IReport[]>([]);
+
 
   useEffect(() => {
     getLoggedInUserInfo().then((res) => {
-      console.log(res)
       setLoggedInUser(res.loggedInUser);
       setOrganization(res.organization);
     }, (rej) => {
-      console.log("something went wrong" + rej)
+      errorHandler(rej)
     })
-  }, [])
 
+    const unsubscribe = navigation.addListener('focus', () => {
+       getReport({sortBy:"upDate",limit:5}).then((res) => {
+      setReports(res)
+    }, (rej) => {
+      errorHandler(rej);
+    })
+    });
+  
+  }, [])
 
 
   return organization && loggedInUser ? (
@@ -68,13 +80,16 @@ export default function HomeScreen(props) {
               <Text style={{ fontSize: 10 }}>Organization: {organization.name}</Text>
             </View>
             <View style={{ flex: 2, paddingRight: "3%" }}>
-              <Text style={{ fontSize: 10 }}>Total Reports : 21</Text>
+              <Text style={{ fontSize: 10 }}>Total Reports : {reports?.length}</Text>
               <Text style={{ fontSize: 10 }}>Report Resolved: 10</Text>
             </View>
           </View>
         </View>
         <LatestUpdatedComponent />
-        <RecentReportList navigation={props.navigation} />
+        {
+          reports &&
+          <RecentReportList navigation={navigation} reports={reports} />
+        }
         <Modal statusBarTranslucent={true} visible={profileModal} animationType={"slide"}>
           <ProfileModal user={loggedInUser} setProfileModal={setProfileModal} editable={false} />
         </Modal>

@@ -1,26 +1,36 @@
 import React from "react";
-import { View, Text, ScrollView, Alert } from "react-native";
+import { View, Text, ScrollView, Alert, StyleSheet, TouchableOpacity } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { IField } from "../../api/Models/Form";
 import { FieldRenderer } from "../../utils/formHandler";
 import { getForm } from "../../api/user";
+import { submitReport } from "../../api/complainant";
 
 export default function ReportFormScreen({ route, navigation }) {
 
-    const [defaultfieldElements, setDefaultFieldElements] = React.useState<JSX.Element[]>([]);
-    const [formFieldElements, setFormFieldElements] = React.useState([]);
 
-    const [defaultfields, setDefaultFields] = React.useState<IField[]>([]);
+    const [defaultFields, setDefaultFields] = React.useState<IField[]>([]);
     const [fields, setFields] = React.useState<IField[]>([]);
     const [formName, setFormName] = React.useState("");
 
+    const [report, setReport] = React.useState({});
+
     const params = route.params;
-    let submitted = false;
+    const [submitted, setSubmitted] = React.useState(false);
+
+    console.log(report)
+
+
+    React.useEffect(() => {
+        if (submitted) {
+            navigation.goBack();
+        }
+    }, [submitted])
 
     React.useEffect(
-        () =>
-            navigation.addListener('beforeRemove', (e) => {
+        () => {
+            const unsubcribe = navigation.addListener('beforeRemove', (e) => {
                 // Prevent default behavior of leaving the screen
                 e.preventDefault();
                 if (submitted) { navigation.dispatch(e.data.action); return }
@@ -39,8 +49,15 @@ export default function ReportFormScreen({ route, navigation }) {
                         },
                     ]
                 );
-            }),
-        [navigation]
+
+
+            }
+
+            )
+
+            return unsubcribe
+        },
+        [navigation, submitted]
     );
 
     React.useEffect(() => {
@@ -56,33 +73,106 @@ export default function ReportFormScreen({ route, navigation }) {
 
     }, [])
 
-    React.useEffect(() => {
+    const defaultFieldElements = React.useMemo(
+        () =>
+            defaultFields.map((field, index) => {
+                setReport((prev) => { return { ...prev, [field._id]: "" } })
+                return <FieldRenderer _id={field._id} key={index} inputType={field.inputType} label={field.label} required setReport={setReport} />
+            }),
+        [defaultFields]
+    );
 
-        const formFieldElements = fields.map((field, index) => (
-            <FieldRenderer key={index} inputType={field.inputType} label={field.label} required={true} />
-        ));
+    const formFieldElements = React.useMemo(
+        () =>
+            fields.map((field, index) => {
+                setReport((prev) => { return { ...prev, [field._id]: "" } })
+                return <FieldRenderer _id={field._id} key={index} inputType={field.inputType} label={field.label} required setReport={setReport} />
+            }),
+        [fields]
+    );
 
-        const formDefaultFieldElement = defaultfields.map((field, index) => (
-            <FieldRenderer key={index} inputType={field.inputType} label={field.label} required={true} />
-        ))
-        setFormFieldElements(formFieldElements);
-        setDefaultFieldElements(formDefaultFieldElement);
-    }, [fields]);
+    const onSubmitButtonPressed = () => {
+        console.log("Submi button pressed")
+        submitReport({ formID: params.formID, report: report })
+        setSubmitted(true)
+    }
 
     return (
-        <SafeAreaView>
-            <ScrollView contentContainerStyle={{ alignItems: "center", width: "100%" }}>
-                <View style={{ backgroundColor: "#162147", width: "100%", alignItems: "center", paddingTop: "5%", borderBottomStartRadius: 20, borderBottomEndRadius: 20 }}><Text style={{ fontWeight: "bold", color: "white", marginBottom: "5%" }}>Report Wild Fire</Text></View>
-                <View style={{ marginTop: "5%", marginBottom: "10%" }}><FontAwesome name="fire" size={50} color="black" /></View>
-                <Text>{formName}</Text>
-                <View style={{ width: "90%", marginBottom: "3%" }}>
-                    {defaultfieldElements}
-                    <Text>Details</Text>
+
+        <SafeAreaView style={styles.container}>
+            <ScrollView contentContainerStyle={styles.scrollView}>
+                <View style={styles.titleContainer}>
+                    <Text style={styles.title}>Report {formName}</Text>
+                </View>
+                <View style={styles.IconContainer}>
+                    <FontAwesome name="fire" size={50} color="black" />
+                </View>
+                <View style={styles.formContainer}>
+                    {defaultFieldElements}
+                    <Text style={styles.detailsText}>Details</Text>
                     {formFieldElements}
                 </View>
-            </ScrollView >
+                <TouchableOpacity style={styles.submitButton} onPress={() => { onSubmitButtonPressed() }}>
+                    <Text style={{ color: "white" }}>Submit</Text>
+                </TouchableOpacity>
+            </ScrollView>
         </SafeAreaView>
     )
 }
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+    },
+    scrollView: {
+        flexGrow: 1,
+        width: "100%",
+        alignItems: "center",
+        paddingTop: "5%",
+        borderBottomStartRadius: 20,
+        borderBottomEndRadius: 20
+    },
+    title: {
+        fontWeight: "bold",
+        color: "white",
+    },
+    titleContainer: {
+        backgroundColor: "#162147",
+        width: "100%",
+        height: "5%",
+        alignItems: "center",
+        justifyContent: "center",
+        borderBottomEndRadius: 10,
+        borderBottomStartRadius: 10
+    },
+    IconContainer: {
+        marginTop: "5%",
+        marginBottom: "10%"
+    },
+    formContainer: {
+        width: "90%",
+        marginBottom: "3%"
+    },
+    detailsText: {
+        marginBottom: 10
+    }, fieldLabel: {
+        flex: 1,
+        fontWeight: "bold",
+    },
+    fieldValue: {
+        flex: 1,
+        textAlign: "right",
+    }, fieldContainer: {
+        flexDirection: "row",
+        marginVertical: 5,
+    },
+    submitButton: {
+        backgroundColor: "blue",
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+        marginTop: "10%",
+        borderRadius: 20,
+    }
+});
+
 
 

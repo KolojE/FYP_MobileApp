@@ -18,7 +18,7 @@ export class axiosError extends Error {
 
     toString()
     {
-        const error =`\naxios message: ${this.message}\nstatus: ${this.status} \nresponse error: ${this.response?JSON.stringify(this.response.data):" No responses "}`
+        const error =`\naxios message: ${this.message}\nstatus: ${this.status} \nresponse error: ${this.response?JSON.stringify(this.response.data,null,2):" No responses "}`
         return error        
     }
 }

@@ -10,10 +10,71 @@ import { Modal } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ReportListContainer from "../../Components/ReportListContainer";
 import ReportScreen from "../../Modals/ReportModal";
+import { IReport } from "../../api/Models/Report";
+import { getReport } from "../../api/complainant";
 
-export default function ReportListScreen(props) {
+type ReportListScreenProps = {
+  reports: IReport[];
+  navigation: any;
+}
 
-  const [ReportModal, SetReportModal] = React.useState(false);
+export default function ReportListScreen({ navigation }: ReportListScreenProps) {
+
+  const [ReportModal, setReportModal] = React.useState(false);
+  const [reports, setReports] = React.useState<IReport[]>([]);
+  const [reportListContainerElements, setReportListContainerElements] = React.useState<JSX.Element>();
+
+
+  React.useEffect(() => {
+    getReport({ sortBy: "subDate", limit: 20 }).then(
+      (res) => {
+        setReports(res);
+      }
+    )
+  }, [])
+
+
+  React.useEffect(() => {
+    setReportListContainerElements((prev) => {
+      return <ReportListContainer reports={reports} setReportModal={setReportModal} />
+    })
+  }, [reports])
+
+
+  console.log(reportListContainerElements)
+  const getReportToDate = () => {
+    getReport((
+      {
+        dateRange: {
+          subToDate: new Date(reports[reports.length - 1].submissionDate)
+        }
+        , limit: 10,
+        sortBy: "subDate"
+      })).then((reports) => {
+
+        setReports((prev) => {
+          return reports.concat(prev).filter((report, index, self) => {
+            index === self.findIndex((t) => t._id === report._id)
+          })
+        })
+
+      })
+  }
+
+
+
+  const isCloseToBottom = ({ layoutMeasurement, contentOffset, contentSize }) => {
+    const paddingToBottom = 20;
+    return layoutMeasurement.height + contentOffset.y >=
+      contentSize.height - paddingToBottom;
+  };
+
+  const onScroll = ({ nativeEvent }) => {
+    if (isCloseToBottom(nativeEvent)) {
+      getReportToDate()
+    }
+  }
+
   return (
     <SafeAreaView>
 
@@ -34,7 +95,7 @@ export default function ReportListScreen(props) {
           <TouchableOpacity
             style={{ marginLeft: "5%" }}
             onPress={() => {
-              props.navigation.goBack();
+              navigation.goBack();
             }}
           >
             <AntDesign name="back" size={18} color="white" />
@@ -46,19 +107,16 @@ export default function ReportListScreen(props) {
             <Ionicons name="filter" size={18} color="white" />
           </TouchableOpacity>
         </View>
-        <ScrollView contentContainerStyle={{ alignItems: "center" }}>
+        <ScrollView contentContainerStyle={{ alignItems: "center" }} onScroll={onScroll}>
           <View style={{ width: "95%" }}>
-            <ReportListContainer SetReportModal={SetReportModal} />
-            <ReportListContainer SetReportModal={SetReportModal} />
-            <ReportListContainer SetReportModal={SetReportModal} />
-            <ReportListContainer SetReportModal={SetReportModal} />
+            {reportListContainerElements}
           </View>
         </ScrollView>
         <Modal statusBarTranslucent={true} visible={ReportModal}
           animationType="slide"
         >
           <ReportScreen
-            SetReportModal={SetReportModal}
+            SetReportModal={setReportModal}
           />
         </Modal>
       </View>

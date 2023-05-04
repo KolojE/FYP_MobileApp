@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
-import { View, Text, StyleSheet, ScrollView, Modal } from "react-native";
+import { View, StyleSheet, ScrollView} from "react-native";
 import {
-    AntDesign, Entypo, FontAwesome, MaterialCommunityIcons
+    AntDesign, Entypo 
 } from "@expo/vector-icons";
 import IconTextInput from "../Components/IconTextInput";
 import IForm from "../api/Models/Form";

@@ -1,6 +1,15 @@
 import React from "react";
 import { View, Text, TouchableOpacity } from "react-native";
-export default function RecentReport() {
+import { IReport } from "../api/Models/Report";
+
+
+type RecenReportProps = {
+  report:IReport;
+
+}
+
+export default function RecentReport({report}:RecenReportProps) {
+
   return (
     <TouchableOpacity
       style={{
@@ -13,13 +22,13 @@ export default function RecentReport() {
     >
       <View style={{ flexDirection: "row" }}>
         <View style={{ justifyContent: "center", flex: 1 }}>
-          <Text style={{ fontSize: 12, color: "#00000" }}>#R0152141</Text>
+          <Text style={{ fontSize: 12, color: "#00000" }}>{report._id}</Text>
           <Text style={{ fontSize: 8, color: "#828282" }}>
-            10 jan 2022 21:32
+            {report.updateDate.toLocaleString()}
           </Text>
         </View>
         <View style={{ flex: 2, height: "100%", justifyContent: "center" }}>
-          <Text>Flood</Text>
+          <Text>{report.name}</Text>
         </View>
         <View
           style={{

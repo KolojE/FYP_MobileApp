@@ -23,7 +23,6 @@ export default function HomeScreen(props) {
                         <VictoryLegend width={300} itemsPerRow={3} title={"Report Type"} height={100} data={[{ name: "flood" }, { name: "fire wild" }, { name: "road crack" }]} gutter={20} colorScale={["navy", "tomato", "grey"]} orientation={"horizontal"} />
                     </View>
                 </View>
-                <RecentReportList navigation={props.navigation} />
             </ScrollView>
         </SafeAreaView >
     )

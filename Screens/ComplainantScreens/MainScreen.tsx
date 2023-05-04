@@ -57,7 +57,7 @@ export default function MainScreen() {
                 name="Logout"
                 component={LoginScreen}
                 options={{
-                    tabBarIcon:()=> {return <TouchableOpacity style={{flex:1,alignItems:"center",justifyContent:"center"}} onPress={()=>onLogoutButtonPressed()}><Entypo name="log-out" size={22}/></TouchableOpacity>},
+                    tabBarButton:()=> {return <TouchableOpacity style={{flex:1,alignItems:"center",justifyContent:"center", height:"100%"}} onPress={()=>onLogoutButtonPressed()}><Entypo name="log-out" size={22}/></TouchableOpacity>},
                 }}
             />
         </Tab.Navigator>

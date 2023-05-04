@@ -1,5 +1,5 @@
 import { AntDesign } from "@expo/vector-icons";
-import React, { useEffect, useReducer, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { TextInput, View, StyleSheet, Text, Modal, BackHandler, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { FieldSelectionModal } from "../../Modals/FieldSelectionModal";
@@ -9,7 +9,7 @@ import { addNewForm, updateForm } from "../../api/admin";
 import { getForm } from "../../api/user";
 
 
-export function FormBuilderScreen({route,navigation}) {
+export function FormBuilderScreen({ route, navigation }) {
 
     const params = route.params;
 
@@ -19,24 +19,23 @@ export function FormBuilderScreen({route,navigation}) {
     const [formName, setFormName] = useState('');
 
     const defaultFieldElements = [
-        <FieldRenderer inputType={inputType.Date} label="Date of Occurence" required={false}/>,
-        <FieldRenderer inputType={inputType.Time} label="Time of Occurence" required={false}/>,
-        <FieldRenderer inputType={inputType.Map} label="Location" required={false}/>,
+        <FieldRenderer inputType={inputType.Date} label="Date of Occurence" required={false} />,
+        <FieldRenderer inputType={inputType.Time} label="Time of Occurence" required={false} />,
+        <FieldRenderer inputType={inputType.Map} label="Location" required={false} />,
     ]
 
 
-useEffect(()=>{
+    useEffect(() => {
 
-        if(params?.formID  )
-        {
-            getForm(params.formID).then((res)=>{
+        if (params?.formID) {
+            getForm(params.formID).then((res) => {
                 setFormName(res.name);
                 setFields(res.fields);
-            },(rej)=>{
+            }, (rej) => {
                 console.log(rej)
             });
         }
-},[])
+    }, [])
 
     useEffect(() => {
         const formFieldElements = fields.map((field, index) => (
@@ -50,21 +49,20 @@ useEffect(()=>{
         setFields([...fields, field]);
     };
 
-    const onSaveButtonClicked =()=>{
-        if(params?.formID)
-        {
+    const onSaveButtonClicked = () => {
+        if (params?.formID) {
             console.log("form Update")
-            updateForm({fields:fields,activation_Status:true,name:formName,_id:params.formID})
+            updateForm({ fields: fields, activation_Status: true, name: formName, _id: params.formID })
             navigation.navigate("dashBoard")
             return;
-            
+
         }
 
-        addNewForm({fields:fields,activation_Status:false,name:formName})
-            navigation.goBack()
+        addNewForm({ fields: fields, activation_Status: false, name: formName })
+        navigation.goBack()
     }
-    
-    const onAddFieldButtonClicked = ()=>{
+
+    const onAddFieldButtonClicked = () => {
         setAddFieldModal(true)
     }
 
@@ -88,12 +86,12 @@ useEffect(()=>{
                     />
                 </View>
                 <View>
-                <Text>Default Fields</Text>
-                <View style={styles.formFields}>{defaultFieldElements}</View>
+                    <Text>Default Fields</Text>
+                    <View style={styles.formFields}>{defaultFieldElements}</View>
                 </View>
                 <View>
-                <Text>Custom Fields</Text>
-                <View style={styles.formFields}>{formFieldElements}</View>
+                    <Text>Custom Fields</Text>
+                    <View style={styles.formFields}>{formFieldElements}</View>
                 </View>
             </View>
             <Modal transparent={true} visible={addFieldModal}>
@@ -130,7 +128,7 @@ const styles = StyleSheet.create({
     formFields: {
         marginTop: 20,
     },
-    saveButton:{
-        marginRight:"auto",
+    saveButton: {
+        marginRight: "auto",
     }
 });

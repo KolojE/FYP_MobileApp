@@ -1,24 +1,41 @@
 import React from "react";
 import { View, Text } from "react-native";
 import ReportList from "./ReportList";
+import { IReport } from "../api/Models/Report";
 
 
 
+type ReportListContainerPorps = {
+    dateRange?: {
+        fromDate: Date,
+        toDate: Date,
+    }
+    reports: IReport[];
+    setReportModal: Function;
+}
 
-export default function ReportListContainer(props) {
+export default function ReportListContainer({ dateRange, reports, setReportModal }: ReportListContainerPorps) {
+
+    const [reportElement, setReportElemnts] = React.useState<JSX.Element[]>([])
+
+    React.useEffect(() => {
+        setReportElemnts(() => {
+            return reports.map<JSX.Element>((report) => {
+                return <ReportList date={report.submissionDate} status={report.status} SetReportModal={setReportModal} reportId={report._id} reportName={report.name} />
+            })
+        })
+    }, [reports])
+
+
+
     return (
         <View style={{ marginBottom: "5%" }}>
-            <View style={{ paddingTop: "3%" }}>
-                <Text style={{ fontSize: 8, color: "grey" }}>
-                    10 Jan 2020 - 17 Jan 2020
+            <View style={{ }}>
+                <Text style={{ fontSize: 12, color: "grey" }}>
+                    {dateRange && dateRange.fromDate.toDateString() + " - " + dateRange.toDate.toDateString()}
                 </Text>
             </View>
-            <ReportList reportName={"Road Crack"} reportId={"#R0152325"} date={"11 feb 2022 21:00"} status={"Resolved"} SetReportModal={props.SetReportModal} />
-            <ReportList reportName={"Flood"} reportId={"#R0152145"} date={"31 jan 2022 21:00"} status={"Resolved"} SetReportModal={props.SetReportModal} />
-            <ReportList reportName={"Wild Fire"} reportId={"#R0122323"} date={"27 jan 2022 21:00"} status={"Resolved"} SetReportModal={props.SetReportModal} />
-            <ReportList reportName={"Flood"} reportId={"#R0122123"} date={"22 jan 2022 21:00"} status={"Resolved"} SetReportModal={props.SetReportModal} />
-            <ReportList reportName={"Flood"} reportId={"#R0104395"} date={"10 jan 2022 21:00"} status={"Resolved"} SetReportModal={props.SetReportModal} />
-            <ReportList reportName={"Wild Fire"} reportId={"#R0122310"} date={"8 jan 2022 21:00"} status={"Resolved"} SetReportModal={props.SetReportModal} />
+                    {reportElement}
         </View>
     )
 }

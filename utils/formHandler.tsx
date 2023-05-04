@@ -1,61 +1,89 @@
 import RNDateTimePicker from "@react-native-community/datetimepicker";
 import React from "react";
 import { Text, TextInput, TouchableOpacity, StyleSheet, View, Modal, ScrollView } from "react-native";
-import { IField,inputType } from "../api/Models/Form";
+import { IField, inputType } from "../api/Models/Form";
 import LocationPickerModal from "../Modals/LocationPickerModal";
 import * as ImagePicker from "expo-image-picker";
-import EvidencePhoto from "../Components/EvidencePhoto";
 import { AntDesign } from "@expo/vector-icons";
 
-export function FieldRenderer(field: IField) {
-    const [datePicker, setDatePicker] = React.useState<boolean>(false);
-    const [locationPicker,setLocationPicker] = React.useState<boolean>(false);
-    const [date, setDate] = React.useState<Date>(new Date());
+type FieldRendererProps = IField & {
+    setReport?: any;
+}
 
-    const onDateChange = (event: Event, date: Date) => {
-        setDate(date);
+export function FieldRenderer(field: FieldRendererProps) {
+    const [datePicker, setDatePicker] = React.useState<boolean>(false);
+    const [locationPicker, setLocationPicker] = React.useState<boolean>(false);
+    const [value, setValue] = React.useState<any>(null);
+
+
+if(field?.setReport)
+    React.useEffect(() => {
+        
+        field?.setReport((prev) => { return { ...prev, [field._id]: value } })
+    }, [value])
+
+    const onDateChange = (event, date: Date) => {
+
+        setValue(date);
         setDatePicker(false);
     };
 
+    const onTimeChange = (event, time: Date) => {
+        setValue(() => {
+            const newDate = new Date();
+            newDate.setTime(time.getTime());
+            return newDate;
+        });
+
+        setDatePicker(false);
+
+    }
+
+    const onTextChange = (text) => {
+        setValue(text);
+    }
+    const onLocationChange = ({La,Lo}) =>{
+        setValue({La:123,Lo:123})
+    }
+
     switch (field.inputType) {
         case inputType.Text:
+            const text = value as string
             return (
                 <View style={styles.container}>
                     <Text style={styles.label}>{field.label}</Text>
                     <View style={styles.inputContainer}>
-                        <TextInput style={styles.input} />
+                        <TextInput style={styles.input} value={text} onChangeText={onTextChange} />
                     </View>
                 </View>
             );
         case inputType.Date:
+            const date = value as Date
             return (
                 <View style={styles.container}>
                     <Text style={styles.label}>{field.label}</Text>
                     <TouchableOpacity onPress={() => setDatePicker(true)}>
                         <View style={styles.inputContainer}>
                             <TextInput
-                                style={styles.input}
+                             style={styles.input}
                                 editable={false}
-                                value={date.toDateString()}
+                                value={date?date.toDateString():" "}
                             />
                         </View>
                     </TouchableOpacity>
                     {datePicker && (
                         <RNDateTimePicker
                             testID="Time Of Occurence"
-                            value={date}
+                            value={date?date:new Date()}
                             mode={"date"}
                             positiveButtonLabel={"Confirm"}
                             negativeButtonLabel={"Cancel"}
-                            onChange={(event, date) => {
-                                setDate(() => { return date });
-                                setDatePicker(false);
-                            }}
-                        />
+                            onChange={onDateChange} />
                     )}
                 </View>
             );
         case inputType.Time:
+            const time = value as Date
             return (
                 <View style={styles.container}>
                     <Text style={styles.label}>{field.label}</Text>
@@ -64,65 +92,57 @@ export function FieldRenderer(field: IField) {
                             <TextInput
                                 style={styles.input}
                                 editable={false}
-                                value={date.toTimeString()}
+                                value={time?time.toTimeString():" "}
                             />
                         </View>
                     </TouchableOpacity>
                     {datePicker && (
                         <RNDateTimePicker
                             testID="Time Of Occurence"
-                            value={date}
+                            value={date?date:new Date()}
                             mode={"time"}
                             positiveButtonLabel={"Confirm"}
                             negativeButtonLabel={"Cancel"}
-                            onChange={() => {
-                                setDate(() => {
-                                    const newDate = new Date();
-                                    newDate.setTime(date.getTime());
-                                    setDatePicker(false);
-                                    return newDate;
-                                });
-                            }
-                            }
+                            onChange={onTimeChange}
                         />
                     )}
                 </View>
             );
-            case inputType.Map:
-            return(
+        case inputType.Map:
+            return (
                 <View style={styles.container}>
                     <Text style={styles.label}>{field.label}</Text>
-                    <TouchableOpacity onPress={() => setLocationPicker(true)}>
+                    <TouchableOpacity onPress={() => {setLocationPicker(true); setValue({Lo:30,La:10}) }}>
                         <View style={styles.inputContainer}>
                             <TextInput
                                 style={styles.input}
                                 editable={false}
-                                value={""}
+                                value={value?value:" "}
                             />
                         </View>
                     </TouchableOpacity>
-                    {locationPicker&& (
+                    {locationPicker && (
                         <Modal animationType="slide">
-                        <LocationPickerModal setOpenLocationPicker={setLocationPicker} />
+                            <LocationPickerModal setOpenLocationPicker={setLocationPicker} />
                         </Modal>
                     )}
                 </View>
             )
-            case inputType.Photo:
-                return (
-     <View style={{ marginBottom: "5%" }}>
-                        <Text style={{ width: "100%", fontSize: 10, color: "grey" }}>Photos 4/10</Text>
-                        <ScrollView horizontal={true} style={{ marginTop: "3%" }} contentContainerStyle={{ alignItems: "center" }}>
-                            <TouchableOpacity onPress={async () => {
-                                const result = await ImagePicker.launchCameraAsync({
-                                })
-                            }}
-                            >
-                                <AntDesign name="plussquareo" size={50} color="black" style={{ height: 100, width: 100, textAlign: "center", textAlignVertical: "center" }} />
-                            </TouchableOpacity>
-                        </ScrollView>
-                    </View>
-                )
+        case inputType.Photo:
+            return (
+                <View style={{ marginBottom: "5%" }}>
+                    <Text style={{ width: "100%", fontSize: 10, color: "grey" }}>Photos 4/10</Text>
+                    <ScrollView horizontal={true} style={{ marginTop: "3%" }} contentContainerStyle={{ alignItems: "center" }}>
+                        <TouchableOpacity onPress={async () => {
+                            const result = await ImagePicker.launchCameraAsync({
+                            })
+                        }}
+                        >
+                            <AntDesign name="plussquareo" size={50} color="black" style={{ height: 100, width: 100, textAlign: "center", textAlignVertical: "center" }} />
+                        </TouchableOpacity>
+                    </ScrollView>
+                </View>
+            )
 
     }
 }

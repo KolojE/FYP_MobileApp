@@ -10,6 +10,7 @@ export enum inputType {
 
 
 export interface IField{
+    _id?:string,
     label: string,
     inputType: inputType,
     options?: Array<any>,
