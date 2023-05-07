@@ -32,7 +32,6 @@ export function FormBuilderScreen({ route, navigation }) {
                 setFormName(res.name);
                 setFields(res.fields);
             }, (rej) => {
-                console.log(rej)
             });
         }
     }, [])
@@ -51,7 +50,6 @@ export function FormBuilderScreen({ route, navigation }) {
 
     const onSaveButtonClicked = () => {
         if (params?.formID) {
-            console.log("form Update")
             updateForm({ fields: fields, activation_Status: true, name: formName, _id: params.formID })
             navigation.navigate("dashBoard")
             return;

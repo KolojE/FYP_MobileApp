@@ -15,7 +15,6 @@ export default function SettingScreen({navigation}) {
     const [formListModal, setFormListModal] = React.useState(false);
     const [profileModal, setProfileModal] = React.useState(false);
     const setLoggedInUser= useContext(AuthContext).setLoggedInUser;
-console.log(formListModal)
     const onLogoutPress=()=>{
         deleteItemAsync("jwt");
         setLoggedInUser(null)

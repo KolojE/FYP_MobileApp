@@ -19,15 +19,8 @@ import { IReport } from "../../api/Models/Report";
 import errorHandler from "../../api/errorHandler/axiosError";
 import { getReport } from "../../api/complainant";
 
-const LatestUpdated = {
-  report_id: "R011024",
-  report_title: "WildFire",
-  report_serverity: "Critical",
-  report_Status: "Resolved",
-  report_update_details: "The status changed to resolved ",
-};
 
-export default function HomeScreen({navigation}) {
+export default function HomeScreen({ navigation }) {
 
   const [profileModal, setProfileModal] = React.useState(false);
   const [loggedInUser, setLoggedInUser] = React.useState<IUser>();
@@ -43,15 +36,19 @@ export default function HomeScreen({navigation}) {
       errorHandler(rej)
     })
 
+
     const unsubscribe = navigation.addListener('focus', () => {
-       getReport({sortBy:"upDate",limit:5}).then((res) => {
-      setReports(res)
-    }, (rej) => {
-      errorHandler(rej);
-    })
+      getReport({ sortBy: "upDate", limit: 5 }).then((res) => {
+        setReports(res)
+      }, (rej) => {
+        errorHandler(rej);
+      })
     });
-  
+
   }, [])
+
+
+
 
 
   return organization && loggedInUser ? (
@@ -99,18 +96,32 @@ export default function HomeScreen({navigation}) {
 }
 
 export function LatestUpdatedComponent() {
+
+  const [lastestUpdatedReprot, setLastestUpdatedReport] = React.useState<IReport>();
+  React.useEffect(()=>{
+    getReport({ limit: 1, sortBy: "upDate" }).then((res) => {
+      setLastestUpdatedReport(res[0]);
+    }, (err) => {
+      errorHandler(err);
+    })
+  },[])
+
+
   return (
     <TouchableOpacity
       style={{ position: "relative", width: "90%", marginTop: "10%" }}
     >
+
       <View style={styles.latestUpdateContainer}>
-        <View
+        {lastestUpdatedReprot &&
+<>
+          <View
           style={{
             flexDirection: "row",
             alignItems: "center",
             width: "100%",
           }}
-        >
+          >
           <View style={{ paddingLeft: 14 }}>
             <Text
               style={{
@@ -120,18 +131,18 @@ export function LatestUpdatedComponent() {
                 paddingTop: 12,
                 paddingBottom: 3,
               }}
-            >
+              >
               Latest Update
             </Text>
             <Text style={{ fontSize: 8, color: "#f8f8f8" }}>
-              20 jan 2022 08:31
+              {lastestUpdatedReprot.updateDate.toDateString()}
             </Text>
           </View>
           <View style={{ position: "absolute", right: 20 }}>
             <Text
               style={{ fontSize: 16, color: "#F8F8F8", fontWeight: "700" }}
-            >
-              #R0112204
+              >
+              {lastestUpdatedReprot._id}
             </Text>
           </View>
         </View>
@@ -143,8 +154,8 @@ export function LatestUpdatedComponent() {
               fontSize: 16,
               paddingBottom: 10,
             }}
-          >
-            WirldFire
+            >
+          {lastestUpdatedReprot.name}
           </Text>
           <Text
             style={{
@@ -154,20 +165,22 @@ export function LatestUpdatedComponent() {
               paddingRight: 10,
               minHeight: 80,
             }}
-          >
-            The issue has been resolved
+            >
+            {lastestUpdatedReprot.comment}
           </Text>
         </View>
         <Text
-          style={{
-            position: "absolute",
-            bottom: 12,
-            right: 20,
-            color: "#C8E6C9",
-          }}
+        style={{
+          position: "absolute",
+          bottom: 12,
+          right: 20,
+          color: "#C8E6C9",
+        }}
         >
-          Resolved
+          {lastestUpdatedReprot.status}
         </Text>
+          </>
+    }
       </View>
     </TouchableOpacity>
   )

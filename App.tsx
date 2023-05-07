@@ -21,7 +21,6 @@ export default function App() {
           return
 
         tokenAuthentication(token).then(loggedInUser => {
-          console.log(loggedInUser)
           setLoggedInUser(loggedInUser)
         }
           , err => {

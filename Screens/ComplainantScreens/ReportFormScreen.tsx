@@ -19,7 +19,6 @@ export default function ReportFormScreen({ route, navigation }) {
     const params = route.params;
     const [submitted, setSubmitted] = React.useState(false);
 
-    console.log(report)
 
 
     React.useEffect(() => {
@@ -68,7 +67,6 @@ export default function ReportFormScreen({ route, navigation }) {
             setFields(res.fields);
             setDefaultFields(res.defaultFields);
         }, (rej) => {
-            console.log(rej)
         });
 
     }, [])
@@ -92,7 +90,6 @@ export default function ReportFormScreen({ route, navigation }) {
     );
 
     const onSubmitButtonPressed = () => {
-        console.log("Submi button pressed")
         submitReport({ formID: params.formID, report: report })
         setSubmitted(true)
     }

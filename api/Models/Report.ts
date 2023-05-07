@@ -7,4 +7,5 @@ export interface IReport{
     updateDate:Date;
     details: object;
     status:string;
+    comment?:string;
 }

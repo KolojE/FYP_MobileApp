@@ -41,7 +41,6 @@ export default function ReportListScreen({ navigation }: ReportListScreenProps) 
   }, [reports])
 
 
-  console.log(reportListContainerElements)
   const getReportToDate = () => {
     getReport((
       {

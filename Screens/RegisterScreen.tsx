@@ -30,7 +30,6 @@ export default function RegisterScreen() {
             return newState
         });
 
-        console.log(registrationForm)
     }
 
     const onRegistrationButtonPressed = () => {

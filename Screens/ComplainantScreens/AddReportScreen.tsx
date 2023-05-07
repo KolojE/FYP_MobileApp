@@ -20,7 +20,6 @@ export default function AddReportScreen({ navigation }) {
   React.useEffect(() => {
     setReportFormElements((prev) => {
       return reportForms.map((reportForm, index) => {
-        console.log("ID : " + reportForm._id)
         return <ReportType color={"blue"} label={reportForm.name} formID={reportForm._id} image={null} navigation={navigation} key={index} />
       })
     })

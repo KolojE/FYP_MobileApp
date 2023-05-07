@@ -13,7 +13,6 @@ const Stack = createNativeStackNavigator();
 export default function LandingScreen({route,navigation}) {
 
  const auth= useContext(AuthContext)
-console.log(auth)
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       {

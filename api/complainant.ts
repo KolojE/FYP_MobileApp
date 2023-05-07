@@ -17,7 +17,7 @@ export async function submitReport({ report, formID }: { report: Object, formID:
     }
 }
 
-export async function getReport({sortBy,limit,dateRange}:{sortBy:"subDate"|"upDate",limit:number,dateRange?:{subFromData?:Date,subToDate?:Date}}): Promise<IReport[]> {
+export async function getReport({sortBy,limit,dateRange}:{sortBy:"subDate"|"upDate",limit?:number,dateRange?:{subFromData?:Date,subToDate?:Date}}): Promise<IReport[]> {
     try {
         const res = await axios.get(`${api_url}/report/getSubmittedReports`,
             {
@@ -86,7 +86,7 @@ const reportReponseResolver = ({ reports }: { reports: any[] }): IReport[] => {
             submissionDate: new Date(report.submissionDate),
             updateDate: new Date(report.updateDate),
             status:report.status,
-            
+            comment:report.comment,
         }
 
       

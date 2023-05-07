@@ -39,12 +39,10 @@ export default function MemeberListModal(props) {
                 return <Member _id={member._id} ID={member.compID} name={member.name} handleProfileModal={handleProfileModal} key={index} />
             })
         })
-        console.log(deactivatedMemberElements)
     }, [activatedMembers, deactivatedMembers])
 
     const handleProfileModal = (id) => {
         const member = members.find(member => {
-            console.log(member._id + "===" + id)
             return member._id === id
         }
         )
@@ -77,7 +75,6 @@ export default function MemeberListModal(props) {
             setActivatedMembers(activatedMembers_);
             setDeactivatedMembers(deactivatedMembers_);
         }, (rej) => {
-            console.log(rej)
         })
     }
 

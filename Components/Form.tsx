@@ -25,7 +25,6 @@ export default function Form({formID,formName, formStatus, formIcon, formCreated
     const onDeleteConfirmPress= async ()=>{ 
         deleteForm(formID)
         const res = await getForms();
-        console.log(res);
             setForms(res);
     }
 

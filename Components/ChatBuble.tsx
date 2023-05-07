@@ -4,7 +4,6 @@ import { View,Text } from "react-native";
 
 export default function ChatBuble(props)
 {
-    console.log(props.reply)
     const reply= props.reply?10:"auto"
     const color = props.reply?"white":"#80ff88"
     return(

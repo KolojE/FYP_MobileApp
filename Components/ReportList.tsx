@@ -5,7 +5,6 @@ import { View, TouchableOpacity, Text } from "react-native";
 
 export default function ReportList({ SetReportModal, date, reportId, reportName, status }) {
 
-console.log(status)
   return (
     <TouchableOpacity onPress={() => { SetReportModal(true) }}
       style={{
