@@ -19,7 +19,7 @@ export default function HomeScreen({ }) {
         const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate(),0,0,0,0); // set time to midnight
         const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate(),23,59,59,999); // set time to one second before midnight
 
-        getReportGroupedByType({ sortBy: "subDate", dateRange: { subFromData: startOfDay, subToDate: endOfDay } }).then((res) => {
+        getReportGroupedByType({ sortBy: "subDate", dateRange: { fromDate: startOfDay, toDate: endOfDay } }).then((res) => {
             
             setTodayReports(res);
         

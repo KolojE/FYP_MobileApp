@@ -110,20 +110,23 @@ export type ReportGroupedByType  = {
     reports:IReport[],//report details
 }
 
-export async function getReportGroupedByType({ sortBy, limit, dateRange }: { sortBy: "subDate" | "upDate", limit?: number, dateRange?: { subFromData?: Date, subToDate?: Date } }):Promise<ReportGroupedByType[]> {
+export async function getReportGroupedByType({ sortBy, limit, dateRange,status,type }: { sortBy: "subDate" | "upDate", limit?: number, dateRange?: { fromDate?: Date, toDate?: Date },status?:string[],type?:string[] }):Promise<ReportGroupedByType[]> {
     try {
 
-
+        const statusParams = status?status.length>0?status.toString():undefined:undefined
+        const typeParams= type?type.length>0?type.toString():undefined:undefined
         const res = await axios.get(`${api_url}/admin/getReport`, {
             params: {
                 sortBy: sortBy,
                 limit: limit,
-                subFromDate: dateRange.subFromData,
-                subToDate: dateRange.subToDate,
+                subFromDate: dateRange.fromDate,
+                subToDate: dateRange.toDate,
+                status:statusParams,
+                type:typeParams,
             }
         })
 
-        const reportGroupedByType:ReportGroupedByType[] = res.data.reports;
+        const reportGroupedByType:ReportGroupedByType[] = res.data.reports?res.data.reports:[];
 
         return reportGroupedByType;
     } catch (err) {
@@ -167,3 +170,30 @@ export async function getReportsWeeklyBySubmissionDate({ weekOffSet }: { weekOff
     }
 }
 
+export type ReprotElement = {
+    type:{
+        _id:string,
+        name:string,
+    }[],
+    status:{
+        _id:string,
+        desc:string,
+    }[],
+}
+
+export async function getReportElement({includeType,includeStatus}:{includeType?:boolean,includeStatus?:boolean}):Promise<ReprotElement>{
+
+    try{
+        const res = await axios.get(`${api_url}/admin/getReportElement`,{
+            params:{
+                type:includeType,
+                status:includeStatus
+            }
+        })
+
+        return res.data.element
+    }
+    catch(err){
+        errorHandler(err);
+    }
+}
