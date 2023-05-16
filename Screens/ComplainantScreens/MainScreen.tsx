@@ -8,6 +8,7 @@ import { TouchableOpacity } from "react-native";
 import AuthContext from "../../Contexts/LoggedInUserContext";
 import { deleteItemAsync } from "expo-secure-store";
 import LoginScreen from "../LoginScreen";
+import IUser, { roles } from "../../api/Models/User";
 
 const Tab = createBottomTabNavigator();
 
@@ -19,6 +20,19 @@ export default function MainScreen() {
         deleteItemAsync("jwt");
         setLoggedInUser(false)
     }
+
+    const adminUser:IUser = {
+        _id: "645a0f589b437ecaa5d8a557",
+        ID: "",
+        name: "",
+        email: "",
+        organization: undefined,
+        contact: {
+            phoneNo: "",
+            address: ""
+        },
+        role: roles.admin,
+    } 
     return (
         <Tab.Navigator
             screenOptions={{
@@ -46,7 +60,7 @@ export default function MainScreen() {
             />
             <Tab.Screen
                 name="Chat"
-                component={ChatScreen}
+                component={()=><ChatScreen selectedUser={adminUser} setChatRoomModal={null}/>}
                 options={{
                     tabBarIcon: ({ }) => {
                         return <Entypo name="chat" size={22} />;

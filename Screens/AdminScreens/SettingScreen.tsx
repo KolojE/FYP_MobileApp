@@ -7,6 +7,7 @@ import MemeberListModal from "../../Modals/MemberListModal";
 import ProfileModal from "../../Modals/ProfileModal";
 import AuthContext from "../../Contexts/LoggedInUserContext";
 import { deleteItemAsync } from "expo-secure-store";
+import { disconnectSocket } from "../../api/socketIO";
 
 
 
@@ -17,7 +18,8 @@ export default function SettingScreen({navigation}) {
     const setLoggedInUser= useContext(AuthContext).setLoggedInUser;
     const onLogoutPress=()=>{
         deleteItemAsync("jwt");
-        setLoggedInUser(null)
+        setLoggedInUser(null);
+        disconnectSocket();
     }
     return (
         <SafeAreaView style={{}}>

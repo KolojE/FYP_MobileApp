@@ -56,7 +56,7 @@ export async function deleteForm(id: string) {
     }
 }
 
-export async function viewMembers(): Promise<Array<IComplainant>> {
+export async function getMembers(): Promise<IComplainant[]> {
     try {
         const res = await axios.get(`${api_url}/admin/viewMembers`)
 

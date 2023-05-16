@@ -4,15 +4,22 @@ import { View, StyleSheet, Image, Text, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import IconTextInput from "../Components/IconTextInput";
 import { registration, registrationForm } from "../api/registration";
+import AuthContext from "../Contexts/LoggedInUserContext";
 
 
 export default function RegisterScreen() {
+
+
     const [registrationForm, setRegistrationForm] = React.useState<registrationForm>({
         email: "",
         name: "",
         organization: { ID: "" },
         password: "",
     });
+
+    const setLoggedInUser= React.useContext(AuthContext).setLoggedInUser
+
+
 
     const onTextChange = ({ inputkey, text }) => {
         const keys = inputkey.split(".");
@@ -31,11 +38,15 @@ export default function RegisterScreen() {
         });
 
     }
+    async function onRegistrationButtonPressed(){
+        const registredUser = await registration(registrationForm);
 
-    const onRegistrationButtonPressed = () => {
-        registration(registrationForm).then(() => {
+        if(registredUser)
+        {
+            setLoggedInUser(registredUser);
+        }
 
-        });
+        
     }
     return (
         <SafeAreaView style={styles.background}>

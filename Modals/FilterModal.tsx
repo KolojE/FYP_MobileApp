@@ -119,11 +119,10 @@ export default function FilterModal({setFilterModal,setReport,setInfo}:FilterMod
                 </View>
                 <Text style={{ marginTop: "5%", fontSize: 16, color: "black", fontWeight: "500" }}>Sort By</Text>
                 <Picker >
-                    <Picker.Item label="Serverity" />
-                    <Picker.Item label="Types" />
-                    <Picker.Item label="Status" />
-                    <Picker.Item label="Date (Descending)" />
-                    <Picker.Item label="Date (Ascending)" />
+                    <Picker.Item label="Submission Date (Descending)" />
+                    <Picker.Item label="Submission Date (Ascending)" />
+                    <Picker.Item label="UP Date (Descending)" />
+                    <Picker.Item label="UP Date (Ascending)" />
                 </Picker>
 
             </View>

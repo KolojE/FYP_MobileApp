@@ -1,19 +1,65 @@
 import React, { useContext } from "react";
 import {
-  ScrollView,
   StyleSheet,
   TextInput,
   TouchableOpacity,
-  View, Text
+  View, Text, FlatList
 } from "react-native";
 import ChatBuble from "../Components/ChatBuble";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { roles } from "../api/Models/User";
+import IUser, { roles } from "../api/Models/User";
 import AuthContext from "../Contexts/LoggedInUserContext";
-export default function ChatScreen({setChatRoomModal}) {
+import { SocketContext } from "../Contexts/SocketConnection";
+import {  sendMessage } from "../api/socketIO";
+import { ChatContext } from "../Contexts/ChatContext";
 
-const loggedInUser = useContext(AuthContext).loggedInUser;
+
+
+type ChatScreenProps = {
+  setChatRoomModal: React.Dispatch<React.SetStateAction<boolean>>,
+  selectedUser: IUser,
+}
+
+export default function ChatScreen({ setChatRoomModal, selectedUser }: ChatScreenProps) {
+
+  const loggedInUser = useContext(AuthContext).loggedInUser;
+  const [message, setMessage] = React.useState<string>("");
+
+  const [chat,setChat] = React.useContext(ChatContext);
+
+  function onSendButtonPressed() {
+    console.log(chat)
+      setChat(prev=>{
+        if(!prev[selectedUser._id])
+        {
+          prev[selectedUser._id] = {chatLog:[{msg:message,reply:false}]}
+        return { 
+          ...prev,
+        }
+        }
+          
+        prev[selectedUser._id].chatLog.push({msg:message,reply:false})
+        return { 
+          ...prev,
+        }
+    })
+    sendMessage({message:message,receiverID:selectedUser._id})
+    setMessage("")
+  }
+
+
+  function onMessageChange(text) {
+    console.log(text)
+    setMessage(text);
+
+  }
+
+  function renderChatBubble({ item }) {
+    return <ChatBuble msg={item.msg} reply={item.reply} />
+  }
+
+
 
   return (
     <SafeAreaView style={{ height: "100%" }}>
@@ -24,22 +70,13 @@ const loggedInUser = useContext(AuthContext).loggedInUser;
               onPress={() => { setChatRoomModal(false) }}           >
               <Ionicons style={{ marginLeft: "5%" }} name="arrow-back" size={30} />
             </TouchableOpacity>
-            <Text style={{ marginLeft: "5%", fontSize: 16, fontWeight: "bold" }}>Ali</Text>
+            <Text style={{ marginLeft: "5%", fontSize: 16, fontWeight: "bold" }}>{selectedUser.name}</Text>
           </View>
         </>}
-      <View style={{ width: "100%" }}>
-        <ScrollView style={{ marginTop: 20 }} contentContainerStyle={{}}>
-          <ChatBuble
-            reply={true}
-            msg={"Hi ,report received, thank for your report"}
-          />
-          <ChatBuble reply={false} msg={"may i know the progress?"} />
-          <ChatBuble
-            reply={true}
-            msg={"The progress will be updated in few days Thank you"}
-          />
-        </ScrollView>
-
+      <View style={{ width: "100%",flex:9,padding:5 }}>
+        <FlatList
+          data={chat[selectedUser._id]?.chatLog}
+          renderItem={renderChatBubble} />
       </View>
       <View
         style={{
@@ -47,12 +84,11 @@ const loggedInUser = useContext(AuthContext).loggedInUser;
           marginTop: "auto",
           flexDirection: "row",
           width: "100%",
-          height: 60,
           backgroundColor: "white",
           bottom: 0,
-          position: "absolute",
           justifyContent: "center",
           alignItems: "center",
+          flex:1
         }}
       >
         <TextInput
@@ -65,9 +101,11 @@ const loggedInUser = useContext(AuthContext).loggedInUser;
             padding: 10,
             backgroundColor: "#f0f0f0",
           }}
+          onChangeText={onMessageChange}
           placeholder="Type Something..."
+          value={message}
         />
-        <TouchableOpacity style={{ width: "10%", marginLeft: "10%" }}>
+        <TouchableOpacity style={{ width: "10%", marginLeft: "10%" }} onPress={onSendButtonPressed}>
           <Ionicons name="send" size={20} color="black" />
         </TouchableOpacity>
       </View>

@@ -7,25 +7,21 @@ export default function LoginScreen({ navigation, onLogin }) {
 
     const [loginForm, setLoginForm] = useState({ identifier: "", password: "" });
 
-    const handleEmailUsernameChange = (newIdentifier) => {
+    function handleEmailUsernameChange(newIdentifier) {
         setLoginForm((prev) => {
             return { ...prev, identifier: newIdentifier };
         });
     };
 
-    const handlePasswordChange = (newPassword) => {
+    function handlePasswordChange(newPassword) {
         setLoginForm((prev) => {
             return { ...prev, password: newPassword }
         })
     };
 
-    const onLoginButtonPressed = async ()=>{
-
-    !await onLogin(loginForm)&&
-    alert("Password / Email incorrect ! Please try again!");
-
-
-}
+    const onLoginButtonPressed = async () => {
+        await onLogin(loginForm)
+    }
 
 
     return (

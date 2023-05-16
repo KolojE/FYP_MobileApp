@@ -2,6 +2,7 @@ import axios from "axios"
 import { api_url } from "../env"
 import errorHandler from "./errorHandler/axiosError"
 import IUser from "./Models/User"
+import * as securestore from "expo-secure-store"
 
 
 export type registrationForm ={
@@ -27,10 +28,14 @@ export async function registration(form:registrationForm):Promise<IUser>
             name:form.name,
             
         })
-        const registeredUser = res.data.user;
+            const registeredUser=res.data.user
+            const jsonWebToken = res.headers.authorization;
+            await securestore.setItemAsync("jwt", jsonWebToken.toString());
+            console.log(registeredUser)
         return registeredUser
     }catch(err)
     {
+        console.log(err)
         errorHandler(err);
     }
 }
