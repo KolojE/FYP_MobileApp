@@ -1,10 +1,12 @@
 import RNDateTimePicker from "@react-native-community/datetimepicker";
 import React from "react";
-import { Text, TextInput, TouchableOpacity, StyleSheet, View, Modal, ScrollView } from "react-native";
+import { Text, TextInput, TouchableOpacity, StyleSheet, View, Modal, ScrollView, FlatList } from "react-native";
 import { IField, inputType } from "../api/Models/Form";
 import LocationPickerModal from "../Modals/LocationPickerModal";
 import * as ImagePicker from "expo-image-picker";
 import { AntDesign } from "@expo/vector-icons";
+import EvidencePhoto from "../Components/EvidencePhoto";
+import { uploadReportPhoto } from "../api/complainant";
 
 type FieldRendererProps = IField & {
     setReport?: any;
@@ -13,14 +15,14 @@ type FieldRendererProps = IField & {
 export function FieldRenderer(field: FieldRendererProps) {
     const [datePicker, setDatePicker] = React.useState<boolean>(false);
     const [locationPicker, setLocationPicker] = React.useState<boolean>(false);
+    const [selectedPhoto, setSelectedPhotos] = React.useState<any>(null);
     const [value, setValue] = React.useState<any>(null);
 
 
-if(field?.setReport)
-    React.useEffect(() => {
-        
-        field?.setReport((prev) => { return { ...prev, [field._id]: value } })
-    }, [value])
+    if (field?.setReport)
+        React.useEffect(() => {
+            field?.setReport((prev) => { return { ...prev, [field._id]: value } })
+        }, [value])
 
     const onDateChange = (event, date: Date) => {
 
@@ -42,8 +44,40 @@ if(field?.setReport)
     const onTextChange = (text) => {
         setValue(text);
     }
-    const onLocationChange = ({La,Lo}) =>{
-        setValue({La:123,Lo:123})
+    const onLocationChange = ({ La, Lo }) => {
+        setValue({ La: 123, Lo: 123 })
+    }
+
+    const onAddPhoto = async () => {
+
+        let image = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.All,
+            base64: true,
+            allowsEditing: true,
+            aspect: [4, 3],
+            quality: 1,
+        })
+
+        if (image.canceled) {
+            return;
+        }
+        const filePath = await uploadReportPhoto({uri:image.assets[0].uri})
+        console.log(filePath)
+        if (!value && !selectedPhoto) {
+            setSelectedPhotos([image.assets[0]])
+            setValue([filePath])
+            return;
+        }
+
+
+        setValue((prev) => [...prev, filePath])
+        setSelectedPhotos((prev) => [...prev,image.assets[0]])
+    }
+
+
+    function renderPhoto({item,index}) {
+        return <EvidencePhoto base64={item.base64} key={index} onPressedCallBack={null} />
+        
     }
 
     switch (field.inputType) {
@@ -65,16 +99,16 @@ if(field?.setReport)
                     <TouchableOpacity onPress={() => setDatePicker(true)}>
                         <View style={styles.inputContainer}>
                             <TextInput
-                             style={styles.input}
+                                style={styles.input}
                                 editable={false}
-                                value={date?date.toDateString():" "}
+                                value={date ? date.toDateString() : " "}
                             />
                         </View>
                     </TouchableOpacity>
                     {datePicker && (
                         <RNDateTimePicker
                             testID="Time Of Occurence"
-                            value={date?date:new Date()}
+                            value={date ? date : new Date()}
                             mode={"date"}
                             positiveButtonLabel={"Confirm"}
                             negativeButtonLabel={"Cancel"}
@@ -92,14 +126,14 @@ if(field?.setReport)
                             <TextInput
                                 style={styles.input}
                                 editable={false}
-                                value={time?time.toTimeString():" "}
+                                value={time ? time.toTimeString() : " "}
                             />
                         </View>
                     </TouchableOpacity>
                     {datePicker && (
                         <RNDateTimePicker
                             testID="Time Of Occurence"
-                            value={date?date:new Date()}
+                            value={date ? date : new Date()}
                             mode={"time"}
                             positiveButtonLabel={"Confirm"}
                             negativeButtonLabel={"Cancel"}
@@ -112,12 +146,12 @@ if(field?.setReport)
             return (
                 <View style={styles.container}>
                     <Text style={styles.label}>{field.label}</Text>
-                    <TouchableOpacity onPress={() => {setLocationPicker(true); setValue({Lo:30,La:10}) }}>
+                    <TouchableOpacity onPress={() => { setLocationPicker(true); setValue({ Lo: 30, La: 10 }) }}>
                         <View style={styles.inputContainer}>
                             <TextInput
                                 style={styles.input}
                                 editable={false}
-                                value={value?value:" "}
+                                value={value ? value : " "}
                             />
                         </View>
                     </TouchableOpacity>
@@ -132,15 +166,17 @@ if(field?.setReport)
             return (
                 <View style={{ marginBottom: "5%" }}>
                     <Text style={{ width: "100%", fontSize: 10, color: "grey" }}>Photos 4/10</Text>
-                    <ScrollView horizontal={true} style={{ marginTop: "3%" }} contentContainerStyle={{ alignItems: "center" }}>
-                        <TouchableOpacity onPress={async () => {
-                            const result = await ImagePicker.launchCameraAsync({
-                            })
-                        }}
-                        >
-                            <AntDesign name="plussquareo" size={50} color="black" style={{ height: 100, width: 100, textAlign: "center", textAlignVertical: "center" }} />
+                    <View style={{flexDirection:"row",alignItems:"center"}}>
+                        <TouchableOpacity onPress={onAddPhoto} style={{height:100,width:100,alignItems:"center",justifyContent:"center"}} >
+                            <AntDesign name="pluscircle" size={50} color="grey" style={{}} />
                         </TouchableOpacity>
-                    </ScrollView>
+                        <FlatList
+                            data={selectedPhoto}
+                            renderItem={renderPhoto}
+                            style={{ width: "80%", height: 100 }}
+                            horizontal
+                        />
+                    </View>
                 </View>
             )
 

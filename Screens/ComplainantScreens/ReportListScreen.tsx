@@ -12,6 +12,7 @@ import ReportListContainer from "../../Components/ReportListContainer";
 import ReportScreen from "../../Modals/ReportModal";
 import { IReport } from "../../api/Models/Report";
 import { getReport } from "../../api/complainant";
+import AuthContext from "../../Contexts/LoggedInUserContext";
 
 type ReportListScreenProps = {
   reports: IReport[];
@@ -23,7 +24,7 @@ export default function ReportListScreen({ navigation }: ReportListScreenProps) 
   const [ReportModal, setReportModal] = React.useState(false);
   const [reports, setReports] = React.useState<IReport[]>([]);
   const [reportListContainerElements, setReportListContainerElements] = React.useState<JSX.Element>();
-
+  const loggedInUser = React.useContext(AuthContext).loggedInUser;
 
   React.useEffect(() => {
     getReport({ sortBy: "subDate", limit: 20 }).then(
@@ -115,7 +116,10 @@ export default function ReportListScreen({ navigation }: ReportListScreenProps) 
           animationType="slide"
         >
           <ReportScreen
-            SetReportModal={setReportModal}
+            setReportModal={setReportModal}
+            report={reports[0]}
+            user={loggedInUser}
+
           />
         </Modal>
       </View>

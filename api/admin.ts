@@ -5,6 +5,8 @@ import { jwtTokenInterception } from "./interceptor/jwtTokenInterception";
 import errorHandler from "./errorHandler/axiosError";
 import IComplainant from "./Models/Complainant";
 import { IReport } from "./Models/Report";
+import { getLoggedInUserInfo } from "./user";
+import IUser from "./Models/User";
 
 
 
@@ -61,8 +63,9 @@ export async function getMembers(): Promise<IComplainant[]> {
         const res = await axios.get(`${api_url}/admin/viewMembers`)
 
         const members: Array<IComplainant> = [];
-        res.data.members.forEach((member) => {
-            const user = member.user
+        res.data.members.forEach(async (member) => {
+        const user:IUser = member.user
+        console.log(user)
             delete member.user
             members.push({
                 ...member,
@@ -104,29 +107,29 @@ export async function deleteDeactivatedMember(id: string) {
 }
 
 
-export type ReportGroupedByType  = {
-    _id:string,//form's ID
-    name:string,//form's name
-    reports:IReport[],//report details
+export type ReportGroupedByType = {
+    _id: string,//form's ID
+    name: string,//form's name
+    reports: IReport[],//report details
 }
 
-export async function getReportGroupedByType({ sortBy, limit, dateRange,status,type }: { sortBy: "subDate" | "upDate", limit?: number, dateRange?: { fromDate?: Date, toDate?: Date },status?:string[],type?:string[] }):Promise<ReportGroupedByType[]> {
+export async function getReportGroupedByType({ sortBy, limit, dateRange, status, type }: { sortBy: "subDate" | "upDate", limit?: number, dateRange?: { fromDate?: Date, toDate?: Date }, status?: string[], type?: string[] }): Promise<ReportGroupedByType[]> {
     try {
 
-        const statusParams = status?status.length>0?status.toString():undefined:undefined
-        const typeParams= type?type.length>0?type.toString():undefined:undefined
+        const statusParams = status ? status.length > 0 ? status.toString() : undefined : undefined
+        const typeParams = type ? type.length > 0 ? type.toString() : undefined : undefined
         const res = await axios.get(`${api_url}/admin/getReport`, {
             params: {
                 sortBy: sortBy,
                 limit: limit,
                 subFromDate: dateRange.fromDate,
                 subToDate: dateRange.toDate,
-                status:statusParams,
-                type:typeParams,
+                status: statusParams,
+                type: typeParams,
             }
         })
 
-        const reportGroupedByType:ReportGroupedByType[] = res.data.reports?res.data.reports:[];
+        const reportGroupedByType: ReportGroupedByType[] = res.data.reports ? res.data.reports : [];
 
         return reportGroupedByType;
     } catch (err) {
@@ -142,12 +145,12 @@ export async function getReportsWeeklyBySubmissionDate({ weekOffSet }: { weekOff
 
         // Calculate the date of this Monday by subtracting the number of days since Monday (if today is Monday, then subtract 0; if it's Tuesday, then subtract 1; etc.)
         const monday = new Date(today);
-        monday.setDate(today.getDate() -  (dayOfWeek === 0 ? 6 : dayOfWeek - 1) - (weekOffSet * 7));
-        monday.setHours(0,0,0,0);
+        monday.setDate(today.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1) - (weekOffSet * 7));
+        monday.setHours(0, 0, 0, 0);
         // Calculate the date of this Sunday by adding the number of days until Sunday (if today is Sunday, then add 0; if it's Saturday, then add 1; etc.)
         const sunday = new Date(today);
-        sunday.setDate(today.getDate() + (dayOfWeek===0?0:7 - dayOfWeek) - (weekOffSet * 7))
-        sunday.setHours(23,59,59,999);
+        sunday.setDate(today.getDate() + (dayOfWeek === 0 ? 0 : 7 - dayOfWeek) - (weekOffSet * 7))
+        sunday.setHours(23, 59, 59, 999);
         const res = await axios.get(`${api_url}/admin/getReport`, {
             params: {
                 subFromDate: monday,
@@ -155,8 +158,8 @@ export async function getReportsWeeklyBySubmissionDate({ weekOffSet }: { weekOff
             }
         })
 
-    
-      
+
+
         return {
             groupedReport: res.data.reports,
             dateRange: {
@@ -171,29 +174,29 @@ export async function getReportsWeeklyBySubmissionDate({ weekOffSet }: { weekOff
 }
 
 export type ReprotElement = {
-    type:{
-        _id:string,
-        name:string,
+    type: {
+        _id: string,
+        name: string,
     }[],
-    status:{
-        _id:string,
-        desc:string,
+    status: {
+        _id: string,
+        desc: string,
     }[],
 }
 
-export async function getReportElement({includeType,includeStatus}:{includeType?:boolean,includeStatus?:boolean}):Promise<ReprotElement>{
+export async function getReportElement({ includeType, includeStatus }: { includeType?: boolean, includeStatus?: boolean }): Promise<ReprotElement> {
 
-    try{
-        const res = await axios.get(`${api_url}/admin/getReportElement`,{
-            params:{
-                type:includeType,
-                status:includeStatus
+    try {
+        const res = await axios.get(`${api_url}/admin/getReportElement`, {
+            params: {
+                type: includeType,
+                status: includeStatus
             }
         })
 
         return res.data.element
     }
-    catch(err){
+    catch (err) {
         errorHandler(err);
     }
 }

@@ -6,19 +6,19 @@ import {
   TouchableOpacity,
   Modal,
 } from "react-native";
-import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
+import {  MaterialIcons } from '@expo/vector-icons';
 import React, { useEffect } from "react";
 import Title from "../../Components/Title"
 import ProfileModal from "../../Modals/ProfileModal";
 import { SafeAreaView } from "react-native-safe-area-context";
 import RecentReportList from "../../Components/RecenReportList";
 import IUser from "../../api/Models/User";
-import { getLoggedInUserInfo } from "../../api/user";
+import { getLoggedInUserInfo, getProfilePicture } from "../../api/user";
 import IOrganization from "../../api/Models/Organization";
 import { IReport } from "../../api/Models/Report";
 import errorHandler from "../../api/errorHandler/axiosError";
 import { getReport } from "../../api/complainant";
-
+import { Image } from "react-native";
 
 export default function HomeScreen({ navigation }) {
 
@@ -29,23 +29,26 @@ export default function HomeScreen({ navigation }) {
 
 
   useEffect(() => {
-    getLoggedInUserInfo().then((res) => {
-      setLoggedInUser(res.loggedInUser);
-      setOrganization(res.organization);
-    }, (rej) => {
-      errorHandler(rej)
-    })
 
+    const getLoggedInUserInfoAsync = async () => {
+      try {
 
-    const unsubscribe = navigation.addListener('focus', () => {
-      getReport({ sortBy: "upDate", limit: 5 }).then((res) => {
-        setReports(res)
-      }, (rej) => {
-        errorHandler(rej);
-      })
-    });
+        const res = await getLoggedInUserInfo()
+        const profilePicture = await getProfilePicture(res.loggedInUser._id);
+        setLoggedInUser({ ...res.loggedInUser, base64ProfilePicture: profilePicture});
+        setOrganization(res.organization);
+      } catch (e) {
+        console.log(e)
+      }
+    }
+    getLoggedInUserInfoAsync();
 
+    const setReportsAsync = async () => {
+      setReports(await getReport({limit:5,sortBy:"subDate"}));
+    }
+    setReportsAsync();
   }, [])
+
 
 
 
@@ -59,7 +62,7 @@ export default function HomeScreen({ navigation }) {
           <Text style={{ fontSize: 10, color: "#8F8F8F" }}>Profile</Text>
           <View style={{ backgroundColor: "#b0cbde", flexDirection: "row", paddingTop: 10, paddingBottom: 10, borderRadius: 15, alignItems: "center" }}>
             <View style={{ marginLeft: "5%" }}>
-              <MaterialCommunityIcons name="face-man-profile" size={34} color="black" />
+               <Image style={{height:50,width:50,borderRadius:100}} source={{uri:`data:image/jpg;base64,${loggedInUser.base64ProfilePicture}`}} />
             </View>
 
             <View style={{ flex: 2, marginLeft: "5%" }}>
@@ -88,7 +91,7 @@ export default function HomeScreen({ navigation }) {
           <RecentReportList navigation={navigation} reports={reports} />
         }
         <Modal statusBarTranslucent={true} visible={profileModal} animationType={"slide"}>
-          <ProfileModal user={loggedInUser} setProfileModal={setProfileModal} editable={false} />
+          <ProfileModal user={loggedInUser} setUser={setLoggedInUser} setProfileModal={setProfileModal} editable={false} />
         </Modal>
       </ScrollView >
     </SafeAreaView>
@@ -98,13 +101,13 @@ export default function HomeScreen({ navigation }) {
 export function LatestUpdatedComponent() {
 
   const [lastestUpdatedReprot, setLastestUpdatedReport] = React.useState<IReport>();
-  React.useEffect(()=>{
+  React.useEffect(() => {
     getReport({ limit: 1, sortBy: "upDate" }).then((res) => {
       setLastestUpdatedReport(res[0]);
     }, (err) => {
       errorHandler(err);
     })
-  },[])
+  }, [])
 
 
   return (
@@ -114,73 +117,73 @@ export function LatestUpdatedComponent() {
 
       <View style={styles.latestUpdateContainer}>
         {lastestUpdatedReprot &&
-<>
-          <View
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            width: "100%",
-          }}
-          >
-          <View style={{ paddingLeft: 14 }}>
+          <>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                width: "100%",
+              }}
+            >
+              <View style={{ paddingLeft: 14 }}>
+                <Text
+                  style={{
+                    color: "white",
+                    fontWeight: "700",
+                    fontSize: 10,
+                    paddingTop: 12,
+                    paddingBottom: 3,
+                  }}
+                >
+                  Latest Update
+                </Text>
+                <Text style={{ fontSize: 8, color: "#f8f8f8" }}>
+                  {lastestUpdatedReprot.updateDate.toDateString()}
+                </Text>
+              </View>
+              <View style={{ position: "absolute", right: 20 }}>
+                <Text
+                  style={{ fontSize: 16, color: "#F8F8F8", fontWeight: "700" }}
+                >
+                  {lastestUpdatedReprot._id}
+                </Text>
+              </View>
+            </View>
+            <View style={{ paddingLeft: 14, paddingTop: 10, paddingBottom: 40 }}>
+              <Text
+                style={{
+                  color: "#F8F8F8",
+                  fontWeight: "700",
+                  fontSize: 16,
+                  paddingBottom: 10,
+                }}
+              >
+                {lastestUpdatedReprot.name}
+              </Text>
+              <Text
+                style={{
+                  color: "#F8F8F8",
+                  fontWeight: "500",
+                  fontSize: 11,
+                  paddingRight: 10,
+                  minHeight: 80,
+                }}
+              >
+                {lastestUpdatedReprot.comment}
+              </Text>
+            </View>
             <Text
               style={{
-                color: "white",
-                fontWeight: "700",
-                fontSize: 10,
-                paddingTop: 12,
-                paddingBottom: 3,
+                position: "absolute",
+                bottom: 12,
+                right: 20,
+                color: "#C8E6C9",
               }}
-              >
-              Latest Update
-            </Text>
-            <Text style={{ fontSize: 8, color: "#f8f8f8" }}>
-              {lastestUpdatedReprot.updateDate.toDateString()}
-            </Text>
-          </View>
-          <View style={{ position: "absolute", right: 20 }}>
-            <Text
-              style={{ fontSize: 16, color: "#F8F8F8", fontWeight: "700" }}
-              >
-              {lastestUpdatedReprot._id}
-            </Text>
-          </View>
-        </View>
-        <View style={{ paddingLeft: 14, paddingTop: 10, paddingBottom: 40 }}>
-          <Text
-            style={{
-              color: "#F8F8F8",
-              fontWeight: "700",
-              fontSize: 16,
-              paddingBottom: 10,
-            }}
             >
-          {lastestUpdatedReprot.name}
-          </Text>
-          <Text
-            style={{
-              color: "#F8F8F8",
-              fontWeight: "500",
-              fontSize: 11,
-              paddingRight: 10,
-              minHeight: 80,
-            }}
-            >
-            {lastestUpdatedReprot.comment}
-          </Text>
-        </View>
-        <Text
-        style={{
-          position: "absolute",
-          bottom: 12,
-          right: 20,
-          color: "#C8E6C9",
-        }}
-        >
-          {lastestUpdatedReprot.status}
-        </Text>
+              {lastestUpdatedReprot.status}
+            </Text>
           </>
-    }
+        }
       </View>
     </TouchableOpacity>
   )

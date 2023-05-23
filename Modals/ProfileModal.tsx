@@ -1,23 +1,25 @@
 import React, { useContext } from "react";
-import { View, Text, TouchableOpacity, TextInput, StyleSheet, StyleSheetProperties } from "react-native";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { View, Text, TouchableOpacity, TextInput} from "react-native";
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from "react-native-safe-area-context";
 import IUser, { roles } from "../api/Models/User";
 import AuthContext from "../Contexts/LoggedInUserContext";
 import { activateMember, deleteDeactivatedMember } from "../api/admin";
 import IComplainant from "../api/Models/Complainant";
-
+import * as ImagePicker from 'expo-image-picker';
+import { Image } from "react-native";
+import { getProfilePicture, uploadProfilePicture } from "../api/user";
 
 type Profile =
     {
-        reRenderCallback?: Function,
+        setMemberActivationCallBack?: ({_id}:{_id:string})=>void,
         setProfileModal: Function,
         user: IComplainant | IUser,
+        setUser?: React.Dispatch<React.SetStateAction<IUser | IComplainant>>,
         editable: boolean,
 
     }
-export default function ProfileModal({ reRenderCallback, setProfileModal, user, editable }: Profile) {
+export default function ProfileModal({ setMemberActivationCallBack, setProfileModal, user,setUser, editable }: Profile) {
 
     const LoggedInUser = useContext(AuthContext).loggedInUser;
     const [editPassword, setEditPassword] = React.useState(false);
@@ -30,9 +32,8 @@ export default function ProfileModal({ reRenderCallback, setProfileModal, user, 
         })
     }
     const onActivationButtonPress = () => {
-        activateMember(user._id,!activation)
         setProfileModal((prev) => {
-            reRenderCallback();
+            setMemberActivationCallBack({_id:user._id})
             return {
                 ...prev, visible: false
             }
@@ -41,20 +42,42 @@ export default function ProfileModal({ reRenderCallback, setProfileModal, user, 
     const onRemoveButtonPress = () => {
         deleteDeactivatedMember(user._id)
         setProfileModal((prev) => {
-            reRenderCallback();
             return {
                 ...prev, visible: false
             }
         })
     }
 
-    const activation ="activation" in user && user.activation
-    
+    const onProfilePicturePressed = async () => {
+        let image = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            base64: true,
+            allowsEditing: true,
+            aspect: [4, 3],
+            quality: 1,
+        })
 
-    const activationButtonStyle =  activation? { backgroundColor: "#ff3d3d" } : { backgroundColor: "#91f2ab" }
+        if (image.canceled) {
+            return;
+        }
+
+    setUser((prev)=>{
+        return {
+            ...prev,
+            base64ProfilePicture:image.assets[0].base64
+        }
+    }
+    )
+    await uploadProfilePicture({ uri:image.assets[0].uri, fileName:image.assets[0].fileName})
+
+
+    }
+
+    const activation = "activation" in user && user.activation
+
+    const activationButtonStyle = activation ? { backgroundColor: "#ff3d3d" } : { backgroundColor: "#91f2ab" }
     return (
         <SafeAreaView>
-
             <View style={{ height: "100%" }}>
                 <View style={{ height: "30%", width: "100%" }}>
                     <TouchableOpacity onPress={onBackButtonPressed}>
@@ -63,9 +86,11 @@ export default function ProfileModal({ reRenderCallback, setProfileModal, user, 
                         </View>
                     </TouchableOpacity>
                     <View>
-                        <View style={{ width: "100%", alignItems: "center" }}>
-                            <MaterialCommunityIcons name="face-man-profile" size={100} color="black" />
-                        </View>
+                        <TouchableOpacity onPress={onProfilePicturePressed}>
+                            <View style={{ width: "100%", alignItems: "center" }}>
+                                <Image style={{height:100,width:100,borderRadius:100}} source={{uri:`data:image/jpg;base64,${user.base64ProfilePicture}`}} />
+                            </View>
+                        </TouchableOpacity>
                         <View style={{ width: "100%", alignItems: "center", height: "20%" }}>
                             <Text style={{ fontSize: 10 }}>Total Report : 21 </Text>
                             <Text style={{ fontSize: 10 }}>Report Resolved : 10 </Text>
@@ -98,7 +123,7 @@ export default function ProfileModal({ reRenderCallback, setProfileModal, user, 
                                 <View style={{ marginTop: 100, margin: 20, padding: 10, borderRadius: 100, ...activationButtonStyle }}>
                                     <TouchableOpacity onPress={onActivationButtonPress}>
                                         <Text>
-                                            {activation? "Deactivate" : "Activate"}
+                                            {activation ? "Deactivate" : "Activate"}
                                         </Text>
                                     </TouchableOpacity>
                                 </View>

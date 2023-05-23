@@ -27,6 +27,7 @@ export function FieldSelectionModal({ setModal, updateField }) {
                 >
                     <Picker.Item label="Text" value={inputType.Text} />
                     <Picker.Item label="Date" value={inputType.Date} />
+                    <Picker.Item label="Photo" value={inputType.Photo} />
                 </Picker>
                 <View style={styles.btnContainer}>
                     <TouchableOpacity

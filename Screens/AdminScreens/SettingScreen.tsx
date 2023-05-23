@@ -50,7 +50,7 @@ export default function SettingScreen({navigation}) {
                 <FormListModal setFormListModal={setFormListModal} isVisible={formListModal} navigation={navigation} />
             </Modal>
             <Modal visible={profileModal} animationType="slide">
-                <ProfileModal reRenderCallback={()=>{}} user={useContext(AuthContext).loggedInUser} setProfileModal={setProfileModal} editable={true} />
+                <ProfileModal setMemberActivationCallBack={()=>{}} user={useContext(AuthContext).loggedInUser} setProfileModal={setProfileModal} editable={true} />
             </Modal>
         </SafeAreaView >
     );

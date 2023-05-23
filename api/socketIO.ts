@@ -19,7 +19,6 @@ let socket: Socket = null;
 
 const getSocket = async () => {
     const token = await secureStorage.getItemAsync("jwt");
-    console.log(token)
     if (!socket) {
         socket = io(`${api_url}`, {
             auth: { token: token }

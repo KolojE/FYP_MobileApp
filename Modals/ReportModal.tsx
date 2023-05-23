@@ -4,23 +4,31 @@ import { AntDesign } from '@expo/vector-icons';
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import EvidencePhoto from "../Components/EvidencePhoto";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { roles } from "../api/Models/User";
+import IUser, { roles } from "../api/Models/User";
+import { IReport } from "../api/Models/Report";
 
 
-export default function ReportModal(props) {
+type ReportModalProps = {
+    user: IUser,
+    report:IReport,
+    setReportModal:React.Dispatch<React.SetStateAction<boolean>>
+    
+}
+
+export default function ReportModal({user,report, setReportModal}: ReportModalProps) {
 
     return (
         <SafeAreaView>
             <ScrollView contentContainerStyle={styles.window}>
                 <View style={styles.titleContainer}>
-                    <TouchableOpacity style={{ marginRight: "auto" }} onPress={() => { props.SetReportModal(false) }}>
+                    <TouchableOpacity style={{ marginRight: "auto" }} onPress={() => { setReportModal(false) }}>
                         <AntDesign name="down" size={24} color="black" />
                     </TouchableOpacity>
                     <View style={{
                         alignSelf: "center"
                     }}>
                         < Text >
-                            #R0152141
+                           {report.name}
                         </Text>
                     </View>
                 </View >
@@ -81,7 +89,7 @@ export default function ReportModal(props) {
                     </View>
                 </View>
 
-                {props.user.role === roles.admin
+                {user.role === roles.admin
 
                     &&
 

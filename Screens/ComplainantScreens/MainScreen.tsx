@@ -18,7 +18,7 @@ export default function MainScreen() {
     const setLoggedInUser = useContext(AuthContext).setLoggedInUser
     const onLogoutButtonPressed = () => {
         deleteItemAsync("jwt");
-        setLoggedInUser(false)
+        setLoggedInUser(null)
     }
 
     const adminUser:IUser = {
@@ -33,6 +33,7 @@ export default function MainScreen() {
         },
         role: roles.admin,
     } 
+
     return (
         <Tab.Navigator
             screenOptions={{

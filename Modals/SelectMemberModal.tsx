@@ -6,21 +6,23 @@ import IconTextInput from "../Components/IconTextInput";
 import { AntDesign, Entypo } from "@expo/vector-icons";
 import { StyleSheet } from "react-native";
 import { getMembers } from "../api/admin";
+import fetchProfilePicture from "../utils/fetchprofilePicture";
+import IComplainant from "../api/Models/Complainant";
 
 
 
 
 type SelectMemberModalProps = {
     setSelectMemberModal: React.Dispatch<React.SetStateAction<boolean>>;
-    setSelectedUser: React.Dispatch<React.SetStateAction<IUser>>;
+    setSelectedUser: React.Dispatch<React.SetStateAction<IComplainant>>;
 }
 
 
 export default function SelectMemberModal({ setSelectMemberModal,setSelectedUser}: SelectMemberModalProps) {
-    const [members, setMembers] = React.useState<IUser[]>([]);
+    const [members, setMembers] = React.useState<IComplainant[]>([]);
 
 
-    function selectMember(selectedUser: IUser) {
+    function selectMember(selectedUser: IComplainant) {
         setSelectedUser(selectedUser)
     }
 
@@ -41,7 +43,15 @@ export default function SelectMemberModal({ setSelectMemberModal,setSelectedUser
 
         getMembersAsync();
 
+
     }, [])
+
+    React.useEffect(() => {
+        const setMemberProfilePicturesAsync = async () => {
+            fetchProfilePicture({setMembers,members})
+        }
+        setMemberProfilePicturesAsync();
+    })
 
 
     return (

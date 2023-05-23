@@ -2,12 +2,16 @@ import axios from "axios";
 import { api_url } from "../env";
 import errorHandler from "./errorHandler/axiosError";
 import { IReport } from "./Models/Report";
+import * as FileSystem from 'expo-file-system';
+import { getItemAsync } from "expo-secure-store";
+import { IField } from "./Models/Form";
 
 
 
-export async function submitReport({ report, formID }: { report: Object, formID: string }) {
+export async function submitReport({ report, formID,fields }: { report: object, formID: string ,fields:IField[]}) {
 
     try {
+
         const res = await axios.post(`${api_url}/report/reportIncident`, {
             formID: formID,
             field: report
@@ -15,6 +19,26 @@ export async function submitReport({ report, formID }: { report: Object, formID:
     } catch (err) {
         errorHandler(err)
     }
+}
+
+export async function uploadReportPhoto({uri}):Promise<string>{
+
+    try{
+        const uploadResult = await FileSystem.uploadAsync(`${api_url}/report/uploadReportPhoto`, uri, {
+            httpMethod: 'POST',
+            uploadType: FileSystem.FileSystemUploadType.MULTIPART,
+            fieldName: 'photo',
+            headers:{
+                authorization: `${await getItemAsync('jwt')}`
+            }
+        });
+
+        return JSON.parse(uploadResult.body).filePath;
+    }catch(err){
+        console.log(err)
+        errorHandler(err)
+    }
+
 }
 
 export async function getReport({sortBy,limit,dateRange}:{sortBy:"subDate"|"upDate",limit?:number,dateRange?:{subFromData?:Date,subToDate?:Date}}): Promise<IReport[]> {

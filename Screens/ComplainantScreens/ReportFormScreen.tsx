@@ -2,12 +2,18 @@ import React from "react";
 import { View, Text, ScrollView, Alert, StyleSheet, TouchableOpacity } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { IField } from "../../api/Models/Form";
+import { IField, inputType } from "../../api/Models/Form";
 import { FieldRenderer } from "../../utils/formHandler";
 import { getForm } from "../../api/user";
 import { submitReport } from "../../api/complainant";
 
-export default function ReportFormScreen({ route, navigation }) {
+
+type ReportFormScreenProps = {
+    route: any,
+    navigation: any
+}
+
+export default function ReportFormScreen({ route, navigation }: ReportFormScreenProps) {
 
 
     const [defaultFields, setDefaultFields] = React.useState<IField[]>([]);
@@ -74,7 +80,7 @@ export default function ReportFormScreen({ route, navigation }) {
     const defaultFieldElements = React.useMemo(
         () =>
             defaultFields.map((field, index) => {
-                setReport((prev) => { return { ...prev, [field._id]: "" } })
+                setReport((prev) => { return { ...prev, [field._id]: ""} })
                 return <FieldRenderer _id={field._id} key={index} inputType={field.inputType} label={field.label} required setReport={setReport} />
             }),
         [defaultFields]
@@ -90,7 +96,7 @@ export default function ReportFormScreen({ route, navigation }) {
     );
 
     const onSubmitButtonPressed = () => {
-        submitReport({ formID: params.formID, report: report })
+        submitReport({ formID: params.formID, report: report,fields:fields })
         setSubmitted(true)
     }
 

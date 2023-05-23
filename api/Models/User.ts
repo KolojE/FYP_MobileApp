@@ -6,6 +6,7 @@ export enum roles  {
 
 export default interface IUser {
     _id:string,
+    base64ProfilePicture?:string,
     ID:string,
     name:string,
     email:string,

@@ -31,11 +31,9 @@ export async function registration(form:registrationForm):Promise<IUser>
             const registeredUser=res.data.user
             const jsonWebToken = res.headers.authorization;
             await securestore.setItemAsync("jwt", jsonWebToken.toString());
-            console.log(registeredUser)
         return registeredUser
     }catch(err)
     {
-        console.log(err)
         errorHandler(err);
     }
 }

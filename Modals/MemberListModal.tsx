@@ -1,87 +1,87 @@
 import { AntDesign, Entypo } from "@expo/vector-icons";
 import React from "react";
-import { View, Text, StyleSheet, ScrollView, Modal } from "react-native";
+import { View, Text, StyleSheet, ScrollView, Modal, FlatList } from "react-native";
 import IconTextInput from "../Components/IconTextInput";
 import Member from "../Components/Member";
 import ProfileModal from "./ProfileModal";
-import { getMembers } from "../api/admin";
+import { activateMember, getMembers } from "../api/admin";
 import IComplainant from "../api/Models/Complainant";
+import { getProfilePicture } from "../api/user";
+import fetchProfilePicture from "../utils/fetchprofilePicture";
 
 
 
 type MemeberListModalProps = {
-setMemberListModal:React.Dispatch<React.SetStateAction<boolean>>;
+    setMemberListModal: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 
-export default function MemeberListModal({setMemberListModal}:MemeberListModalProps) {
+export default function MemeberListModal({ setMemberListModal }: MemeberListModalProps) {
     const [activatedMembers, setActivatedMembers] = React.useState<Array<IComplainant>>([]);
     const [deactivatedMembers, setDeactivatedMembers] = React.useState<Array<IComplainant>>([]);
     const [members, setMembers] = React.useState<Array<IComplainant>>([]);
 
-
-    const [activatedMemberElements, setActivatedMemberElements] = React.useState<Array<JSX.Element>>([]);
-    const [deactivatedMemberElements, setDeactivatedMemberElements] = React.useState<Array<JSX.Element>>([]);
     const [profileModal, setProfileModal] = React.useState({
         visible: false,
-        modal: <ProfileModal reRenderCallback={Renderer} editable={false} setProfileModal={undefined} user={undefined} />
+        modal: <ProfileModal setMemberActivationCallBack={setMemberActivationCallBack} editable={false} setProfileModal={undefined} user={undefined} />
     });
+
     React.useEffect(() => {
-        Renderer()
+        const getMembersAsync = async () => {
+            const members = await getMembers();
+            setMembers(members);
+        }
+        getMembersAsync();
     }, [])
 
-
     React.useEffect(() => {
-
-        setActivatedMemberElements(() => {
-            return activatedMembers.map((member, index) => {
-                return <Member user={member} onPressedCallBack={handleProfileModal} key={index} />
-            })
-        })
-
-        setDeactivatedMemberElements(() => {
-            return deactivatedMembers.map((member, index) => {
-                return <Member user={member} onPressedCallBack={handleProfileModal} key={index} />
-            })
-        })
-    }, [activatedMembers, deactivatedMembers])
-
-    const handleProfileModal = (id) => {
-        const member = members.find(member => {
-            return member._id === id
+        const setMemberProfilePicturesAsync = async () => {
+            fetchProfilePicture({setMembers,members})
         }
-        )
+        const setMembersAsync = async () => {
+            setActivatedMembers(members.filter((member) => member.activation));
+            setDeactivatedMembers(members.filter((member) => !member.activation));
+        }
 
+
+        setMemberProfilePicturesAsync();
+        setMembersAsync();
+    }, [members])
+
+
+
+
+    function setMemberActivationCallBack({ _id}) {
+        setMembers((prev) => {
+            return prev.map((member) => {
+                if (member._id === _id) {
+                    activateMember(_id, !member.activation)
+                    return {
+                        ...member,
+                        activation: !member.activation
+                    }
+                }
+                return member;
+            })
+        })
+    }
+    const handleProfileModal = (member) => {
         setProfileModal((prev) => {
             return {
                 ...prev,
                 visible: true,
                 modal: <ProfileModal
-                    editable={false} reRenderCallback={Renderer} setProfileModal={setProfileModal} user={member} />
+                    editable={false} setMemberActivationCallBack={setMemberActivationCallBack} setProfileModal={setProfileModal} user={member} />
             }
         })
     }
 
-    function Renderer() {
 
-        const activatedMembers_: Array<IComplainant> = []
-        const deactivatedMembers_: Array<IComplainant> = []
-
-        getMembers().then((members) => {
-            members.forEach((member) => {
-                if (member.activation) {
-                    activatedMembers_.push(member);
-                }
-                else {
-                    deactivatedMembers_.push(member);
-                }
-            })
-            setMembers(members);
-            setActivatedMembers(activatedMembers_);
-            setDeactivatedMembers(deactivatedMembers_);
-        }, (rej) => {
-        })
+    const renderMember = ({ item }) => {
+        return <Member user={item} onPressedCallBack={handleProfileModal} key={item.id} />
     }
+
+
 
     return (
         <View style={styles.searchContainer}>
@@ -89,17 +89,27 @@ export default function MemeberListModal({setMemberListModal}:MemeberListModalPr
             <View style={{ flexDirection: "row" }}>
                 <IconTextInput icon={<Entypo name="magnifying-glass" style={{ marginRight: 10 }} />} placeholder="Search" style={styles.searchBox} editable={true} />
             </View>
-            <ScrollView style={{ width: "100%" }} contentContainerStyle={{ width: "100%", alignItems: 'center' }}>
-                {
-                    deactivatedMembers.length > 0 &&
-                    <>
-                        <Text style={{ color: "grey", marginVertical: "5%" }}>Deactivated Members</Text>
-                        {deactivatedMemberElements}
-                    </>
-                }
-                <Text style={{ color: "grey", marginVertical: "5%" }}>Activated Members</Text>
-                {activatedMemberElements}
-            </ScrollView>
+            {
+
+                deactivatedMembers.length > 0 && <>
+                    <Text style={{ color: "grey", marginVertical: "5%" }}>Deactivated Members</Text>
+                    <FlatList
+                        data={deactivatedMembers}
+                        renderItem={renderMember}
+                        style={{ width: "90%" }}
+                    />
+                </>
+            }
+            {
+                <>
+                    <Text style={{ color: "grey", marginVertical: "5%" }}>Activated Members</Text>
+                    <FlatList
+                        data={activatedMembers}
+                        renderItem={renderMember}
+                        style={{ width: "90%" }}
+                    />
+                </>
+            }
             <Modal visible={profileModal.visible}>
                 {profileModal.modal}
             </Modal>
