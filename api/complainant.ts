@@ -32,7 +32,7 @@ export async function uploadReportPhoto({uri}):Promise<string>{
                 authorization: `${await getItemAsync('jwt')}`
             }
         });
-
+        console.log(uploadResult.body)
         return JSON.parse(uploadResult.body).filePath;
     }catch(err){
         console.log(err)

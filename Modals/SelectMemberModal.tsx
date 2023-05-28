@@ -58,7 +58,7 @@ export default function SelectMemberModal({ setSelectMemberModal,setSelectedUser
         <View>
             <TouchableOpacity onPress={onDownButtonPressed} style={{ marginHorizontal: 20, marginTop: 20 }}><AntDesign name="down" size={24} /></TouchableOpacity>
             <View style={{ flexDirection: "row", alignSelf: "center" }}>
-                <IconTextInput icon={<Entypo name="magnifying-glass" style={{ marginRight: 10 }} />} placeholder="Search" style={styles.searchBox} editable={true} />
+                <IconTextInput icon={<Entypo name="magnifying-glass" style={{ marginRight: 10 }} />} placeholder="Search" viewContainerStyle={styles.searchBox} editable={true} />
             </View>
 
             <FlatList

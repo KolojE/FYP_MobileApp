@@ -36,7 +36,7 @@ export default function FormListModal(props) {
                 <AntDesign onPress={() => { props.setFormListModal(false);  props.navigation.navigate("formBuilder");  }} name="plus" size={24} style={[styles.iconStyle, styles.iconMarginLeft]} />
             </View>
             <View style={styles.rowContainer}>
-                <IconTextInput icon={<Entypo name="magnifying-glass" style={styles.iconStyle} />} placeholder="Search" style={styles.searchBox} editable={undefined} />
+                <IconTextInput icon={<Entypo name="magnifying-glass" style={styles.iconStyle} />} placeholder="Search" viewContainerStyle={styles.searchBox} editable={undefined} />
             </View>
             <ScrollView style={styles.scrollViewContainer} contentContainerStyle={styles.scrollViewContentContainer}>
                 {formListElement.length > 0 && formListElement}

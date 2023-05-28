@@ -1,5 +1,5 @@
 import React from "react";
-import { View, TouchableOpacity, Image } from "react-native";
+import {  TouchableOpacity, Image } from "react-native";
 
 type EvidencePhotoProps = {
     onPressedCallBack?: Function

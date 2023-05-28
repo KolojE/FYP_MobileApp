@@ -44,8 +44,8 @@ export function FieldRenderer(field: FieldRendererProps) {
     const onTextChange = (text) => {
         setValue(text);
     }
-    const onLocationChange = ({ La, Lo }) => {
-        setValue({ La: 123, Lo: 123 })
+    const onLocationChange = ({ la, lo, address }) => {
+        setValue({ cords: { La: la, Lo: lo }, address: address })
     }
 
     const onAddPhoto = async () => {
@@ -61,7 +61,7 @@ export function FieldRenderer(field: FieldRendererProps) {
         if (image.canceled) {
             return;
         }
-        const filePath = await uploadReportPhoto({uri:image.assets[0].uri})
+        const filePath = await uploadReportPhoto({ uri: image.assets[0].uri })
         console.log(filePath)
         if (!value && !selectedPhoto) {
             setSelectedPhotos([image.assets[0]])
@@ -71,13 +71,13 @@ export function FieldRenderer(field: FieldRendererProps) {
 
 
         setValue((prev) => [...prev, filePath])
-        setSelectedPhotos((prev) => [...prev,image.assets[0]])
+        setSelectedPhotos((prev) => [...prev, image.assets[0]])
     }
 
 
-    function renderPhoto({item,index}) {
+    function renderPhoto({ item, index }) {
         return <EvidencePhoto base64={item.base64} key={index} onPressedCallBack={null} />
-        
+
     }
 
     switch (field.inputType) {
@@ -151,13 +151,13 @@ export function FieldRenderer(field: FieldRendererProps) {
                             <TextInput
                                 style={styles.input}
                                 editable={false}
-                                value={value ? value : " "}
+                                value={value ? value.address : " "}
                             />
                         </View>
                     </TouchableOpacity>
                     {locationPicker && (
                         <Modal animationType="slide">
-                            <LocationPickerModal setOpenLocationPicker={setLocationPicker} />
+                            <LocationPickerModal onLocationChange={onLocationChange} setOpenLocationPicker={setLocationPicker} />
                         </Modal>
                     )}
                 </View>
@@ -166,8 +166,8 @@ export function FieldRenderer(field: FieldRendererProps) {
             return (
                 <View style={{ marginBottom: "5%" }}>
                     <Text style={{ width: "100%", fontSize: 10, color: "grey" }}>Photos 4/10</Text>
-                    <View style={{flexDirection:"row",alignItems:"center"}}>
-                        <TouchableOpacity onPress={onAddPhoto} style={{height:100,width:100,alignItems:"center",justifyContent:"center"}} >
+                    <View style={{ flexDirection: "row", alignItems: "center" }}>
+                        <TouchableOpacity onPress={onAddPhoto} style={{ height: 100, width: 100, alignItems: "center", justifyContent: "center" }} >
                             <AntDesign name="pluscircle" size={50} color="grey" style={{}} />
                         </TouchableOpacity>
                         <FlatList

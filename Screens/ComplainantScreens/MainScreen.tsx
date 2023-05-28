@@ -61,13 +61,14 @@ export default function MainScreen() {
             />
             <Tab.Screen
                 name="Chat"
-                component={()=><ChatScreen selectedUser={adminUser} setChatRoomModal={null}/>}
                 options={{
                     tabBarIcon: ({ }) => {
                         return <Entypo name="chat" size={22} />;
                     },
                 }}
-            />
+            >
+                {()=><ChatScreen selectedUser={adminUser} setChatRoomModal={null}/>}
+            </Tab.Screen>
             <Tab.Screen
                 name="Logout"
                 component={LoginScreen}

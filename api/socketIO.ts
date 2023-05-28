@@ -3,9 +3,6 @@ import { api_url } from "../env";
 import * as secureStorage from "expo-secure-store";
 
 
-type message = {
-    message: string
-}
 
 type emitSendMessageArgs = {
     receiverID: string,

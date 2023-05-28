@@ -11,7 +11,7 @@ type RecenReportListProps = {
 
 export default function RecentReportList({ navigation, reports }: RecenReportListProps) {
 
-    const [reportRecentReportElement,setRecentReportElement] = React.useState<JSX.Element[]>([])
+    const [reportRecentReportElement, setRecentReportElement] = React.useState<JSX.Element[]>([])
 
     const recentReport = reports.sort((report1, report2) => {
         return report1.updateDate.getDate() - report2.updateDate.getDate();
@@ -19,12 +19,12 @@ export default function RecentReportList({ navigation, reports }: RecenReportLis
 
 
     React.useEffect(() => {
-       setRecentReportElement(
-           recentReport.slice(0, 5).map(
-               (report,index) => {
-                   return <RecentReport report={report} key={index}/>
+        setRecentReportElement(
+            recentReport.slice(0, 5).map(
+                (report, index) => {
+                    return <RecentReport report={report} key={index} />
                 })
-                )
+        )
     }, [reports])
 
 

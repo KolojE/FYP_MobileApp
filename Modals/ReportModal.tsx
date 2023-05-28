@@ -56,12 +56,6 @@ export default function ReportModal({user,report, setReportModal}: ReportModalPr
                             <Text></Text>
                             <ScrollView horizontal={true} >
                                 <View style={{ flexDirection: "row" }}>
-                                    <EvidencePhoto />
-                                    <EvidencePhoto />
-                                    <EvidencePhoto />
-                                    <EvidencePhoto />
-                                    <EvidencePhoto />
-                                    <EvidencePhoto />
                                 </View>
                             </ScrollView>
                         </View>

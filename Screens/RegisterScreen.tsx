@@ -55,12 +55,12 @@ export default function RegisterScreen() {
             </View>
             <View style={styles.RegisterContainer}>
                 <Text style={styles.Title}>Registration</Text>
-                <IconTextInput icon={<Ionicons name="person" style={styles.Icon} />} placeholder="User Name" style={styles.IconTextInput} editable={true} onChange={onTextChange} inputkey={"name"} />
-                <IconTextInput icon={<FontAwesome name="envelope" style={styles.Icon} />} placeholder="Email" style={styles.IconTextInput} editable={true} onChange={onTextChange} inputkey={"email"} />
-                <IconTextInput icon={<FontAwesome5 name="key" style={styles.Icon} />} placeholder="Password" style={styles.IconTextInput} editable={true} onChange={onTextChange} inputkey={"password"} />
-                <IconTextInput icon={<FontAwesome5 name="key" style={styles.Icon} />} placeholder="Confirm Password" style={styles.IconTextInput} editable={true} onChange={onTextChange} inputkey={"Confirm password"} />
-                <IconTextInput icon={<MaterialCommunityIcons name="form-textbox-password" style={styles.Icon} />} placeholder="Organization ID" style={styles.IconTextInput} editable={undefined} onChange={onTextChange} inputkey={"organization.ID"} />
-                <IconTextInput icon={<Octicons name="organization" style={styles.Icon} />} placeholder="Organization Name" style={{ ...styles.IconTextInput, height: "15%", backgroundColor: "#b5b3b3" }} editable={false} />
+                <IconTextInput icon={<Ionicons name="person" style={styles.Icon} />} placeholder="User Name" viewContainerStyle={styles.IconTextInput} editable={true} onChange={onTextChange} inputkey={"name"} />
+                <IconTextInput icon={<FontAwesome name="envelope" style={styles.Icon} />} placeholder="Email" viewContainerStyle={styles.IconTextInput} editable={true} onChange={onTextChange} inputkey={"email"} />
+                <IconTextInput icon={<FontAwesome5 name="key" style={styles.Icon} />} placeholder="Password" viewContainerStyle={styles.IconTextInput} editable={true} onChange={onTextChange} inputkey={"password"} />
+                <IconTextInput icon={<FontAwesome5 name="key" style={styles.Icon} />} placeholder="Confirm Password" viewContainerStyle={styles.IconTextInput} editable={true} onChange={onTextChange} inputkey={"Confirm password"} />
+                <IconTextInput icon={<MaterialCommunityIcons name="form-textbox-password" style={styles.Icon} />} placeholder="Organization ID" viewContainerStyle={styles.IconTextInput} editable={undefined} onChange={onTextChange} inputkey={"organization.ID"} />
+                <IconTextInput icon={<Octicons name="organization" style={styles.Icon} />} placeholder="Organization Name" viewContainerStyle={{ ...styles.IconTextInput, height: "15%", backgroundColor: "#b5b3b3" }} editable={false} />
                 <TouchableOpacity style={{ ...styles.input, marginTop: "2%", width: "50%", backgroundColor: "#4d8ef7", paddingTop: 10, paddingBottom: 10 }} onPress={() => { onRegistrationButtonPressed() }}>
                     <Text style={{ fontWeight: "bold", textAlign: "center", color: "white" }}>Register</Text>
                 </TouchableOpacity>

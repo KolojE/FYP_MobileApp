@@ -1,12 +1,11 @@
 import { AntDesign, Entypo } from "@expo/vector-icons";
 import React from "react";
-import { View, Text, StyleSheet, ScrollView, Modal, FlatList } from "react-native";
+import { View, Text, StyleSheet,  Modal, FlatList } from "react-native";
 import IconTextInput from "../Components/IconTextInput";
 import Member from "../Components/Member";
 import ProfileModal from "./ProfileModal";
 import { activateMember, getMembers } from "../api/admin";
 import IComplainant from "../api/Models/Complainant";
-import { getProfilePicture } from "../api/user";
 import fetchProfilePicture from "../utils/fetchprofilePicture";
 
 
@@ -36,7 +35,7 @@ export default function MemeberListModal({ setMemberListModal }: MemeberListModa
 
     React.useEffect(() => {
         const setMemberProfilePicturesAsync = async () => {
-            fetchProfilePicture({setMembers,members})
+            fetchProfilePicture({ setMembers, members })
         }
         const setMembersAsync = async () => {
             setActivatedMembers(members.filter((member) => member.activation));
@@ -51,7 +50,7 @@ export default function MemeberListModal({ setMemberListModal }: MemeberListModa
 
 
 
-    function setMemberActivationCallBack({ _id}) {
+    function setMemberActivationCallBack({ _id }) {
         setMembers((prev) => {
             return prev.map((member) => {
                 if (member._id === _id) {
@@ -87,7 +86,7 @@ export default function MemeberListModal({ setMemberListModal }: MemeberListModa
         <View style={styles.searchContainer}>
             <AntDesign onPress={() => { setMemberListModal(false) }} name="down" size={24} style={{ marginRight: "auto", marginLeft: "5%", marginTop: "5%" }} />
             <View style={{ flexDirection: "row" }}>
-                <IconTextInput icon={<Entypo name="magnifying-glass" style={{ marginRight: 10 }} />} placeholder="Search" style={styles.searchBox} editable={true} />
+                <IconTextInput icon={<Entypo name="magnifying-glass" style={{ marginRight: 10 }} />} placeholder="Search" viewContainerStyle={styles.searchBox} editable={true} />
             </View>
             {
 
