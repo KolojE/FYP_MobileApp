@@ -2,16 +2,20 @@ import React from "react";
 import { View, Text, ScrollView, Alert, StyleSheet, TouchableOpacity } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { IField, inputType } from "../../api/Models/Form";
+import { IField, inputType } from "../../types/Models/Form";
 import { FieldRenderer } from "../../utils/formHandler";
 import { getForm } from "../../api/user";
 import { submitReport } from "../../api/complainant";
+import { reportSubmissionSchema } from "../../types/General";
 
 
 type ReportFormScreenProps = {
     route: any,
     navigation: any
 }
+
+
+
 
 export default function ReportFormScreen({ route, navigation }: ReportFormScreenProps) {
 
@@ -20,7 +24,7 @@ export default function ReportFormScreen({ route, navigation }: ReportFormScreen
     const [fields, setFields] = React.useState<IField[]>([]);
     const [formName, setFormName] = React.useState("");
 
-    const [report, setReport] = React.useState({});
+    const [report, setReport] = React.useState<reportSubmissionSchema>({});
 
     const params = route.params;
     const [submitted, setSubmitted] = React.useState(false);
@@ -80,7 +84,7 @@ export default function ReportFormScreen({ route, navigation }: ReportFormScreen
     const defaultFieldElements = React.useMemo(
         () =>
             defaultFields.map((field, index) => {
-                setReport((prev) => { return { ...prev, [field._id]: ""} })
+                setReport((prev) => { return { ...prev, [field._id]: null } })
                 return <FieldRenderer _id={field._id} key={index} inputType={field.inputType} label={field.label} required setReport={setReport} />
             }),
         [defaultFields]
@@ -89,14 +93,14 @@ export default function ReportFormScreen({ route, navigation }: ReportFormScreen
     const formFieldElements = React.useMemo(
         () =>
             fields.map((field, index) => {
-                setReport((prev) => { return { ...prev, [field._id]: "" } })
+                setReport((prev) => { return { ...prev, [field._id]: null } })
                 return <FieldRenderer _id={field._id} key={index} inputType={field.inputType} label={field.label} required setReport={setReport} />
             }),
         [fields]
     );
 
     const onSubmitButtonPressed = () => {
-        submitReport({ formID: params.formID, report: report,fields:fields })
+        submitReport({ formID: params.formID, report: report, fields: fields })
         setSubmitted(true)
     }
 

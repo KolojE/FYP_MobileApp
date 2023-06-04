@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Text, TouchableOpacity } from "react-native";
-import { IReport } from "../api/Models/Report";
+import { IReport } from "../types/Models/Report";
 
 
 type RecenReportProps = {

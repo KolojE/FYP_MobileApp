@@ -1,30 +1,25 @@
 import axios, { CancelTokenSource } from "axios";
-import IUser from "./Models/User";
 import { api_url } from "../env";
-import IOrganization from "./Models/Organization";
 import { jwtTokenInterception } from "./interceptor/jwtTokenInterception";
-import Form from "./Models/Form";
+import Form from "../types/Models/Form";
 import errorHandler from "./errorHandler/axiosError";
 import * as FileSystem from 'expo-file-system';
 import { getItemAsync } from "expo-secure-store";
+import { UserInfo } from "../types/General";
 
 
 
 axios.interceptors.request.use(jwtTokenInterception);
 
-type UserInfo = {
-    loggedInUser: IUser,
-    organization: IOrganization,
-
-}
 
 export async function getLoggedInUserInfo(): Promise<UserInfo> {
 
     try {
 
         const res = await axios.get(`${api_url}/user/getUserInfo`)
-        const LoggedInUser = res.data
-        return LoggedInUser
+        const userinfo= res.data
+        console.log(userinfo)
+        return userinfo 
     } catch (err) {
         errorHandler(err);
     }
@@ -58,7 +53,7 @@ export async function getForm(id: String): Promise<Form> {
 
 }
 
-export async function uploadProfilePicture({ uri }: { uri: string, fileName: string }) {
+export async function uploadProfilePicture(uri:string)  {
     try {
 
         const uploadResult = await FileSystem.uploadAsync(`${api_url}/user/uploadProfilePicture`, uri, {
@@ -76,7 +71,7 @@ export async function uploadProfilePicture({ uri }: { uri: string, fileName: str
     }
 }
 
-export async function getProfilePicture(userID: string) {
+export async function getProfilePicture(userID: string): Promise<string> {
     try {
         const res = await axios.get(`${api_url}/user/getProfilePicture`, {
             params: {
@@ -119,6 +114,15 @@ export async function searchAddress(query: string) {
 
         });
         return addressSuggestion;
+    } catch (err) {
+        errorHandler(err)
+    }
+}
+
+export async function getAddressByCoordinates(lat: number, lon: number):Promise<string> {
+    try {
+        const res = await axios.get(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`)
+        return res.data.display_name
     } catch (err) {
         errorHandler(err)
     }

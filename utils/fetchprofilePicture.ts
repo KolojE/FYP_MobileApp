@@ -1,4 +1,4 @@
-import IComplainant from "../api/Models/Complainant";
+import IComplainant from "../types/Models/Complainant";
 import { getProfilePicture } from "../api/user";
 
 type MemeberListModalProps = {

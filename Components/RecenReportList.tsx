@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import RecentReport from "./RecentReport";
-import { IReport } from "../api/Models/Report";
+import { IReport } from "../types/Models/Report";
 
 
 type RecenReportListProps = {

@@ -6,55 +6,50 @@ import {
   TouchableOpacity,
   Modal,
 } from "react-native";
-import {  MaterialIcons } from '@expo/vector-icons';
+import { MaterialIcons } from '@expo/vector-icons';
 import React, { useEffect } from "react";
 import Title from "../../Components/Title"
 import ProfileModal from "../../Modals/ProfileModal";
 import { SafeAreaView } from "react-native-safe-area-context";
 import RecentReportList from "../../Components/RecenReportList";
-import IUser from "../../api/Models/User";
-import { getLoggedInUserInfo, getProfilePicture } from "../../api/user";
-import IOrganization from "../../api/Models/Organization";
-import { IReport } from "../../api/Models/Report";
+import { IReport } from "../../types/Models/Report";
 import errorHandler from "../../api/errorHandler/axiosError";
 import { getReport } from "../../api/complainant";
 import { Image } from "react-native";
+import { useUserInfoAction } from "../../actions/userAction";
+import { RootState } from "../../redux/store";
+import { useSelector } from "react-redux";
 
 export default function HomeScreen({ navigation }) {
 
   const [profileModal, setProfileModal] = React.useState(false);
-  const [loggedInUser, setLoggedInUser] = React.useState<IUser>();
-  const [organization, setOrganization] = React.useState<IOrganization>();
-  const [reports, setReports] = React.useState<IReport[]>([]);
+  const [recentReport, setRecentReports] = React.useState<IReport[]>([]);
 
+  const userInfoAction = useUserInfoAction();
 
+  const userinfo= useSelector((state: RootState) => state.userinfo);
+
+  const {user,organization,totalReportCount,totalResolvedCount} = {...userinfo.userinfo}
+
+  
   useEffect(() => {
-
     const getLoggedInUserInfoAsync = async () => {
-      try {
-
-        const res = await getLoggedInUserInfo()
-        const profilePicture = await getProfilePicture(res.loggedInUser._id);
-        setLoggedInUser({ ...res.loggedInUser, base64ProfilePicture: profilePicture});
-        setOrganization(res.organization);
-      } catch (e) {
-        console.log(e)
-      }
+      userInfoAction.fetchUserInfoAction();
     }
+
     getLoggedInUserInfoAsync();
 
     const setReportsAsync = async () => {
-      setReports(await getReport({limit:5,sortBy:"subDate"}));
+      setRecentReports(await getReport({ limit: 5, sortBy: "subDate" }));
     }
     setReportsAsync();
   }, [])
 
+  const onCloseModalPressed = () => {
+    setProfileModal(false);
+  }
 
-
-
-
-
-  return organization && loggedInUser ? (
+  return organization && user? (
     <SafeAreaView>
       <ScrollView contentContainerStyle={styles.window} >
         <Title title={"Dashboard"} />
@@ -62,36 +57,34 @@ export default function HomeScreen({ navigation }) {
           <Text style={{ fontSize: 10, color: "#8F8F8F" }}>Profile</Text>
           <View style={{ backgroundColor: "#b0cbde", flexDirection: "row", paddingTop: 10, paddingBottom: 10, borderRadius: 15, alignItems: "center" }}>
             <View style={{ marginLeft: "5%" }}>
-               <Image style={{height:50,width:50,borderRadius:100}} source={{uri:`data:image/jpg;base64,${loggedInUser.base64ProfilePicture}`}} />
+              <Image style={{ height: 50, width: 50, borderRadius: 100 }} source={{ uri: `data:image/jpg;base64,${user.base64ProfilePicture}` }} />
             </View>
 
             <View style={{ flex: 2, marginLeft: "5%" }}>
               <View style={{ flexDirection: "row", alignItems: "center" }}>
-                <Text style={{ fontSize: 12 }}>{loggedInUser ? loggedInUser.name : ""}</Text>
+                <Text style={{ fontSize: 12 }}>{user? user.name : ""}</Text>
                 <TouchableOpacity onPress={() => {
                   setProfileModal(true);
-                }
-
-                }>
+                }}>
                   <MaterialIcons name="edit" size={12} color="black" />
                 </TouchableOpacity>
               </View>
-              <Text style={{ fontSize: 10 }}>ID: {loggedInUser ? loggedInUser.ID : ""}</Text>
+              <Text style={{ fontSize: 10 }}>ID: {user? user.ID : ""}</Text>
               <Text style={{ fontSize: 10 }}>Organization: {organization.name}</Text>
             </View>
             <View style={{ flex: 2, paddingRight: "3%" }}>
-              <Text style={{ fontSize: 10 }}>Total Reports : {reports?.length}</Text>
-              <Text style={{ fontSize: 10 }}>Report Resolved: 10</Text>
+              <Text style={{ fontSize: 10 }}>Total Reports : {totalReportCount}</Text>
+              <Text style={{ fontSize: 10 }}>Report Resolved: {totalResolvedCount}</Text>
             </View>
           </View>
         </View>
         <LatestUpdatedComponent />
         {
-          reports &&
-          <RecentReportList navigation={navigation} reports={reports} />
+          recentReport &&
+          <RecentReportList navigation={navigation} reports={recentReport} />
         }
         <Modal statusBarTranslucent={true} visible={profileModal} animationType={"slide"}>
-          <ProfileModal user={loggedInUser} setUser={setLoggedInUser} setProfileModal={setProfileModal} editable={false} />
+          <ProfileModal userInfo={userinfo.userinfo} closeModal={onCloseModalPressed} />
         </Modal>
       </ScrollView >
     </SafeAreaView>
@@ -114,7 +107,6 @@ export function LatestUpdatedComponent() {
     <TouchableOpacity
       style={{ position: "relative", width: "90%", marginTop: "10%" }}
     >
-
       <View style={styles.latestUpdateContainer}>
         {lastestUpdatedReprot &&
           <>

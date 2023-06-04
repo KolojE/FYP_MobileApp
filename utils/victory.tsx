@@ -1,4 +1,4 @@
-import { ReportGroupedByType } from "../api/admin"
+import { ReportGroupedByType } from "../types/General"
 
 export function getGroupedReportInfoForVictory({ groupedReport }: { groupedReport: ReportGroupedByType[] }) {
     const reports = {
@@ -6,6 +6,7 @@ export function getGroupedReportInfoForVictory({ groupedReport }: { groupedRepor
         pie: [],
         totalReport: 0,
     }
+
     groupedReport.length > 0 &&
         groupedReport.forEach((res) => {
             reports.legend.push({ name: res.name })

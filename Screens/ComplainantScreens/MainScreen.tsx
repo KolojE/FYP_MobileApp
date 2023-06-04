@@ -5,24 +5,22 @@ import HomeScreen from "./HomeScreen";
 import AddReportScreen from "./AddReportScreen";
 import ChatScreen from "../ChatScreen";
 import { TouchableOpacity } from "react-native";
-import AuthContext from "../../Contexts/LoggedInUserContext";
-import { deleteItemAsync } from "expo-secure-store";
 import LoginScreen from "../LoginScreen";
-import IUser, { roles } from "../../api/Models/User";
+import IUser, { roles } from "../../types/Models/User";
+import { useAuthAction } from "../../actions/authAndRegAction";
 
 const Tab = createBottomTabNavigator();
 
 
 export default function MainScreen() {
 
-    const setLoggedInUser = useContext(AuthContext).setLoggedInUser
+    const authAction = useAuthAction();
     const onLogoutButtonPressed = () => {
-        deleteItemAsync("jwt");
-        setLoggedInUser(null)
+        authAction.logoutAction();
     }
 
     const adminUser:IUser = {
-        _id: "645a0f589b437ecaa5d8a557",
+        _id: "646cccd978d49b3f29706659",
         ID: "",
         name: "",
         email: "",

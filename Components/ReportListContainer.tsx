@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text } from "react-native";
 import ReportList from "./ReportList";
-import { IReport } from "../api/Models/Report";
+import { IReport } from "../types/Models/Report";
 
 
 

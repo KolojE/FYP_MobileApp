@@ -1,6 +1,7 @@
 import { Socket, io } from "socket.io-client";
 import { api_url } from "../env";
 import * as secureStorage from "expo-secure-store";
+import { onMessageReceiveCallback } from "../types/General";
 
 
 
@@ -9,47 +10,79 @@ type emitSendMessageArgs = {
     message: string,
 }
 
-type onMessageReceiveArgs = ({ senderID, message }) => void
-
-
 let socket: Socket = null;
 
 const getSocket = async () => {
-    const token = await secureStorage.getItemAsync("jwt");
-    if (!socket) {
-        socket = io(`${api_url}`, {
-            auth: { token: token }
-        })
+
+  const token = await secureStorage.getItemAsync("jwt");
+   return new Promise<Socket>((resolve, reject) => {
+    if (socket) {
+      socket.connect();
+      console.log("socket connected")
+      resolve(socket);
+    } else {
+      socket = io(`${api_url}`, {
+        auth: { token: token },
+        reconnection: true,
+        reconnectionDelay: 200,
+        reconnectionDelayMax: 200,
+        reconnectionAttempts: Infinity,
+      });
+      console.log("new socket created")
+
+      socket.on("connect", () => {
+        console.log("socket connected"); 
+        resolve(socket);
+      });
+
+      socket.on("error", (error) => {
+        reject(error);
+      });
+
+      socket.on("connect_error", (error) => {
+        reject(error);
+      });
+
+      socket.on("connect_timeout", (timeout) => {
+        reject(new Error(`Connection timeout (${timeout}ms)`));
+      });
+
+      socket.on("disconnect", (reason) => { 
+        console.log(reason+" socket disconnected")
+      })
     }
-    socket.on("connect", () => {
-        console.log("connected")
-    })
-    socket.on("error", (error) => {
-        console.log(error)
-    })
-    return socket;
-}
+  });
+};
+
+
+
 
 
 export function sendMessage({ receiverID, message }: emitSendMessageArgs) {
-    socket.emit("sendMessage", receiverID, message);
+    socket.emit("sendMessage", receiverID, message, (ack) => {
+      console.log("ack", ack);
+    });
+}
+
+export function getPendingMessages() {
+    socket.emit("getPendingMessages");
 }
 
 
-export function onMessageReceive(callBack: onMessageReceiveArgs) {
+export function addOnMessageReceiveListener(callBack: onMessageReceiveCallback) {
+    console.log("add on message receive listener")
     socket.on("receiveMessage", (...args) => {
-        console.log(args)
         const [senderID, message] = args
+        console.log("message received", args)
         callBack({ senderID: senderID, message: message });
     })
 }
 
-export function disconnectSocket()
-{
+export function disconnectSocket() {
+    socket.disconnect()
     socket.removeAllListeners()
-    socket.disconnect();
+    socket = null;
+    console.log("socket disconnected", socket)
 }
-
-getSocket()
 
 export default getSocket;

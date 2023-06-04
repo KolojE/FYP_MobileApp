@@ -1,18 +1,14 @@
 import axios from "axios";
 import * as securestore from "expo-secure-store"
-import IUser from "./Models/User";
+import IUser from "../types/Models/User";
 import { api_url } from "../env";
 import errorHandler from "./errorHandler/axiosError";
+import { LoginCredentials } from "../types/General";
 
 
-interface login {
-    identifier: String,
-    password: String,
-
-}
 
 
-export async function authenticate(login: login): Promise<IUser> {
+export async function login(login: LoginCredentials): Promise<IUser> {
     try {
         const res = await axios.post(`${api_url}/login`, {
             identifier: login.identifier,
@@ -27,11 +23,11 @@ export async function authenticate(login: login): Promise<IUser> {
 
     }
     catch (err) {
-        errorHandler(err);
+        throw err
     }
 }
 
-export async function tokenAuthentication(token:string):Promise<IUser>{
+export async function tokenLogin(token:string):Promise<IUser>{
     try{
         const res= await axios.get(`${api_url}/login`,{
             headers:{

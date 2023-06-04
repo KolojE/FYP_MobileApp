@@ -4,7 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import Title from "../../Components/Title";
 import React from "react";
 import { getForms } from "../../api/user";
-import IForm from "../../api/Models/Form";
+import IForm from "../../types/Models/Form";
 
 export default function AddReportScreen({ navigation }) {
 

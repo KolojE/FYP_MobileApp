@@ -1,26 +1,28 @@
-import React, { useContext } from "react";
-import { View, Text,  Modal } from "react-native";
+import React from "react";
+import { View, Text, Modal } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { SettingOption } from "../../Components/SettingOption";
 import FormListModal from "../../Modals/FormListModal";
 import MemeberListModal from "../../Modals/MemberListModal";
 import ProfileModal from "../../Modals/ProfileModal";
-import AuthContext from "../../Contexts/LoggedInUserContext";
-import { deleteItemAsync } from "expo-secure-store";
-import { disconnectSocket } from "../../api/socketIO";
+import { useAuthAction } from "../../actions/authAndRegAction";
+import { useSelector } from "react-redux";
+import { RootState } from "../../redux/store";
 
 
 
-export default function SettingScreen({navigation}) {
+export default function SettingScreen({ navigation }) {
     const [memberListModal, setMemberListModal] = React.useState(false);
     const [formListModal, setFormListModal] = React.useState(false);
     const [profileModal, setProfileModal] = React.useState(false);
-    const setLoggedInUser= useContext(AuthContext).setLoggedInUser;
-    const onLogoutPress=()=>{
-        deleteItemAsync("jwt");
-        setLoggedInUser(null);
-        disconnectSocket();
+
+    const authAction = useAuthAction();
+    const loggedInUser = useSelector((state: RootState) => state.authentication.loggedInUser);
+    const onLogoutPress = () => {
+        authAction.logoutAction();
     }
+
+
     return (
         <SafeAreaView style={{}}>
             <View style={{ position: "relative", height: "100%", backgroundColor: "#050e2d" }}>
@@ -33,7 +35,7 @@ export default function SettingScreen({navigation}) {
 
                 </View>
             </View>
-            <View style={{ backgroundColor: "white", position: "absolute", alignSelf: "center", height: "50%", width: "85%", borderRadius: 30, top: "40%" ,padding:"5%"}}>
+            <View style={{ backgroundColor: "white", position: "absolute", alignSelf: "center", height: "50%", width: "85%", borderRadius: 30, top: "40%", padding: "5%" }}>
                 <View style={{ width: "90%", alignSelf: "center", height: "100%", justifyContent: "center" }}>
                     <SettingOption label={"Company Profile"} setModal={setProfileModal} />
                     <SettingOption label={"Profile"} setModal={setProfileModal} />
@@ -50,7 +52,7 @@ export default function SettingScreen({navigation}) {
                 <FormListModal setFormListModal={setFormListModal} isVisible={formListModal} navigation={navigation} />
             </Modal>
             <Modal visible={profileModal} animationType="slide">
-                <ProfileModal setMemberActivationCallBack={()=>{}} user={useContext(AuthContext).loggedInUser} setProfileModal={setProfileModal} editable={true} />
+                <ProfileModal onActivationButtonPressedCallBack={() => { }} user={loggedInUser} setProfileModal={setProfileModal} editable={true} />
             </Modal>
         </SafeAreaView >
     );

@@ -1,10 +1,10 @@
 import axios from "axios";
 import { api_url } from "../env";
 import errorHandler from "./errorHandler/axiosError";
-import { IReport } from "./Models/Report";
+import { IReport } from "../types/Models/Report";
 import * as FileSystem from 'expo-file-system';
 import { getItemAsync } from "expo-secure-store";
-import { IField } from "./Models/Form";
+import { IField } from "../types/Models/Form";
 
 
 
@@ -16,6 +16,10 @@ export async function submitReport({ report, formID,fields }: { report: object, 
             formID: formID,
             field: report
         })
+
+        console.log(res.data)
+
+        return res.data.reportID;
     } catch (err) {
         errorHandler(err)
     }

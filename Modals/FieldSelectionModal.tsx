@@ -1,7 +1,7 @@
 import { Picker } from "@react-native-picker/picker";
 import React from "react";
 import { Text, StyleSheet, TextInput, View, TouchableOpacity, Dimensions } from "react-native";
-import { IField, inputType } from "../api/Models/Form";
+import { IField, inputType } from "../types/Models/Form";
 
 export function FieldSelectionModal({ setModal, updateField }) {
     const [newField, setNewField] = React.useState<IField>({ label: "", inputType: inputType.Text,required:true });

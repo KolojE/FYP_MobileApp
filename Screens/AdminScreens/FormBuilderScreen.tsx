@@ -4,7 +4,7 @@ import { TextInput, View, StyleSheet, Text, Modal, BackHandler, TouchableOpacity
 import { SafeAreaView } from "react-native-safe-area-context";
 import { FieldSelectionModal } from "../../Modals/FieldSelectionModal";
 import { FieldRenderer } from "../../utils/formHandler";
-import { IField, inputType } from "../../api/Models/Form";
+import { IField, inputType } from "../../types/Models/Form";
 import { addNewForm, updateForm } from "../../api/admin";
 import { getForm } from "../../api/user";
 

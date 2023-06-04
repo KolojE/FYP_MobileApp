@@ -3,9 +3,10 @@ import { ScrollView, View, Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { VictoryLegend, VictoryPie } from "victory-native";
 import Title from "../../Components/Title";
-import { ReportGroupedByType, getReportGroupedByType} from "../../api/admin";
+import {  getReportGroupedByType} from "../../api/admin";
 import errorHandler from "../../api/errorHandler/axiosError";
 import { getGroupedReportInfoForVictory } from "../../utils/victory";
+import { ReportGroupedByType } from "../../types/General";
 
 
 export default function HomeScreen({ }) {

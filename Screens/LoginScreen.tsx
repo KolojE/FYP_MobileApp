@@ -1,11 +1,29 @@
 import { View, StyleSheet, Image, Text, TextInput, TouchableOpacity, Alert, Dimensions } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import { useAuthAction } from "../actions/authAndRegAction";
+import { RootState } from "../redux/store";
+import { useSelector } from "react-redux";
 
 
-export default function LoginScreen({ navigation, onLogin }) {
+export default function LoginScreen({ navigation }) {
+
+    const authAction = useAuthAction();
 
     const [loginForm, setLoginForm] = useState({ identifier: "", password: "" });
+    const login = useSelector((state: RootState) => state.authentication)
+
+
+    useEffect(() => {
+        const tokenLogin = () => {
+            authAction.tokenLoginAction();
+        }
+        tokenLogin();
+    }, []);
+
+    useEffect(() => {
+        login.error && Alert.alert("Login Failed", login.error);
+    }, [login])
 
     function handleEmailUsernameChange(newIdentifier) {
         setLoginForm((prev) => {
@@ -19,8 +37,8 @@ export default function LoginScreen({ navigation, onLogin }) {
         })
     };
 
-    const onLoginButtonPressed = async () => {
-        await onLogin(loginForm)
+    const onLoginButtonPressed = () => {
+        authAction.loginAction({ identifier: loginForm.identifier, password: loginForm.password })
     }
 
 

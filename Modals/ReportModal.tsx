@@ -4,8 +4,8 @@ import { AntDesign } from '@expo/vector-icons';
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import EvidencePhoto from "../Components/EvidencePhoto";
 import { SafeAreaView } from "react-native-safe-area-context";
-import IUser, { roles } from "../api/Models/User";
-import { IReport } from "../api/Models/Report";
+import IUser, { roles } from "../types/Models/User";
+import { IReport } from "../types/Models/Report";
 
 
 type ReportModalProps = {

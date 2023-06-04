@@ -3,22 +3,22 @@ import { View,Text } from "react-native";
 
 
 type ChatBubleProps = {
-reply:boolean,
+receive:boolean,
 msg:string,
 }
 
-export default function ChatBuble({reply,msg}:ChatBubleProps)
+export default function ChatBuble({receive ,msg}:ChatBubleProps)
 {
-    const isReply= reply?10:"auto"
-    const color =reply?"white":"#80ff88"
+    const isReceive= receive?10:"auto"
+    const color =receive?"white":"#80ff88"
     return(
         <View style={{alignItems:"baseline"}}>
-        <View style={{marginLeft:isReply, marginRight:10}}>
+        <View style={{marginLeft:isReceive, marginRight:10}}>
         <Text style={{fontSize:8}}>
             21-02-28 12:30
         </Text>
         </View>
-        <View style={{backgroundColor:color,padding:10,margin:10,marginBottom:0,marginLeft:isReply,borderRadius:10}}>
+        <View style={{backgroundColor:color,padding:10,margin:10,marginBottom:0,marginLeft:isReceive,borderRadius:10}}>
             <Text style={{fontSize:12}}>
                 {msg}
             </Text>

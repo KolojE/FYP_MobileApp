@@ -10,9 +10,10 @@ import { Modal } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ReportListContainer from "../../Components/ReportListContainer";
 import ReportScreen from "../../Modals/ReportModal";
-import { IReport } from "../../api/Models/Report";
+import { IReport } from "../../types/Models/Report";
 import { getReport } from "../../api/complainant";
-import AuthContext from "../../Contexts/LoggedInUserContext";
+import { RootState } from "../../redux/store";
+import { useSelector } from "react-redux";
 
 type ReportListScreenProps = {
   reports: IReport[];
@@ -24,7 +25,8 @@ export default function ReportListScreen({ navigation }: ReportListScreenProps) 
   const [ReportModal, setReportModal] = React.useState(false);
   const [reports, setReports] = React.useState<IReport[]>([]);
   const [reportListContainerElements, setReportListContainerElements] = React.useState<JSX.Element>();
-  const loggedInUser = React.useContext(AuthContext).loggedInUser;
+
+  const loggedInUser = useSelector((state: RootState) => state.authentication.loggedInUser);
 
   React.useEffect(() => {
     getReport({ sortBy: "subDate", limit: 20 }).then(

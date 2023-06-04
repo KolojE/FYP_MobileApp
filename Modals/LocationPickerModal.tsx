@@ -1,21 +1,24 @@
 import React, { useRef, useState, useEffect } from "react";
 import { View, Text, TouchableOpacity, FlatList, Modal, Alert } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
-import MapView, { Marker} from "react-native-maps";
+import MapView, { Marker } from "react-native-maps";
 import * as Location from 'expo-location';
 
 import IconTextInput from "../Components/IconTextInput";
-import { Openstreetmap, searchAddress } from "../api/user";
+import { Openstreetmap, getAddressByCoordinates, searchAddress } from "../api/user";
 import AddressSuggestion from "../Components/AddressSuggestion";
 
 type LocationPickerModalProps = {
-    onLocationChange: ({ la, lo }: { la: number, lo: number }) => void,
+    onLocationChange: ({ La, Lo }: { La: number, Lo: number }) => void,
     setOpenLocationPicker: (open: boolean) => void,
 }
 
 export default function LocationPickerModal({ onLocationChange, setOpenLocationPicker }: LocationPickerModalProps) {
-    const [location, setLocation] = useState<{ lo: number, la: number }>();
+    const [cameraLocation, setCameraLocation] = useState<{ lo: number, la: number }>();
+    const [markerlocation, setMarkerLocation] = useState<{ lo: number, la: number }>();
     const [searchText, setSearchText] = useState<string>("");
+    const [address, setAddress] = useState<string>("");
+
     const [textInputFocus, setTextInputFocus] = useState<boolean>(false);
     const [suggestions, setSuggestions] = useState<Openstreetmap[]>([]);
     const map = useRef<MapView>(null);
@@ -25,7 +28,8 @@ export default function LocationPickerModal({ onLocationChange, setOpenLocationP
             let { status } = await Location.requestForegroundPermissionsAsync();
             if (status === 'granted') {
                 let location = await Location.getCurrentPositionAsync({});
-                setLocation({ la: location.coords.latitude, lo: location.coords.longitude });
+                setCameraLocation({ la: location.coords.latitude, lo: location.coords.longitude });
+                setMarkerLocation({ la: location.coords.latitude, lo: location.coords.longitude });
             }
         };
 
@@ -42,10 +46,11 @@ export default function LocationPickerModal({ onLocationChange, setOpenLocationP
     }, [searchText]);
 
     const onTextInputFocus = () => {
+        console.log("focus")
         setTextInputFocus(true);
     };
 
-    const onSearchtextChange = ({ inputkey, text }) => {
+    const onSearchtextChange = (text) => {
         setSearchText(text);
     };
 
@@ -54,31 +59,40 @@ export default function LocationPickerModal({ onLocationChange, setOpenLocationP
     };
 
     const onSuggestionPressed = (item: Openstreetmap) => {
-        console.log(typeof item.lat, typeof item.lon)
-        setLocation({ la: item.lat, lo: item.lon });
+        setCameraLocation({ la: item.lat, lo: item.lon });
         setTextInputFocus(false);
         map.current.animateToRegion({
             latitude: item.lat, longitude: item.lon,
             latitudeDelta: 0.03,
             longitudeDelta: 0.03
         }, 1000);
+        markerlocation.la = item.lat;
+        markerlocation.lo = item.lon; 
+        setAddress(item.display_name);
 
+    }
+
+    const onMarkerDragEnd = async (e) => {
+        setMarkerLocation({ la: e.nativeEvent.coordinate.latitude, lo: e.nativeEvent.coordinate.longitude });
+        setAddress(await getAddressByCoordinates(e.nativeEvent.coordinate.latitude, e.nativeEvent.coordinate.longitude));
     }
 
     const confirmLocation = () => {
         setOpenLocationPicker(false);
+        onLocationChange({ La: markerlocation.la, Lo: markerlocation.lo });
+        console.log(markerlocation)
     };
 
     return (
         <View style={{ flex: 1 }}>
             <View style={{ flex: 1, alignItems: "center" }}>
-                {location && (
+                {cameraLocation && (
                     <MapView
                         ref={map}
                         style={{ flex: 1, width: "100%" }}
                         initialRegion={{
-                            latitude: location.la,
-                            longitude: location.lo,
+                            latitude: cameraLocation.la,
+                            longitude: cameraLocation.lo,
                             latitudeDelta: 0.1,
                             longitudeDelta: 0.1,
                         }}
@@ -86,9 +100,10 @@ export default function LocationPickerModal({ onLocationChange, setOpenLocationP
                         <Marker
                             draggable={true}
                             coordinate={{
-                                latitude: location?.la,
-                                longitude: location?.lo,
+                                latitude: cameraLocation?.la,
+                                longitude: cameraLocation?.lo,
                             }}
+                            onDragEnd={onMarkerDragEnd}
                         />
                     </MapView>
                 )}
@@ -115,12 +130,11 @@ export default function LocationPickerModal({ onLocationChange, setOpenLocationP
                     position: "absolute",
                     width: "100%",
                     alignItems: "center",
+                    zIndex: 5,
                 }}
             >
-                <IconTextInput
-                    icon={<AntDesign name="search1" size={24} color="black" />}
-                    viewContainerStyle={{
-                        zIndex: 2,
+                <View
+                    style={{
                         flexDirection: "row",
                         alignItems: "center",
                         backgroundColor: "white",
@@ -131,15 +145,15 @@ export default function LocationPickerModal({ onLocationChange, setOpenLocationP
                         borderRadius: 80,
                         marginTop: "3%",
                     }}
-                    textInputStyle={{ marginLeft: 20 }}
-                    placeholder="Search"
-                    editable={true}
-                />
+                >
+                    <AntDesign name="search1" size={24} color="black" />
+                    <Text style={{ marginLeft: 20, width: "70%" }}>{address.length < 30 ? address : address.slice(0, 50) + "..."}</Text>
+                </View>
             </TouchableOpacity>
             <Modal visible={textInputFocus} animationType="fade">
                 <View style={{ alignItems: "center" }}>
                     <IconTextInput
-                        onChange={onSearchtextChange}
+                        onTextChange={onSearchtextChange}
                         onFocus={onTextInputFocus}
                         icon={<AntDesign name="search1" size={24} color="black" />}
                         viewContainerStyle={{

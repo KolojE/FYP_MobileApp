@@ -1,128 +1,65 @@
 import { SimpleLineIcons } from "@expo/vector-icons";
 import React from "react";
-import { View, Text, TouchableOpacity, ScrollView, Modal } from "react-native";
+import { View, Text, TouchableOpacity, ScrollView, Modal, ActivityIndicator } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { VictoryPie, VictoryLegend, VictoryChart, VictoryArea, VictoryScatter, VictoryLine, VictoryAxis } from "victory-native";
 import Title from "../../Components/Title";
 import FilterModal from "../../Modals/FilterModal";
-import { ReportGroupedByType, getReportsWeeklyBySubmissionDate } from "../../api/admin";
-import errorHandler from "../../api/errorHandler/axiosError";
 import { getGroupedReportInfoForVictory } from "../../utils/victory";
-import { getReportGroupedByType } from "../../api/admin";
+import { useReportAction } from "../../actions/reportAction";
+import { useSelector } from "react-redux";
+import { RootState } from "../../redux/store";
 
 
-type WeeklyReport = {
-    offset: number;
-    reports: ReportGroupedByType[];
-}
 
 type Info = {
-    dateRange: string;
     totalReport: number;
 
 }
-
-
 
 export default function ReportsScreen() {
     const [graphVisible, setGraphVisible] = React.useState(false);
     const [filterModal, setFilterModal] = React.useState(false);
     const [mode, setMode] = React.useState<"weekly" | "monthly" | "daily" | "custom">("weekly");
-
-    const [Report, setReport] = React.useState<WeeklyReport>({
-        reports: [],
-        offset: 0,
-    })
+    const [offset, setOffset] = React.useState<number>(0)
     const [info, setInfo] = React.useState<Info>({
-        dateRange: "",
         totalReport: 0
     })
 
-    const victoryData = getGroupedReportInfoForVictory({ groupedReport: Report.reports })
+    const groupedReport = useSelector((state: RootState) => state.report)
+    console.log(groupedReport)
+    const victoryData = getGroupedReportInfoForVictory({ groupedReport: groupedReport.reports })
+
+    const adminAction = useReportAction()
 
     React.useEffect(() => {
-
         if (mode === "weekly") {
-            getReportsWeeklyBySubmissionDate({ weekOffSet: Report.offset })
-                .then((result) => {
-                    setReport((prev) => { return { ...prev, reports: result.groupedReport } });
-                    let totalReport = 0
-                    result.groupedReport.forEach((group) => {
-                        totalReport += group.reports.length;
-                    })
-                    setInfo((prev) => { return { ...prev, dateRange: result.dateRange.fromDate.toDateString() + "-" + result.dateRange.toDate.toDateString(), totalReport: totalReport } })
-                }, (rej) => { errorHandler(rej) })
+            console.log("weekly")
+            adminAction.fetchReportGroupedByTypeWeelky(offset)
             return
         }
-
 
         if (mode === "daily") {
-            const start = new Date()
-            const end = new Date();
-            start.setHours(0, 0, 0, 0);
-            end.setHours(23, 59, 59, 999);
-
-            start.setDate(start.getDate() - Report.offset)
-            end.setDate(start.getDate())
-
-            getReportGroupedByType({ sortBy: "subDate", dateRange: { fromDate: start, toDate: end } })
-                .then((result) => {
-                    setReport((prev) => { return { ...prev, reports: result } })
-                    let totalReport = 0
-                    result.forEach((group) => {
-                        totalReport += group.reports.length;
-                    })
-                    setInfo({ dateRange: start.toDateString(), totalReport: totalReport })
-
-                })
-
+            console.log("daily")
+            adminAction.fetchReportGroupedByTypeDaily(offset)
             return
         }
 
-
         if (mode === "monthly") {
-            const start = new Date();
-            const end = new Date();
-            start.setHours(0, 0, 0, 0);
-            end.setHours(23, 59, 59, 999);
-
-            start.setDate(1);
-            end.setDate(0);
-
-            start.setMonth(new Date().getMonth() - Report.offset);
-            end.setMonth(new Date().getMonth() - Report.offset);
-
-            console.log(`${start} - ${end}`)
-            getReportGroupedByType({ sortBy: "subDate", dateRange: { fromDate: start, toDate: end } })
-                .then((result) => {
-                    setReport((prev) => { return { ...prev, reports: result } })
-                    let totalReport = 0
-                    result.forEach((group) => {
-                        totalReport += group.reports.length;
-                    })
-                    setInfo({ dateRange: `${start.toDateString()} - ${end.toDateString()}`, totalReport: totalReport })
-
-                })
+            adminAction.fetchReportGroupedByTypeMonthly(offset)
         }
-
-
-    }, [Report.offset, mode])
+    }, [offset, mode])
 
     React.useEffect(() => {
-        setReport(prev => ({ offset: 0, reports: prev.reports }))
+        setOffset(0)
     }, [mode])
 
     const onLeftButtonPressed = () => {
-        setReport((prev) => {
-            return { offset: prev.offset + 1, reports: [] }
-        })
+        setOffset(offset + 1)
 
-        console.log(Report)
     }
     const onRightButtonPressed = () => {
-        setReport((prev) => {
-            return { offset: prev.offset - 1, reports: [] }
-        })
+        setOffset(offset - 1)
     }
 
 
@@ -156,24 +93,55 @@ export default function ReportsScreen() {
                             </TouchableOpacity>
                         </View>
                     </View>
-                        <View style={{ flexDirection: "row", alignItems: "center" }}>
-                    {
-                            mode!=="custom"&&
-                        <TouchableOpacity onPress={onLeftButtonPressed} style={{ paddingRight: 10 }}><SimpleLineIcons name="arrow-left" style={{ paddingRight: 10 }} /></TouchableOpacity>
-                    }
-                        <Text>
-                            {info.dateRange}
-                        </Text>
+                    <View style={{ flexDirection: "row", alignItems: 'center', justifyContent: "center", width: "80%" }}>
+                        {mode !== "custom" && (
+                            <View style={{ position: 'absolute', left: 0 }}>
+                                <TouchableOpacity onPress={onLeftButtonPressed} style={{ padding: 10 }}>
+                                    <SimpleLineIcons name="arrow-left" />
+                                </TouchableOpacity>
+                            </View>
+                        )}
+
+                        <View style={{ flex: 1, alignItems: 'center' }}>
+                           { 
+                        !groupedReport.loading? 
+                        <>
                         {
-                            Report.offset !== 0 ?
-                            <TouchableOpacity onPress={onRightButtonPressed} style={{ paddingLeft: 10 }}><SimpleLineIcons name="arrow-right" style={{ paddingLeft: 10 }} /></TouchableOpacity> : <View style={{ marginLeft: 20 }}></View>
+                            mode === "daily" ? <Text>{`${groupedReport.dateRange.fromDate}`}</Text> :
+                           <Text>{`${groupedReport.dateRange.fromDate} - ${groupedReport.dateRange.toDate}`}</Text>
                         }
+                        </>:
+                        <Text>Loading...</Text>
+                        }
+                        </View>
+
+                        {offset !== 0 && (
+                            <View style={{ position: 'absolute', right: 0 }}>
+                                <TouchableOpacity onPress={onRightButtonPressed} style={{ padding: 10 }}>
+                                    <SimpleLineIcons name="arrow-right" />
+                                </TouchableOpacity>
+                            </View>
+                        )}
                     </View>
                 </View>
-                <View style={{ alignItems: "center" }}>
+
+                {
+                    !groupedReport.loading?
+                    <>
+                {
+                    groupedReport.reports.length > 0 ?
+                    <View style={{ alignItems: "center",justifyContent:"center",minHeight:300,minWidth:300 }}>
                     <VictoryPie width={300} height={300} style={{ labels: { fontSize: 10 } }} colorScale={["navy", "tomato", "grey"]} data={victoryData.pie} />
                     <VictoryLegend width={300} itemsPerRow={3} title={"Report Type"} height={100} data={victoryData.legend} gutter={20} colorScale={["navy", "tomato", "grey"]} orientation={"horizontal"} />
-                </View>
+                </View>:
+                    <View style={{ alignItems: "center",justifyContent:"center",minHeight:300,minWidth:300 }}>
+                    <Text>No report found</Text>
+                    </View>
+                }   
+                    </>:
+                    <View style={{ alignItems: "center",justifyContent:"center",minHeight:300,minWidth:300 }}>
+                <ActivityIndicator  size={"large"}/></View>
+                }
                 {graphVisible &&
                     <View>
                         <VictoryChart >
@@ -190,7 +158,7 @@ export default function ReportsScreen() {
                 </TouchableOpacity>
             </ScrollView>
             <Modal animationType="slide" visible={filterModal}>
-                <FilterModal setInfo={setInfo} setReport={setReport} setFilterModal={setFilterModal} />
+                <FilterModal setFilterModal={setFilterModal} />
             </Modal>
             <Modal visible={false}>
 

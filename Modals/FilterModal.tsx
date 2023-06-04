@@ -4,82 +4,92 @@ import { Picker } from "@react-native-picker/picker";
 import React from "react";
 import { View, Text, TextInput, TouchableOpacity, ScrollView } from "react-native";
 import TagSelector from "../Components/TagSelector";
-import { ReportGroupedByType, ReprotElement, getReportElement, getReportGroupedByType } from "../api/admin";
+import { ReprotElement, getReportElement } from "../api/admin";
+import { filterOptions } from "../types/General";
+import { useReportAction } from "../actions/reportAction";
 
-type WeeklyReport = {
-    offset: number;
-    reports: ReportGroupedByType[];
-}
 
-type Info = {
-    dateRange: string;
-    totalReport: number;
-
-}
 
 type FilterModalProps = {
-    setFilterModal:React.Dispatch<React.SetStateAction<boolean>>,
-    setReport:React.Dispatch<React.SetStateAction<WeeklyReport>>,
-    setInfo:React.Dispatch<React.SetStateAction<Info>>
+    setFilterModal: React.Dispatch<React.SetStateAction<boolean>>,
 }
 
 
-export default function FilterModal({setFilterModal,setReport,setInfo}:FilterModalProps) {
+export default function FilterModal({ setFilterModal }: FilterModalProps) {
 
     const [fromDatePicker, setFromDatePicker] = React.useState(false);
     const [toDatePicker, setToDatePicker] = React.useState(false);
 
-    const [fromDate, setFromDate] = React.useState<Date>();
-    const [toDate, setToDate] = React.useState(new Date());
-    const [typeTagIDs,setTypeTagIDs] = React.useState([])
-    const [statusTagIDs,setStatusTagIDs] = React.useState([])
+    const [filterOptions, setFilterOptions] = React.useState<filterOptions>({ toDate: new Date(), typeIDs: [], statusIDs: [], sortBy: "subDate" })
 
-    const [filterElement,setFilterElement] = React.useState<ReprotElement>({status:[],type:[]})
+    const [filterElement, setFilterElement] = React.useState<ReprotElement>({ status: [], type: [] })
+    const [typeTag, setTypeTag] = React.useState<JSX.Element[]>([]);
+    const [statusTag, setStatusTag] = React.useState<JSX.Element[]>([]);
 
-    const [typeTag,setTypeTag] = React.useState<JSX.Element[]>([]);
-    const [statusTag,setStatusTag] = React.useState<JSX.Element[]>([]);
+    const adminAction = useReportAction();
+    React.useEffect(() => {
 
-    React.useEffect(()=>{
-        getReportElement({includeStatus:true,includeType:true})
-        .then((res)=>{
-            setFilterElement((prev)=>{return {status:res.status,type:res.type}})
-        },
-        ()=>{})
-    },[])
+        const getReportElementAsync = async () => {
+            const res = await getReportElement({ includeStatus: true, includeType: true });
+            setFilterElement((prev) => { return { status: res.status, type: res.type } })
+        }
 
+        getReportElementAsync();
+    }, [])
 
 
-    React.useEffect(()=>{
+
+    React.useEffect(() => {
         setTypeTag(
-            filterElement.type.map((type,index)=>{
-                return <TagSelector key={index} setValue={setTypeTagIDs} tagName={type.name} tagValue={type._id}  />
-        })
+            filterElement.type.map((type, index) => {
+                return <TagSelector key={index} onSelect={onTypeTagSelect} tagName={type.name} tagValue={type._id} />
+            })
         )
         setStatusTag(
-            filterElement.status.map((status,index)=>{
-                return <TagSelector key={index} setValue={setStatusTagIDs} tagName={status.desc} tagValue={status._id}   />
-        })
+            filterElement.status.map((status, index) => {
+                return <TagSelector key={index} onSelect={onStatusTagSelect} tagName={status.desc} tagValue={status._id} />
+            })
         )
         console.log(filterElement.type)
-    },[filterElement])
+    }, [filterElement])
 
 
-    const onFilterButtonPressed=()=>{
+    const onFilterButtonPressed = () => {
+        setFilterModal(false);
+        adminAction.fetchReportGroupedByTypeCustom(filterOptions)
+    }
 
-        getReportGroupedByType({sortBy:"subDate",dateRange:{fromDate:fromDate,toDate:toDate},status:statusTagIDs,type:typeTagIDs}
-        ).then((res)=>{
-            setReport({
-                reports:res,
-                offset:0
-            })
-            setFilterModal(false);
-            setInfo({
-                dateRange:`${fromDate.toDateString()} -${toDate.toDateString()}`,
-                totalReport:res.length,
-            })
-        })
-    }   
+    const onSortPickerChange = (itemValue: "subDate" | "upDate", itemIndex: number) => {
+        setFilterOptions((prev) => { return { ...prev, sortBy: itemValue } })
+    }
 
+    const onFromDateChange = (event: any, selectedDate: Date | undefined) => {
+        setFromDatePicker(false);
+        setFilterOptions((prev) => { return { ...prev, fromDate: selectedDate } })
+    }
+    const onToDateChange = (event: any, selectedDate: Date | undefined) => {
+        setToDatePicker(false);
+        setFilterOptions((prev) => { return { ...prev, toDate: selectedDate } })
+    }
+
+    const onTypeTagSelect = (typeID: string, selected) => {
+
+        if (selected) {
+            setFilterOptions((prev) => { return { ...prev, typeIDs: [...prev.typeIDs, typeID] } })
+            return
+        }
+
+        setFilterOptions((prev) => { return { ...prev, typeIDs: prev.typeIDs.filter((id) => { return id !== typeID }) } })
+    }
+    const onStatusTagSelect = (statusID: string, selected) => {
+        if (selected) {
+            setFilterOptions((prev) => { return { ...prev, statusIDs: [...prev.statusIDs, statusID] } })
+            return
+        }
+
+        setFilterOptions((prev) => { return { ...prev, statusIDs: prev.statusIDs.filter((id) => { return id !== statusID }) } })
+    }
+        console.log(filterOptions)
 
     return (
 
@@ -94,13 +104,13 @@ export default function FilterModal({setFilterModal,setReport,setInfo}:FilterMod
                     <TouchableOpacity onPress={() => { setFromDatePicker(true) }} style={{ flex: 1, alignItems: "center", borderRightWidth: 1 }}>
                         <Text style={{ fontSize: 10 }}>From</Text>
                         <View >
-                            <TextInput style={{ color: "black", textAlign: "center" }} placeholder="From Date" value={fromDate === undefined ? "" : fromDate.getFullYear() + " - " + Number(fromDate.getMonth()+1)+ " - " + fromDate.getDate()} editable={false} />
+                            <TextInput style={{ color: "black", textAlign: "center" }} placeholder="From Date" value={filterOptions.fromDate === undefined ? "" : filterOptions.fromDate.getFullYear() + " - " + Number(filterOptions.fromDate.getMonth() + 1) + " - " + filterOptions.fromDate.getDate()} editable={false} />
                         </View>
                     </TouchableOpacity>
                     <TouchableOpacity onPress={() => { setToDatePicker(true) }} style={{ flex: 1, alignItems: "center" }}>
                         <Text style={{ fontSize: 10 }}>To</Text>
                         <View >
-                            <TextInput style={{ color: "black", textAlign: "center" }} placeholder="To Date" value={toDate === undefined ? "" : toDate.getFullYear() + " - " + Number(toDate.getMonth()+1) + " - " + toDate.getDate()} editable={false} />
+                            <TextInput style={{ color: "black", textAlign: "center" }} placeholder="To Date" value={filterOptions.toDate === undefined ? "" : filterOptions.toDate.getFullYear() + " - " + Number(filterOptions.toDate.getMonth() + 1) + " - " + filterOptions.toDate.getDate()} editable={false} />
                         </View>
                     </TouchableOpacity>
                 </View>
@@ -118,28 +128,24 @@ export default function FilterModal({setFilterModal,setReport,setInfo}:FilterMod
                     </View>
                 </View>
                 <Text style={{ marginTop: "5%", fontSize: 16, color: "black", fontWeight: "500" }}>Sort By</Text>
-                <Picker >
-                    <Picker.Item label="Submission Date (Descending)" />
-                    <Picker.Item label="Submission Date (Ascending)" />
-                    <Picker.Item label="UP Date (Descending)" />
-                    <Picker.Item label="UP Date (Ascending)" />
+                <Picker onValueChange={onSortPickerChange} >
+                    <Picker.Item label="Submission Date (Descending)" value={"subDate"} />
+                    <Picker.Item label="Submission Date (Ascending)" value={"subDate"} />
+                    <Picker.Item label="UP Date (Descending)" value={"upDate"} />
+                    <Picker.Item label="UP Date (Ascending)" value={"upDate"} />
                 </Picker>
 
             </View>
-            <View style={{alignSelf:"center",marginTop:"20%"}}>
-                <TouchableOpacity onPress={onFilterButtonPressed} style={{backgroundColor:"#89CFF0",padding:5,paddingHorizontal:20,borderRadius:20}}>
-                    <Text style={{fontSize:20}}>Filter</Text>
+            <View style={{ alignSelf: "center", marginTop: "20%" }}>
+                <TouchableOpacity onPress={onFilterButtonPressed} style={{ backgroundColor: "#89CFF0", padding: 5, paddingHorizontal: 20, borderRadius: 20 }}>
+                    <Text style={{ fontSize: 20 }}>Filter</Text>
                 </TouchableOpacity>
             </View>
             {
                 fromDatePicker &&
                 <RNDateTimePicker value={new Date()}
-                    onChange={(event, newDate) => {
-                        setFromDatePicker(false);
-                        setFromDate(() => newDate)
-                    }}
-                    maximumDate={toDate}
-
+                    maximumDate={filterOptions.toDate}
+                    onChange={onFromDateChange}
                 />
 
 
@@ -147,13 +153,9 @@ export default function FilterModal({setFilterModal,setReport,setInfo}:FilterMod
             {
                 toDatePicker &&
                 <RNDateTimePicker value={new Date()}
-                    onChange={(event, newDate) => {
-                        setToDatePicker(false);
-                        setToDate(() => { return newDate })
-                    }}
-
-                    minimumDate={fromDate}
+                    minimumDate={filterOptions.fromDate}
                     maximumDate={new Date()}
+                    onChange={onToDateChange}
                 />
             }
         </ScrollView>);

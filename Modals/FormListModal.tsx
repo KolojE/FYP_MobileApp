@@ -4,7 +4,7 @@ import {
     AntDesign, Entypo 
 } from "@expo/vector-icons";
 import IconTextInput from "../Components/IconTextInput";
-import IForm from "../api/Models/Form";
+import IForm from "../types/Models/Form";
 import { getForms } from "../api/user";
 import Form from "../Components/Form";
 

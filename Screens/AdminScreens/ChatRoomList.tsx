@@ -5,7 +5,7 @@ import Title from "../../Components/Title";
 import ChatScreen from "../ChatScreen";
 import { AntDesign } from "@expo/vector-icons";
 import SelectMemberModal from "../../Modals/SelectMemberModal";
-import IUser from "../../api/Models/User";
+import IUser from "../../types/Models/User";
 
 export default function ChatRoomList() {
     const [chatRoomModal, setChatRoomModal] = React.useState<boolean>(false);

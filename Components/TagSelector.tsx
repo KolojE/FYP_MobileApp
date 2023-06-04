@@ -1,26 +1,17 @@
-import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { View, Text, TouchableOpacity, StyleProp, ViewStyle, StyleSheet } from "react-native";
+import { filterOptions } from "../types/General";
 
 
 type TagSelectorProps = {
 tagName:string,
 tagValue:any,
-setValue:React.Dispatch<React.SetStateAction<any[]>>
+onSelect:(value:string,selected:boolean)=>void
 }
-export default function TagSelector({ tagName, tagValue,setValue}:TagSelectorProps) {
+export default function TagSelector({ tagName, tagValue,onSelect }:TagSelectorProps) {
     const [selected,setSelected] = React.useState<boolean>(false);
     React.useEffect(() => {
-        if(selected){
-            setValue((prev)=>[...prev,tagValue])
-        }
-        else
-        {
-            setValue((prev)=>{
-                return prev.filter(value=>value!==value)
-            })
-        }
-        
+        onSelect(tagValue,selected);
     }, [selected])
 
     

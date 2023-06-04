@@ -1,20 +1,12 @@
 import axios from "axios"
 import { api_url } from "../env"
 import errorHandler from "./errorHandler/axiosError"
-import IUser from "./Models/User"
+import IUser from "../types/Models/User"
 import * as securestore from "expo-secure-store"
 
+import { RegistrationCredentials } from "../types/General"
 
-export type registrationForm ={
-    email:string,
-    password:string,
-    organization:{
-        ID:string,
-    }
-    name:string,
-    
-}
-export async function registration(form:registrationForm):Promise<IUser>
+export async function registration(form:RegistrationCredentials):Promise<IUser>
 {
     try{
 

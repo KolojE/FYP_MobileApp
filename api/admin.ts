@@ -1,16 +1,16 @@
 import axios from "axios";
-import IForm from "./Models/Form";
+import IForm from "../types/Models/Form";
 import { api_url } from "../env";
 import { jwtTokenInterception } from "./interceptor/jwtTokenInterception";
 import errorHandler from "./errorHandler/axiosError";
-import IComplainant from "./Models/Complainant";
-import { IReport } from "./Models/Report";
-import { getLoggedInUserInfo } from "./user";
-import IUser from "./Models/User";
+import IComplainant from "../types/Models/Complainant";
+import IUser from "../types/Models/User";
+import { ReportGroupedByType } from "../types/General";
 
 
 
 axios.interceptors.request.use(jwtTokenInterception);
+
 
 export async function addNewForm(form: IForm) {
     try {
@@ -107,13 +107,8 @@ export async function deleteDeactivatedMember(id: string) {
 }
 
 
-export type ReportGroupedByType = {
-    _id: string,//form's ID
-    name: string,//form's name
-    reports: IReport[],//report details
-}
 
-export async function getReportGroupedByType({ sortBy, limit, dateRange, status, type }: { sortBy: "subDate" | "upDate", limit?: number, dateRange?: { fromDate?: Date, toDate?: Date }, status?: string[], type?: string[] }): Promise<ReportGroupedByType[]> {
+export async function getReportGroupedByType({ sortBy, limit, dateRange, status, types: type }: { sortBy: "subDate" | "upDate", limit?: number, dateRange?: { fromDate?: Date, toDate?: Date }, status?: string[], types?: string[] }): Promise<ReportGroupedByType[]> {
     try {
 
         const statusParams = status ? status.length > 0 ? status.toString() : undefined : undefined
@@ -129,7 +124,7 @@ export async function getReportGroupedByType({ sortBy, limit, dateRange, status,
             }
         })
 
-        const reportGroupedByType: ReportGroupedByType[] = res.data.reports ? res.data.reports : [];
+        const reportGroupedByType: ReportGroupedByType[] = res.data.reports? res.data.reports : [];
 
         return reportGroupedByType;
     } catch (err) {
@@ -137,41 +132,7 @@ export async function getReportGroupedByType({ sortBy, limit, dateRange, status,
     }
 
 }
-export async function getReportsWeeklyBySubmissionDate({ weekOffSet }: { weekOffSet: number }): Promise<{ groupedReport: ReportGroupedByType[], dateRange: { fromDate: Date, toDate: Date } }> {
-    try {
-        const today = new Date();
 
-        const dayOfWeek = today.getDay();
-
-        // Calculate the date of this Monday by subtracting the number of days since Monday (if today is Monday, then subtract 0; if it's Tuesday, then subtract 1; etc.)
-        const monday = new Date(today);
-        monday.setDate(today.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1) - (weekOffSet * 7));
-        monday.setHours(0, 0, 0, 0);
-        // Calculate the date of this Sunday by adding the number of days until Sunday (if today is Sunday, then add 0; if it's Saturday, then add 1; etc.)
-        const sunday = new Date(today);
-        sunday.setDate(today.getDate() + (dayOfWeek === 0 ? 0 : 7 - dayOfWeek) - (weekOffSet * 7))
-        sunday.setHours(23, 59, 59, 999);
-        const res = await axios.get(`${api_url}/admin/getReport`, {
-            params: {
-                subFromDate: monday,
-                subToDate: sunday,
-            }
-        })
-
-
-
-        return {
-            groupedReport: res.data.reports,
-            dateRange: {
-                fromDate: monday,
-                toDate: sunday,
-            }
-        }
-    }
-    catch (err) {
-        errorHandler(err);
-    }
-}
 
 export type ReprotElement = {
     type: {
