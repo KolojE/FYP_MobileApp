@@ -6,8 +6,9 @@ import AddReportScreen from "./AddReportScreen";
 import ChatScreen from "../ChatScreen";
 import { TouchableOpacity } from "react-native";
 import LoginScreen from "../LoginScreen";
-import IUser, { roles } from "../../types/Models/User";
 import { useAuthAction } from "../../actions/authAndRegAction";
+import { RootState } from "../../redux/store";
+import { useSelector } from "react-redux";
 
 const Tab = createBottomTabNavigator();
 
@@ -18,19 +19,9 @@ export default function MainScreen() {
     const onLogoutButtonPressed = () => {
         authAction.logoutAction();
     }
+    const userinfo= useSelector((state: RootState) => state.userinfo).userinfo
 
-    const adminUser:IUser = {
-        _id: "646cccd978d49b3f29706659",
-        ID: "",
-        name: "",
-        email: "",
-        organization: undefined,
-        contact: {
-            phoneNo: "",
-            address: ""
-        },
-        role: roles.admin,
-    } 
+    const admin = userinfo?.organizationAdmins!=undefined?userinfo?.organizationAdmins[0]:null
 
     return (
         <Tab.Navigator
@@ -65,7 +56,7 @@ export default function MainScreen() {
                     },
                 }}
             >
-                {()=><ChatScreen selectedUser={adminUser} setChatRoomModal={null}/>}
+                {()=><ChatScreen selectedUser={admin} setChatRoomModal={null}/>}
             </Tab.Screen>
             <Tab.Screen
                 name="Logout"

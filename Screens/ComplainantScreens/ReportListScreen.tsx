@@ -24,6 +24,7 @@ export default function ReportListScreen({ navigation }: ReportListScreenProps) 
 
   const [ReportModal, setReportModal] = React.useState(false);
   const [reports, setReports] = React.useState<IReport[]>([]);
+  const [selectedReport,setSelectedReport] = React.useState<IReport>(null);
   const [reportListContainerElements, setReportListContainerElements] = React.useState<JSX.Element>();
 
   const loggedInUser = useSelector((state: RootState) => state.authentication.loggedInUser);
@@ -36,10 +37,19 @@ export default function ReportListScreen({ navigation }: ReportListScreenProps) 
     )
   }, [])
 
+  const onOpenModalPressed = (report:IReport) => {
+    setSelectedReport(report);
+    setReportModal(true);
+  }
+
+  const onCloseModalPressed = () => {
+    setReportModal(false);
+  }
+
 
   React.useEffect(() => {
     setReportListContainerElements((prev) => {
-      return <ReportListContainer reports={reports} setReportModal={setReportModal} />
+      return <ReportListContainer reports={reports} onOpenModalPressed={onOpenModalPressed}/>
     })
   }, [reports])
 
@@ -114,14 +124,12 @@ export default function ReportListScreen({ navigation }: ReportListScreenProps) 
             {reportListContainerElements}
           </View>
         </ScrollView>
-        <Modal statusBarTranslucent={true} visible={ReportModal}
+        <Modal statusBarTranslucent={true} visible={ReportModal && selectedReport !== null}
           animationType="slide"
         >
           <ReportScreen
-            setReportModal={setReportModal}
-            report={reports[0]}
-            user={loggedInUser}
-
+            closeModal={onCloseModalPressed}
+            report={selectedReport}
           />
         </Modal>
       </View>

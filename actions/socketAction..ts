@@ -16,9 +16,8 @@ export const useSocketAction = () => {
         const socket = await getSocket();
 
         try {
-            console.log("establishing connection")
             dispatch(socketStart());
-            addOnMessageReceiveListener(chatAction.receiveMessageAction)
+            await addOnMessageReceiveListener(chatAction.receiveMessageAction)
             getPendingMessages();
             dispatch(socketSuccess());
         } catch (err) {

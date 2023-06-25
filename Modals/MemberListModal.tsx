@@ -135,7 +135,7 @@ export default function MemeberListModal({ setMemberListModal }: MemeberListModa
                 </Modal>
                 {
                     selectedMember &&
-                    <MemberProfileModal member={selectedMember} key={selectedMember._id} />
+                    <MemberProfileModal closeModal={()=>{setProfileModal(false)}} member={selectedMember} key={selectedMember._id} />
                 }
             </Modal>
         </View>)

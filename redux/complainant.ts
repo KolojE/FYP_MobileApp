@@ -64,9 +64,7 @@ const complainantSlice = createSlice({
         fetchProfilePictureError: (state, action) => {
             state.loading = false
             state.error =action.payload 
-        },
-
-
+        }
     }
 
 })

@@ -15,7 +15,6 @@ export const useChatAction = () => {
         } catch (err) {
             dispatch(sendMessageError(err.message))
         }
-
     }
 
     const receiveMessageAction = async ({ message, senderID }) => {

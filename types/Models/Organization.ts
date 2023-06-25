@@ -5,7 +5,10 @@ export default interface IOrganization {
     contactNo: string;
     address: string;
     creationDate: Date;
-    defaultStatus: string;
+    system:{
+        autoActiveNewUser: boolean;
+        defaultStatus: string;
+    }
 }
 
 

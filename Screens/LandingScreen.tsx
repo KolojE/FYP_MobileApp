@@ -15,12 +15,12 @@ const Stack = createNativeStackNavigator();
 export default function LandingScreen({ route, navigation }) {
 
   const loggedInUser = useSelector((state: RootState) => state.authentication.loggedInUser);
+  const socket = useSelector((state: RootState) => state.socket);
   const socketAction = useSocketAction();
 
   //disconnect socket when app is closed
   useEffect(() => {
 
-    socketAction.establishConnection();
     const handleRefresh = () => {
       // Perform your desired action here
       socketAction.disconnect()

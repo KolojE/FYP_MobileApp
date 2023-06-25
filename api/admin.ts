@@ -5,7 +5,8 @@ import { jwtTokenInterception } from "./interceptor/jwtTokenInterception";
 import errorHandler from "./errorHandler/axiosError";
 import IComplainant from "../types/Models/Complainant";
 import IUser from "../types/Models/User";
-import { ReportGroupedByType } from "../types/General";
+import { ReportGroupedByType, updateOrganizaitonInfoArgs } from "../types/General";
+import { IReport } from "../types/Models/Report";
 
 
 
@@ -64,8 +65,8 @@ export async function getMembers(): Promise<IComplainant[]> {
 
         const members: Array<IComplainant> = [];
         res.data.members.forEach(async (member) => {
-        const user:IUser = member.user
-        console.log(user)
+            const user: IUser = member.user
+            console.log(user)
             delete member.user
             members.push({
                 ...member,
@@ -85,7 +86,7 @@ export async function activateMember(id: string, activationStatus: boolean) {
             id: id,
             activation: activationStatus,
         });
-
+        return res.data;
     }
     catch (err) {
         errorHandler(err);
@@ -93,13 +94,15 @@ export async function activateMember(id: string, activationStatus: boolean) {
 
 }
 
-export async function deleteDeactivatedMember(id: string) {
+export async function deleteDeactivatedMember(id: string): Promise<IComplainant> {
     try {
         const res = await axios.delete(`${api_url}/admin/deleteMember`, {
             params: {
                 _id: id
             }
         })
+
+        return res.data;
     }
     catch (err) {
         errorHandler(err)
@@ -123,9 +126,23 @@ export async function getReportGroupedByType({ sortBy, limit, dateRange, status,
                 type: typeParams,
             }
         })
-
-        const reportGroupedByType: ReportGroupedByType[] = res.data.reports? res.data.reports : [];
-
+        const groupedReports: ReportGroupedByType[] = res.data.reports;
+        const reportGroupedByType: ReportGroupedByType[] = groupedReports.map((groupedReport) => {
+            return {
+                _id: groupedReport._id.toString(),
+                reports: groupedReport.reports.map((report) => {
+                    return {
+                        _id: report._id.toString(),
+                        status: report.status,
+                        submissionDate: report.submissionDate,
+                        updateDate: report.updateDate,
+                        name: report.name,
+                        details: report.details,
+                    };
+                }),
+                name: groupedReport.name,
+            };
+        });
         return reportGroupedByType;
     } catch (err) {
         errorHandler(err)
@@ -159,5 +176,43 @@ export async function getReportElement({ includeType, includeStatus }: { include
     }
     catch (err) {
         errorHandler(err);
+    }
+}
+
+export async function updateCreateOrganizaitonInfoAndStatues({organization,statuses,statusesToDelete}:updateOrganizaitonInfoArgs)
+{
+
+    console.log(organization)
+    try{
+        const res = await axios.post(`${api_url}/admin/updateOrganization`,{
+            organization:organization,
+            statuses:statuses,
+            statusesToDelete:statusesToDelete,
+        })
+
+        console.log(JSON.stringify(res.data,null,2))
+        return {
+            newStatuses:res.data.statuses,
+            newOrganizationInfo:res.data.organization,
+        }
+    }catch (err)
+    {
+        errorHandler(err)
+    }
+}
+
+export async function updateReport(report:IReport)
+{
+    console.log(api_url)
+    try{
+        const res = await axios.post(`${api_url}/admin/updateReport`,{
+            reportID:report._id,
+            status:report.status,
+            comment:report.status.comment,
+        })
+        return res.data.report;
+    }catch(err)
+    {
+        errorHandler(err)
     }
 }

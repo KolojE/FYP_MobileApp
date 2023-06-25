@@ -5,7 +5,8 @@ import Form from "../types/Models/Form";
 import errorHandler from "./errorHandler/axiosError";
 import * as FileSystem from 'expo-file-system';
 import { getItemAsync } from "expo-secure-store";
-import { UserInfo } from "../types/General";
+import { UserInfo, updateProfileArgs } from "../types/General";
+import IUser from "../types/Models/User";
 
 
 
@@ -15,11 +16,17 @@ axios.interceptors.request.use(jwtTokenInterception);
 export async function getLoggedInUserInfo(): Promise<UserInfo> {
 
     try {
-
         const res = await axios.get(`${api_url}/user/getUserInfo`)
-        const userinfo= res.data
-        console.log(userinfo)
-        return userinfo 
+        const userinfo: UserInfo = {
+            organization: res.data.organization,
+            user: res.data.user,
+            organizationAdmins: res.data.admins,
+            totalReportCount: res.data.totalReportCount,
+            totalResolvedCount: res.data.totalResolvedCount,
+            statuses: res.data.statuses
+        }
+
+        return userinfo
     } catch (err) {
         errorHandler(err);
     }
@@ -53,7 +60,7 @@ export async function getForm(id: String): Promise<Form> {
 
 }
 
-export async function uploadProfilePicture(uri:string)  {
+export async function uploadProfilePicture(uri: string) {
     try {
 
         const uploadResult = await FileSystem.uploadAsync(`${api_url}/user/uploadProfilePicture`, uri, {
@@ -95,6 +102,8 @@ export type Openstreetmap = {
 
 }
 
+
+
 let cancelTokenSource: CancelTokenSource = null;
 //Open Street Map API
 export async function searchAddress(query: string) {
@@ -106,10 +115,10 @@ export async function searchAddress(query: string) {
         var addressSuggestion: Openstreetmap[] = []
         const res = await axios.get(`https://nominatim.openstreetmap.org/search?format=json&q=${query}`, { cancelToken: cancelTokenSource.token })
         res.data.forEach(element => {
-            const suggestion:Openstreetmap=element;
+            const suggestion: Openstreetmap = element;
             suggestion.lat = parseFloat(element.lat)
             suggestion.lon = parseFloat(element.lon)
-            
+
             addressSuggestion.push(suggestion)
 
         });
@@ -119,7 +128,7 @@ export async function searchAddress(query: string) {
     }
 }
 
-export async function getAddressByCoordinates(lat: number, lon: number):Promise<string> {
+export async function getAddressByCoordinates(lat: number, lon: number): Promise<string> {
     try {
         const res = await axios.get(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`)
         return res.data.display_name
@@ -128,3 +137,30 @@ export async function getAddressByCoordinates(lat: number, lon: number):Promise<
     }
 }
 
+export async function updateProfile(userInfo: updateProfileArgs): Promise<IUser> {
+    try {
+        const res = await axios.post(`${api_url}/user/updateProfile`, userInfo)
+        return res.data.user
+    } catch (err) {
+        errorHandler(err)
+    }
+}
+
+export async function getOrganizationAdmins(): Promise<Array<IUser>> {
+    try {
+        const res = await axios.get(`${api_url}/user/getOrganizationAdmins`)
+        console.log(res)
+        return res.data.admins
+    } catch (err) {
+        errorHandler(err)
+    }
+}
+
+export async function getReportPhotos(): Promise<Array<string>> {
+    try {
+        const res = await axios.get(`${api_url}/user/getReportPhotos`)
+        return res.data.photos
+    } catch (err) {
+        errorHandler(err)
+    }
+}

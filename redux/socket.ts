@@ -4,6 +4,7 @@ import { onMessageReceiveCallback } from "../types/General";
 
 type initialState = {
     onMessageReceive: (callBack: onMessageReceiveCallback) => void,
+    connected: boolean,
     loading: boolean,
     error: string | null,
 }
@@ -11,6 +12,7 @@ type initialState = {
 const socketSlice = createSlice({
     name: "socket",
     initialState: {
+        connected: false,
         loading: false,
         error: null,
     } as initialState,
@@ -20,14 +22,17 @@ const socketSlice = createSlice({
             state.error = null;
         },
         socketSuccess: (state) => {
+            state.connected = true;
             state.loading = false;
             state.error = null; 
         },
         socketFailure: (state, action) => {
+            state.connected = false;
             state.loading = false;
             state.error = action.payload;
         },
         socketDisconnect: (state) => {
+            state.connected = false;
             state.loading = false;
             state.error = null;
         }

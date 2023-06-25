@@ -10,6 +10,8 @@ import { LoginCredentials } from "../types/General";
 
 export async function login(login: LoginCredentials): Promise<IUser> {
     try {
+
+        console.log(api_url)
         const res = await axios.post(`${api_url}/login`, {
             identifier: login.identifier,
             password: login.password,

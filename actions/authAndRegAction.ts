@@ -3,7 +3,7 @@ import { loginStart, loginSuccess, loginFailure, logout, loginError } from "../r
 import * as secureStore from "expo-secure-store"
 import { login, tokenLogin } from "../api/authentication";
 import { registration } from "../api/registration";
-import { registrationStart } from "../redux/registration";
+import { registrationFailure, registrationStart, registrationSuccess } from "../redux/registration";
 import { LoginCredentials, RegistrationCredentials } from "../types/General";
 import { AxiosError } from "axios";
 import { useSocketAction } from "./socketAction.";
@@ -13,7 +13,7 @@ import { useSocketAction } from "./socketAction.";
 export const useAuthAction = () => {
   const dispatch = useDispatch();
   const socketActions = useSocketAction()
-
+  
   const loginAction = async (credentials: LoginCredentials) => {
     try {
       dispatch(loginStart());
@@ -22,10 +22,14 @@ export const useAuthAction = () => {
       socketActions.establishConnection()
     } catch (error) {
       if (error instanceof AxiosError) {
-        dispatch(loginFailure("Password or username is incorrect"));
+        if(error.response)
+        dispatch(loginFailure(error.response?.data.message));
+        else
+        dispatch(loginFailure(error.message));
+
         return
       }
-      dispatch(loginError(error.message));
+      dispatch(loginError(error));
     }
   };
 
@@ -66,10 +70,10 @@ export const useRegistrationAction = () => {
   const registrationAction = async (credentials: RegistrationCredentials) => {
     try {
       dispatch(registrationStart());
-      const user = await registration(credentials);
-      dispatch(loginSuccess(user));
+      await registration(credentials);
+      dispatch(registrationSuccess(null))
     } catch (err) {
-      dispatch(loginFailure(err.message));
+      dispatch(registrationFailure(err.message))
     }
   }
 

@@ -36,7 +36,6 @@ export default function HomeScreen({ navigation }) {
     const getLoggedInUserInfoAsync = async () => {
       userInfoAction.fetchUserInfoAction();
     }
-
     getLoggedInUserInfoAsync();
 
     const setReportsAsync = async () => {
@@ -97,10 +96,13 @@ export function LatestUpdatedComponent() {
   React.useEffect(() => {
     getReport({ limit: 1, sortBy: "upDate" }).then((res) => {
       setLastestUpdatedReport(res[0]);
+      console.log(res[0])
     }, (err) => {
       errorHandler(err);
     })
   }, [])
+
+  
 
 
   return (
@@ -161,7 +163,7 @@ export function LatestUpdatedComponent() {
                   minHeight: 80,
                 }}
               >
-                {lastestUpdatedReprot.comment}
+                {lastestUpdatedReprot.status.comment}
               </Text>
             </View>
             <Text
@@ -172,7 +174,7 @@ export function LatestUpdatedComponent() {
                 color: "#C8E6C9",
               }}
             >
-              {lastestUpdatedReprot.status}
+              {lastestUpdatedReprot.status.desc}
             </Text>
           </>
         }

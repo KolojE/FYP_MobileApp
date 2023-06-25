@@ -8,6 +8,7 @@ export default interface IUser {
     _id:string,
     base64ProfilePicture?:string,
     ID:string,
+    roleID:string,
     name:string,
     email:string,
     organization:IOrganization,

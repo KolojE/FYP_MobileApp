@@ -8,19 +8,21 @@ import { useComplainantAction } from "../actions/complainantAction";
 
 type MemberProfileModalProps = {
     member: IComplainant,
+    closeModal: () => void,
 }
 
-export default function MemberProfileModal({ member }: MemberProfileModalProps) {
+export default function MemberProfileModal({ member,closeModal }: MemberProfileModalProps) {
 
     const complaiantAction = useComplainantAction();
 
     const onActivationButtonPressed = () => {
-        console.log("pressed")
         complaiantAction.activateComplainant(member._id, !member.activation)
+        closeModal();
     }
 
     const onDeleteButtonPressed = () => {
         complaiantAction.deleteDeactivatedComplainant(member._id);
+        closeModal();
     }
 
 

@@ -1,7 +1,9 @@
-import { useDispatch } from "react-redux";
-import { getReportGroupedByType } from "../api/admin"
-import { fetchReportError, fetchReportSuccess, startFetchingReport } from "../redux/report";
+import { useDispatch, useSelector } from "react-redux";
+import { getReportGroupedByType, updateReport } from "../api/admin"
+import { fetchReportError, fetchReportSuccess, startFetchingReport, updateReportStart, updateReportSuccess } from "../redux/report";
 import { filterOptions } from "../types/General";
+import { IReport } from "../types/Models/Report";
+import { RootState } from "../redux/store";
 
 
 
@@ -30,6 +32,7 @@ export const useReportAction = () => {
 
 
             const res = await getReportGroupedByType({ sortBy: "subDate", dateRange: { fromDate: monday, toDate: sunday } })
+
             dispatch(fetchReportSuccess({ reports: res, dateRange: { fromDate: monday.toDateString(), toDate: sunday.toDateString()} }))
 
         } catch (err) {
@@ -87,12 +90,21 @@ export const useReportAction = () => {
             dispatch(fetchReportSuccess({ reports: res, dateRange: { fromDate: fromDate.toDateString(), toDate: toDate.toDateString() } }))
         }
         catch(err){
-
+            dispatch(fetchReportError(err.message))
+            new Error(err.message)
         }
 
     }
 
-    return { fetchReportGroupedByTypeWeelky,  fetchReportGroupedByTypeMonthly, fetchReportGroupedByTypeDaily, fetchReportGroupedByTypeCustom }
+    const updateReportAction = async (updatedReport:IReport) => {
+
+        dispatch(updateReportStart())
+        const res = await updateReport(updatedReport)
+        dispatch(updateReportSuccess({...res}))
+
+    }
+
+    return { fetchReportGroupedByTypeWeelky,  fetchReportGroupedByTypeMonthly, fetchReportGroupedByTypeDaily, fetchReportGroupedByTypeCustom,updateReportAction }
 }
 
 

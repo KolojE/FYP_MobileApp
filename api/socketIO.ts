@@ -6,8 +6,8 @@ import { onMessageReceiveCallback } from "../types/General";
 
 
 type emitSendMessageArgs = {
-    receiverID: string,
-    message: string,
+  receiverID: string,
+  message: string,
 }
 
 let socket: Socket = null;
@@ -15,7 +15,7 @@ let socket: Socket = null;
 const getSocket = async () => {
 
   const token = await secureStorage.getItemAsync("jwt");
-   return new Promise<Socket>((resolve, reject) => {
+  return new Promise<Socket>((resolve, reject) => {
     if (socket) {
       socket.connect();
       console.log("socket connected")
@@ -31,7 +31,7 @@ const getSocket = async () => {
       console.log("new socket created")
 
       socket.on("connect", () => {
-        console.log("socket connected"); 
+        console.log("socket connected");
         resolve(socket);
       });
 
@@ -47,8 +47,8 @@ const getSocket = async () => {
         reject(new Error(`Connection timeout (${timeout}ms)`));
       });
 
-      socket.on("disconnect", (reason) => { 
-        console.log(reason+" socket disconnected")
+      socket.on("disconnect", (reason) => {
+        console.log(reason + " socket disconnected")
       })
     }
   });
@@ -59,30 +59,40 @@ const getSocket = async () => {
 
 
 export function sendMessage({ receiverID, message }: emitSendMessageArgs) {
-    socket.emit("sendMessage", receiverID, message, (ack) => {
-      console.log("ack", ack);
-    });
+  socket.emit("sendMessage", receiverID, message, (ack) => {
+    console.log("ack", ack);
+  });
 }
 
 export function getPendingMessages() {
-    socket.emit("getPendingMessages");
+  socket.emit("getPendingMessages");
 }
 
 
 export function addOnMessageReceiveListener(callBack: onMessageReceiveCallback) {
-    console.log("add on message receive listener")
-    socket.on("receiveMessage", (...args) => {
-        const [senderID, message] = args
-        console.log("message received", args)
-        callBack({ senderID: senderID, message: message });
-    })
+  console.log("add on message receive listener")
+
+  return new Promise((resolve, reject) => {
+    try {
+      resolve(
+        socket.on("receiveMessage", (...args) => {
+          const [senderID, message] = args
+          console.log("message received", args)
+          callBack({ senderID: senderID, message: message });
+        })
+      )
+    } catch (err) {
+      reject(err)
+    }
+
+  })
 }
 
 export function disconnectSocket() {
-    socket.disconnect()
-    socket.removeAllListeners()
-    socket = null;
-    console.log("socket disconnected", socket)
+  socket.disconnect()
+  socket.removeAllListeners()
+  socket = null;
+  console.log("socket disconnected", socket)
 }
 
 export default getSocket;

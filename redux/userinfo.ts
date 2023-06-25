@@ -1,8 +1,9 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { UserInfo } from "../types/General";
+import IUser from "../types/Models/User";
 
 type initialState = {
-    userinfo:UserInfo,
+    userinfo: UserInfo,
     loading: boolean,
     error: string | null,
 }
@@ -10,7 +11,7 @@ type initialState = {
 export const userSlice = createSlice({
     name: "user",
     initialState: {
-        userinfo:null,
+        userinfo: null,
         loading: false,
         error: null,
     } as initialState,
@@ -41,7 +42,35 @@ export const userSlice = createSlice({
         uploadProfilePictureFailure: (state, action) => {
             state.loading = false;
             state.error = action.payload;
+        },
+        updateUserInfoStart: (state) => {
+            state.loading = true;
+            state.error = null;
+        },
+        updateUserInfoSuccess: (state, action) => {
+            console.log(action.type+ "action.payload")
+            state.userinfo.user = {...state.userinfo.user, ...action.payload};
+            state.loading = false;
+            state.error = null;
+        },
+        updateUserInfoFailure: (state, action) => {
+            state.loading = false;
+            state.error = action.payload;
+        },
+        updateOrganizationInfoStart:(state) =>{
+            state.loading=true;
+            state.error=null;
+        },
+        updateOrganizationInfoSuccess:(state,action) =>{
+            state.userinfo.organization=action.payload.organization
+            state.userinfo.statuses=action.payload.statuses
+            state.loading=false;
+            state.error=null;
+        },
+        updateOrganizationInfoFailure:(state,action) =>{
+            state.error=action.payload;
         }
+
     }
 
 }
@@ -49,4 +78,17 @@ export const userSlice = createSlice({
 )
 
 export default userSlice.reducer
-export const { fetchUserInfoStart, fetchUserInfoSuccess, fetchUserInfoFailure,uploadProfilePictureFailure,uploadProfilePictureStart,uploadProfilePictureSuccess } = userSlice.actions;
+export const {
+    fetchUserInfoStart,
+    fetchUserInfoSuccess,
+    fetchUserInfoFailure,
+    uploadProfilePictureFailure,
+    uploadProfilePictureStart,
+    uploadProfilePictureSuccess,
+    updateUserInfoFailure ,
+    updateUserInfoStart,
+    updateUserInfoSuccess ,
+    updateOrganizationInfoFailure,
+    updateOrganizationInfoStart,
+    updateOrganizationInfoSuccess,
+ } = userSlice.actions;

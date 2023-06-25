@@ -8,6 +8,7 @@ import ProfileModal from "../../Modals/ProfileModal";
 import { useAuthAction } from "../../actions/authAndRegAction";
 import { useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
+import OrganizationProfileScreen from "../../Modals/OrganizationProfileModal";
 
 
 
@@ -15,11 +16,17 @@ export default function SettingScreen({ navigation }) {
     const [memberListModal, setMemberListModal] = React.useState(false);
     const [formListModal, setFormListModal] = React.useState(false);
     const [profileModal, setProfileModal] = React.useState(false);
+    const [organizationProfileModal, setOrganizationProfileModal] = React.useState(false);
 
     const authAction = useAuthAction();
     const loggedInUser = useSelector((state: RootState) => state.authentication.loggedInUser);
+    const userInfo = useSelector((state: RootState) => state.userinfo.userinfo);
     const onLogoutPress = () => {
         authAction.logoutAction();
+    }
+
+    const onOrganizationProfileModalClose = () => {
+        setOrganizationProfileModal(false)
     }
 
 
@@ -37,7 +44,7 @@ export default function SettingScreen({ navigation }) {
             </View>
             <View style={{ backgroundColor: "white", position: "absolute", alignSelf: "center", height: "50%", width: "85%", borderRadius: 30, top: "40%", padding: "5%" }}>
                 <View style={{ width: "90%", alignSelf: "center", height: "100%", justifyContent: "center" }}>
-                    <SettingOption label={"Company Profile"} setModal={setProfileModal} />
+                    <SettingOption label={"Company Profile"} setModal={setOrganizationProfileModal} />
                     <SettingOption label={"Profile"} setModal={setProfileModal} />
                     <SettingOption label={"Report Forms"} setModal={setFormListModal} />
                     <SettingOption label={"Members"} setModal={setMemberListModal} />
@@ -52,7 +59,10 @@ export default function SettingScreen({ navigation }) {
                 <FormListModal setFormListModal={setFormListModal} isVisible={formListModal} navigation={navigation} />
             </Modal>
             <Modal visible={profileModal} animationType="slide">
-                <ProfileModal onActivationButtonPressedCallBack={() => { }} user={loggedInUser} setProfileModal={setProfileModal} editable={true} />
+                <ProfileModal closeModal={()=>{setProfileModal(false)}} userInfo={userInfo}/> 
+            </Modal>
+            <Modal visible={organizationProfileModal} animationType="slide">
+                <OrganizationProfileScreen closeModal={onOrganizationProfileModalClose} organization={userInfo.organization} organizationStatues={userInfo.statuses} />
             </Modal>
         </SafeAreaView >
     );

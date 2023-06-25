@@ -1,5 +1,6 @@
 import IOrganization from "./Models/Organization"
 import { IReport } from "./Models/Report"
+import { IStatus } from "./Models/Status"
 import IUser from "./Models/User"
 
 export type LoginCredentials = {
@@ -20,6 +21,8 @@ export type RegistrationCredentials = {
 export type UserInfo = {
     user: IUser,
     organization: IOrganization,
+    organizationAdmins: IUser[],
+    statuses: IStatus[],
     totalReportCount: number,
     totalResolvedCount: number,
 }
@@ -51,4 +54,22 @@ export type filterOptions = {
     statusIDs?: string[],
     typeIDs?: string[],
     sortBy?: "subDate" | "upDate",
+}
+
+
+export type updateProfileArgs = {
+    name?: string,
+    address?: string,
+    contact?: {
+        phoneNo?: string,
+        address?: string
+    },
+    password?: string,
+}
+
+
+export type updateOrganizaitonInfoArgs = {
+    organization:IOrganization,
+    statuses:IStatus[],
+    statusesToDelete:IStatus[],
 }

@@ -107,14 +107,18 @@ const reportReponseResolver = ({ reports }: { reports: any[] }): IReport[] => {
 
 
     const resovled: IReport[] = reports.map((report) => {
+        console.log(report.submissionDate)
         const report_: IReport = {
             _id: report._id,
             name: report.name,
             details: report.details,
             submissionDate: new Date(report.submissionDate),
             updateDate: new Date(report.updateDate),
-            status:report.status,
-            comment:report.comment,
+            status:{
+                _id:report.status._id,
+                comment:report.status.comment,
+                desc:report.status.desc
+            },
         }
 
       

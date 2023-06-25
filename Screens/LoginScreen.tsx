@@ -20,7 +20,7 @@ export default function LoginScreen({ navigation }) {
         }
         tokenLogin();
     }, []);
-
+    console.log(login)
     useEffect(() => {
         login.error && Alert.alert("Login Failed", login.error);
     }, [login])
@@ -38,6 +38,7 @@ export default function LoginScreen({ navigation }) {
     };
 
     const onLoginButtonPressed = () => {
+        console.log(loginForm)
         authAction.loginAction({ identifier: loginForm.identifier, password: loginForm.password })
     }
 

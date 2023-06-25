@@ -2,7 +2,7 @@ import { AntDesign } from "@expo/vector-icons";
 import RNDateTimePicker from "@react-native-community/datetimepicker";
 import { Picker } from "@react-native-picker/picker";
 import React from "react";
-import { View, Text, TextInput, TouchableOpacity, ScrollView } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, ScrollView, ToastAndroid } from "react-native";
 import TagSelector from "../Components/TagSelector";
 import { ReprotElement, getReportElement } from "../api/admin";
 import { filterOptions } from "../types/General";
@@ -55,6 +55,11 @@ export default function FilterModal({ setFilterModal }: FilterModalProps) {
 
 
     const onFilterButtonPressed = () => {
+        if (!filterOptions.fromDate) {
+            ToastAndroid.show("Please select a from date", ToastAndroid.SHORT);
+            return
+        }
+
         setFilterModal(false);
         adminAction.fetchReportGroupedByTypeCustom(filterOptions)
     }
@@ -89,7 +94,7 @@ export default function FilterModal({ setFilterModal }: FilterModalProps) {
 
         setFilterOptions((prev) => { return { ...prev, statusIDs: prev.statusIDs.filter((id) => { return id !== statusID }) } })
     }
-        console.log(filterOptions)
+    console.log(filterOptions)
 
     return (
 

@@ -7,14 +7,23 @@ import {  getReportGroupedByType} from "../../api/admin";
 import errorHandler from "../../api/errorHandler/axiosError";
 import { getGroupedReportInfoForVictory } from "../../utils/victory";
 import { ReportGroupedByType } from "../../types/General";
+import { useUserInfoAction } from "../../actions/userAction";
 
 
 export default function HomeScreen({ }) {
 
     const [todayReports, setTodayReports] = React.useState<ReportGroupedByType[]>([])
+    const userInfoAction = useUserInfoAction();
 
 
     React.useEffect(() => {
+
+        const getLoggedInUserInfoAsync = async () => {
+            userInfoAction.fetchUserInfoAction();
+        }
+
+        getLoggedInUserInfoAsync();
+
 
         const today = new Date(); // current date and time
         const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate(),0,0,0,0); // set time to midnight

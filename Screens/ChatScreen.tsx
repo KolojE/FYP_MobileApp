@@ -26,7 +26,7 @@ export default function ChatScreen({ setChatRoomModal, selectedUser }: ChatScree
   const loggedInUser = useSelector((state: RootState) => state.authentication.loggedInUser)
   const chat = useSelector((state: RootState) => state.chat.chat)
   const chatAction = useChatAction()
-
+  
   function onSendButtonPressed() {
     chatAction.sendMessageAction({ message: message, receiverID: selectedUser._id })
     setMessage("")

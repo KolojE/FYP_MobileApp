@@ -38,7 +38,7 @@ export default function RecentReport({report}:RecenReportProps) {
             alignItems: "center",
           }}
         >
-          <Text style={{ fontSize: 10 }}>Status</Text>
+          <Text style={{ fontSize: 10 }}>{report.status.desc}</Text>
         </View>
       </View>
     </TouchableOpacity>

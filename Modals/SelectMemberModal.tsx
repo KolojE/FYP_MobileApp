@@ -60,12 +60,11 @@ export default function SelectMemberModal({ setSelectMemberModal, setSelectedUse
 
             <FlatList
                 style={{ width: "85%", alignSelf: "center" }}
-                data={filteredMembers.length>0? filteredMembers:members}
+                data={filteredMembers.length > 0 ? filteredMembers : members}
                 renderItem={renderMembers}
                 refreshControl={
                     <RefreshControl refreshing={complainants.loading} onRefresh={() => { complainantAction.getComplainants() }} />
                 }
-
             />
 
         </View>

@@ -11,17 +11,17 @@ type ReportListContainerPorps = {
         toDate: Date,
     }
     reports: IReport[];
-    setReportModal: Function;
+    onOpenModalPressed: (report:IReport)=>void;
 }
 
-export default function ReportListContainer({ dateRange, reports, setReportModal }: ReportListContainerPorps) {
+export default function ReportListContainer({ dateRange, reports, onOpenModalPressed}: ReportListContainerPorps) {
 
     const [reportElement, setReportElemnts] = React.useState<JSX.Element[]>([])
 
     React.useEffect(() => {
         setReportElemnts(() => {
             return reports.map<JSX.Element>((report) => {
-                return <ReportList date={report.submissionDate} status={report.status} SetReportModal={setReportModal} reportId={report._id} reportName={report.name} />
+                return <ReportList  onPressed={onOpenModalPressed} report={report} key={report._id} />
             })
         })
     }, [reports])
