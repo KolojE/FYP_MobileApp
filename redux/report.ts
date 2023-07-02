@@ -43,6 +43,18 @@ const reportSlice = createSlice({
             state.loading = false
             state.error = action.payload
         },
+        startDownloadingReport: (state) => {
+            state.loading = true
+            state.error = null
+        },
+        downloadReportSuccess: (state) => {
+            state.loading = false
+            state.error = null
+        },
+        downloadReportError: (state, action) => {
+            state.loading = false
+            state.error = action.payload
+        },
         updateReportStart: (state) => {
             state.loading = true
             state.error = null
@@ -75,6 +87,9 @@ export const {
     fetchReportError,
     updateReportStart,
     updateReportSuccess,
-    updateReportError 
+    updateReportError,
+    startDownloadingReport,
+    downloadReportSuccess,
+    downloadReportError,
 } = reportSlice.actions
 export default reportSlice.reducer;

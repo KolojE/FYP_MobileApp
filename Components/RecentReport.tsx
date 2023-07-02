@@ -1,14 +1,15 @@
 import React from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 import { IReport } from "../types/Models/Report";
+import { Ionicons } from "@expo/vector-icons";
 
 
 type RecenReportProps = {
   report:IReport;
-
+  onForwardReportPressed?: (report:IReport) => void,
 }
 
-export default function RecentReport({report}:RecenReportProps) {
+export default function RecentReport({report,onForwardReportPressed}:RecenReportProps) {
 
   return (
     <TouchableOpacity
@@ -36,9 +37,13 @@ export default function RecentReport({report}:RecenReportProps) {
             height: "100%",
             justifyContent: "center",
             alignItems: "center",
+            flexDirection:"row"
           }}
         >
-          <Text style={{ fontSize: 10 }}>{report.status.desc}</Text>
+          <Text style={{ fontSize: 10,paddingHorizontal:"6%" }}>{report.status.desc}</Text>
+          <Ionicons name="send" size={12} color="black"  onPress={()=>{
+            onForwardReportPressed(report)
+            }}/>
         </View>
       </View>
     </TouchableOpacity>

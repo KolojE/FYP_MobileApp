@@ -7,7 +7,7 @@ import {
   Modal,
 } from "react-native";
 import { MaterialIcons } from '@expo/vector-icons';
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect } from "react";
 import Title from "../../Components/Title"
 import ProfileModal from "../../Modals/ProfileModal";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -19,9 +19,9 @@ import { Image } from "react-native";
 import { useUserInfoAction } from "../../actions/userAction";
 import { RootState } from "../../redux/store";
 import { useSelector } from "react-redux";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 
-export default function HomeScreen({ navigation }) {
-
+export default function HomeScreen({navigation}) {
   const [profileModal, setProfileModal] = React.useState(false);
   const [recentReport, setRecentReports] = React.useState<IReport[]>([]);
 
@@ -31,22 +31,30 @@ export default function HomeScreen({ navigation }) {
 
   const {user,organization,totalReportCount,totalResolvedCount} = {...userinfo.userinfo}
 
-  
-  useEffect(() => {
-    const getLoggedInUserInfoAsync = async () => {
-      userInfoAction.fetchUserInfoAction();
-    }
-    getLoggedInUserInfoAsync();
 
-    const setReportsAsync = async () => {
-      setRecentReports(await getReport({ limit: 5, sortBy: "subDate" }));
-    }
-    setReportsAsync();
-  }, [])
+  useFocusEffect(
 
-  const onCloseModalPressed = () => {
-    setProfileModal(false);
-  }
+    useCallback(() => {
+      const getLoggedInUserInfoAsync = async () => {
+        userInfoAction.fetchUserInfoAction();
+      }
+      getLoggedInUserInfoAsync();
+      
+      const setReportsAsync = async () => {
+        setRecentReports(await getReport({ limit: 5, sortBy: "subDate" })as IReport[]);
+      }
+      setReportsAsync();
+    }, [])
+    )
+    
+    const onCloseModalPressed = () => {
+      setProfileModal(false);
+    }
+
+    const onForwardReportPressed = (report:IReport) => {
+      console.log(report+"===============")
+      navigation.navigate("Chat", { report: report } );
+    };
 
   return organization && user? (
     <SafeAreaView>
@@ -80,7 +88,7 @@ export default function HomeScreen({ navigation }) {
         <LatestUpdatedComponent />
         {
           recentReport &&
-          <RecentReportList navigation={navigation} reports={recentReport} />
+          <RecentReportList navigation={navigation} reports={recentReport} onForwardPressed={onForwardReportPressed}/>
         }
         <Modal statusBarTranslucent={true} visible={profileModal} animationType={"slide"}>
           <ProfileModal userInfo={userinfo.userinfo} closeModal={onCloseModalPressed} />

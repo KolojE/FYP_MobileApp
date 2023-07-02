@@ -2,23 +2,23 @@ import { Socket, io } from "socket.io-client";
 import { api_url } from "../env";
 import * as secureStorage from "expo-secure-store";
 import { onMessageReceiveCallback } from "../types/General";
-
-
+import { IReport } from "../types/Models/Report";
 
 type emitSendMessageArgs = {
-  receiverID: string,
-  message: string,
-}
+  receiverID: string;
+  forwardedReport?: IReport;
+  message: string;
+};
 
 let socket: Socket = null;
 
 const getSocket = async () => {
-
   const token = await secureStorage.getItemAsync("jwt");
+  
   return new Promise<Socket>((resolve, reject) => {
     if (socket) {
       socket.connect();
-      console.log("socket connected")
+      console.log("Socket connected");
       resolve(socket);
     } else {
       socket = io(`${api_url}`, {
@@ -28,10 +28,10 @@ const getSocket = async () => {
         reconnectionDelayMax: 200,
         reconnectionAttempts: Infinity,
       });
-      console.log("new socket created")
+      console.log("New socket created");
 
       socket.on("connect", () => {
-        console.log("socket connected");
+        console.log("Socket connected");
         resolve(socket);
       });
 
@@ -48,18 +48,15 @@ const getSocket = async () => {
       });
 
       socket.on("disconnect", (reason) => {
-        console.log(reason + " socket disconnected")
-      })
+        console.log(reason + " Socket disconnected");
+      });
     }
   });
 };
 
-
-
-
-
-export function sendMessage({ receiverID, message }: emitSendMessageArgs) {
-  socket.emit("sendMessage", receiverID, message, (ack) => {
+export function sendMessage({ receiverID, message, forwardedReport }: emitSendMessageArgs) {
+  if (!socket) throw new Error("Socket not initialized");
+  socket.emit("sendMessage", receiverID, { message, forwardedReport }, (ack) => {
     console.log("ack", ack);
   });
 }
@@ -68,31 +65,29 @@ export function getPendingMessages() {
   socket.emit("getPendingMessages");
 }
 
-
 export function addOnMessageReceiveListener(callBack: onMessageReceiveCallback) {
-  console.log("add on message receive listener")
+  console.log("Add on message receive listener");
 
   return new Promise((resolve, reject) => {
     try {
       resolve(
         socket.on("receiveMessage", (...args) => {
-          const [senderID, message] = args
-          console.log("message received", args)
-          callBack({ senderID: senderID, message: message });
+          const [senderID, message] = args;
+          console.log("Message received", args);
+          callBack({ senderID: senderID, message: message.message, forwardedReport: message.forwardedReport });
         })
-      )
+      );
     } catch (err) {
-      reject(err)
+      reject(err);
     }
-
-  })
+  });
 }
 
 export function disconnectSocket() {
-  socket.disconnect()
-  socket.removeAllListeners()
+  socket.disconnect();
+  socket.removeAllListeners();
   socket = null;
-  console.log("socket disconnected", socket)
+  console.log("Socket disconnected", socket);
 }
 
 export default getSocket;

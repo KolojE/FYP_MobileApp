@@ -5,7 +5,7 @@ import Form from "../types/Models/Form";
 import errorHandler from "./errorHandler/axiosError";
 import * as FileSystem from 'expo-file-system';
 import { getItemAsync } from "expo-secure-store";
-import { UserInfo, updateProfileArgs } from "../types/General";
+import { NominatimResult, UserInfo, updateProfileArgs } from "../types/General";
 import IUser from "../types/Models/User";
 
 
@@ -128,10 +128,10 @@ export async function searchAddress(query: string) {
     }
 }
 
-export async function getAddressByCoordinates(lat: number, lon: number): Promise<string> {
+export async function getAddressByCoordinates(lat: number, lon: number): Promise<NominatimResult> {
     try {
         const res = await axios.get(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`)
-        return res.data.display_name
+        return res.data as NominatimResult
     } catch (err) {
         errorHandler(err)
     }

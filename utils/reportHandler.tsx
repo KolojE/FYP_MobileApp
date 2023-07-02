@@ -30,7 +30,7 @@ export function detailRenderer(detail: IDetail, key) {
                 <PhotoValue label={detail.label} value={detail.value} key={key} />
             );
         case inputType.DropDown:
-            return null; // Handle the DropDown input type
+            return <DropDownValue label={detail.label} value={detail.value} />; // Handle the DropDown input type
     }
 }
 
@@ -74,7 +74,7 @@ export function MapValue(data: DataProps) {
 
     React.useEffect(() => {
         const getAddressAsync = async () => {
-            const address = await getAddressByCoordinates(value.La, value.Lo);
+            const address = (await getAddressByCoordinates(value.La, value.Lo)).display_name;
             setAddress(address);
         }
         getAddressAsync();
@@ -152,6 +152,18 @@ export function PhotoValue(data: DataProps) {
                     }}/>
                 </TouchableOpacity>
             </Modal>
+        </View>
+    );
+}
+
+export function DropDownValue(data: DataProps) {
+    const label = data.label;
+    const value = data.value as string;
+
+    return (
+        <View style={styles.container}>
+            <Text style={styles.label}>{label}</Text>
+            <Text style={styles.value}>{value}</Text>
         </View>
     );
 }

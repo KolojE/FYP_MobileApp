@@ -1,17 +1,21 @@
 import { createSlice } from "@reduxjs/toolkit"
+import { IReport } from "../types/Models/Report"
+
+type chats = {
+    [key: string]: {
+        chatLog: {
+            msg: string,
+            forwardedReport?: IReport,
+            receive?: boolean
+        }[],
+        unRead: boolean
+    }
+}
 
 type initialState = {
     loading: boolean,
     error: string | null,
-    chat: {
-        [key: string]: {
-            chatLog: {
-                msg: string,
-                receive?: boolean
-            }[],
-            unRead: boolean
-        }
-    },
+    chat: chats
 
 }
 
@@ -28,15 +32,15 @@ const chatSlice = createSlice({
             state.error = null
         },
         addMessage: (state, action) => {
-            const { receiverID, msg, receive } = action.payload
+            const { receiverID, msg, receive,forwardedReport } = action.payload
             if (!state.chat[receiverID]) {
                 state.chat[receiverID] = {
-                    chatLog: [{ msg, receive }]
+                    chatLog: [{ msg, receive,forwardedReport}]
                     , unRead: true
                 }
             }
             else {
-                state.chat[receiverID].chatLog.push({ msg, receive })
+                state.chat[receiverID].chatLog.push({ msg, receive,forwardedReport  })
                 state.chat[receiverID].unRead = true
             }
         },
@@ -55,10 +59,22 @@ const chatSlice = createSlice({
         readMessage: (state, action) => {
             const { receiverID } = action.payload
             state.chat[receiverID].unRead = false
+        },
+        retrieveAllChat: (state, action) => {
+            state.chat = action.payload
+
         }
     }
 
 })
 
-export const { startSendingMessage, addMessage, sendMessageError, receiveMessageError, receiveMessageSuccess,readMessage } = chatSlice.actions
+export const { 
+    startSendingMessage,
+    addMessage,
+    sendMessageError,
+    receiveMessageError,
+    receiveMessageSuccess,
+    readMessage,
+    retrieveAllChat
+ } = chatSlice.actions
 export default chatSlice.reducer;

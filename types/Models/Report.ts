@@ -11,8 +11,13 @@ export interface IDetails {
  };
 
 export interface IReport {
+    form_id?: any;
     _id: string;
     name: string;
+    location?:{
+        latitude: number;
+        longitude: number;
+    }
     submissionDate: Date;
     updateDate: Date;
     details: IDetails;
@@ -20,5 +25,10 @@ export interface IReport {
         _id: string;
         desc: string;
         comment: string;
+    };
+    complainant?:{
+        email: string;
+        _id:string;
+        name:string;
     };
 }

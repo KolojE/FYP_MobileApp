@@ -6,10 +6,11 @@ import { IReport } from "../types/Models/Report";
 
 type RecenReportListProps = {
     navigation: any;
+    onForwardPressed?: (report: IReport) => void;
     reports: IReport[];
 }
 
-export default function RecentReportList({ navigation, reports }: RecenReportListProps) {
+export default function RecentReportList({ navigation, reports,onForwardPressed }: RecenReportListProps) {
 
     const [reportRecentReportElement, setRecentReportElement] = React.useState<JSX.Element[]>([])
 
@@ -22,7 +23,7 @@ export default function RecentReportList({ navigation, reports }: RecenReportLis
         setRecentReportElement(
             recentReport.slice(0, 5).map(
                 (report, index) => {
-                    return <RecentReport report={report} key={index} />
+                    return <RecentReport report={report} key={index} onForwardReportPressed={onForwardPressed} />
                 })
         )
     }, [reports])

@@ -45,20 +45,40 @@ export async function uploadReportPhoto({uri}):Promise<string>{
 
 }
 
-export async function getReport({sortBy,limit,dateRange}:{sortBy:"subDate"|"upDate",limit?:number,dateRange?:{subFromData?:Date,subToDate?:Date}}): Promise<IReport[]> {
+export async function getReport({sortBy,limit,dateRange,reportID}:{sortBy?:"subDate"|"upDate",limit?:number,dateRange?:{subFromData?:Date,subToDate?:Date},reportID?:string}): Promise<IReport[]|IReport> {
     try {
         const res = await axios.get(`${api_url}/report/getSubmittedReports`,
             {
                 params: {
+                    reportID: reportID,
                     limit: limit,
                     sortBy:sortBy,
                     subFromDate:dateRange?.subFromData,
                     subToDate:dateRange?.subToDate
                 }
             })
+
+        if (reportID) {
+            const report = {
+                _id: res.data.report._id,
+                name: res.data.report.form_id.name,
+                details: res.data.report.details,
+                status: {
+                    comment : res.data.report.status.comment,
+                    desc : res.data.report.status._id.desc,
+                    _id : res.data.report.status._id._id
+                },
+                submissionDate : new Date(res.data.report.submissionDate),
+                updateDate : new Date(res.data.report.updateDate)
+            };
+
+            console.log(report+"report===================")
+
+            return report
+                 }
             
 
-            const resovled = reportReponseResolver({reports:res.data.reports})
+        const resovled = reportReponseResolver({reports:res.data.reports})
         return resovled;
     }
     catch (err) {

@@ -31,7 +31,7 @@ export default function HomeScreen({ }) {
 
         getReportGroupedByType({ sortBy: "subDate", dateRange: { fromDate: startOfDay, toDate: endOfDay } }).then((res) => {
             
-            setTodayReports(res);
+            setTodayReports(res as ReportGroupedByType[]);
         
         }, (rej) => { errorHandler(rej) })
 

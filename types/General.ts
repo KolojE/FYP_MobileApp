@@ -27,11 +27,41 @@ export type UserInfo = {
     totalResolvedCount: number,
 }
 
+export type NominatimResult = {
+    place_id: number;
+    licence: string;
+    osm_type: string;
+    osm_id: number;
+    lat: string;
+    lon: string;
+    display_name: string;
+    address: {
+      house_number?: string;
+      road?: string;
+      suburb?: string;
+      city?: string;
+      county?: string;
+      state?: string;
+      postcode?: string;
+      country?: string;
+      country_code?: string;
+    };
+    boundingbox: string[];
 
-export type onMessageReceiveCallback = ({ senderID, message }) => void
+  }
+
+
+export type ReportGroupedByStateAndCity = {
+    [state: string]: {
+        [city: string]: ReportGroupedByType[]
+    }
+} 
+
+export type onMessageReceiveCallback = ({ senderID, message,forwardedReport }) => void
 
 export type sendMessageArgs = {
     receiverID: string,
+    forwardedReport?: IReport,
     message: string,
 }
 

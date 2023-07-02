@@ -1,6 +1,6 @@
 import { AntDesign } from "@expo/vector-icons";
 import React, { useEffect, useState } from "react";
-import { TextInput, View, StyleSheet, Text, Modal, BackHandler, TouchableOpacity } from "react-native";
+import { TextInput, View, StyleSheet, Text, Modal, BackHandler, TouchableOpacity, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { FieldSelectionModal } from "../../Modals/FieldSelectionModal";
 import { FieldRenderer } from "../../utils/formHandler";
@@ -24,6 +24,7 @@ export function FormBuilderScreen({ route, navigation }) {
         <FieldRenderer inputType={inputType.Map} label="Location" required={false} />,
     ]
 
+    console.log(fields)
 
     useEffect(() => {
 
@@ -32,30 +33,105 @@ export function FormBuilderScreen({ route, navigation }) {
                 setFormName(res.name);
                 setFields(res.fields);
             }, (rej) => {
+                console.log(rej)
             });
         }
     }, [])
 
+
+    const onFieldUpPressed = (index) => {
+        if (index > 0) {
+            const newFields = [...fields];
+            const temp = newFields[index - 1];
+            newFields[index - 1] = newFields[index];
+            newFields[index] = temp;
+            setFields(newFields);
+            setFormFieldElements([])
+        }
+    }
+
+    const onFieldDownPressed = (index) => {
+        if (index < fields.length - 1) {
+            const newFields = [...fields];
+            const temp = newFields[index + 1];
+            newFields[index + 1] = newFields[index];
+            newFields[index] = temp;
+            setFields(newFields);
+            setFormFieldElements([])
+        }
+    }
+
     useEffect(() => {
         const formFieldElements = fields.map((field, index) => (
-            <FieldRenderer key={index} inputType={field.inputType} label={field.label} required={true} />
+        <View
+            style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "center",
+            }}>
+                <View 
+                style={{
+                    flex: 15,
+                }}
+                >
+            <FieldRenderer key={index} inputType={field.inputType} label={field.label} options={field.options} required={field.required} />
+                </View>
+            <TouchableOpacity onPress={() => {}}
+                style={{
+                    flex:1,
+                }}
+            >
+                <AntDesign name="delete" size={15} color="black" />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => {
+                onFieldUpPressed(index);
+            }}
+                style={{
+                    flex:1,
+                }}
+            >
+                <AntDesign name="up" size={15} color="black" />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => {
+                onFieldDownPressed(index);
+            }}
+                style={{
+                    flex:1,
+                }}
+            >
+                <AntDesign name="down" size={15} color="black" />
+            </TouchableOpacity>
+        </View>
         ));
         setFormFieldElements(formFieldElements);
 
     }, [fields]);
 
     const handleAddField = (field) => {
+        console.log(field)
         setFields([...fields, field]);
     };
 
+    const validateForm = () => {
+        if (formName.length < 1) {
+            return false;
+        }
+        return true
+    }
+
     const onSaveButtonClicked = () => {
+        if(!validateForm())
+        {
+            Alert.alert("Please enter a form name");
+            return;
+        }
+
         if (params?.formID) {
             updateForm({ fields: fields, activation_Status: true, name: formName, _id: params.formID })
             navigation.navigate("dashBoard")
             return;
 
         }
-
         addNewForm({ fields: fields, activation_Status: false, name: formName })
         navigation.goBack()
     }

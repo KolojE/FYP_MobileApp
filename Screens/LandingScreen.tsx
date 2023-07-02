@@ -8,7 +8,7 @@ import { roles } from "../types/Models/User";
 import React, { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "../redux/store";
-import { useSocketAction } from "../actions/socketAction.";
+import { useSocketAction } from "../actions/socketAction";
 import { AppState } from "react-native";
 
 const Stack = createNativeStackNavigator();
@@ -20,7 +20,6 @@ export default function LandingScreen({ route, navigation }) {
 
   //disconnect socket when app is closed
   useEffect(() => {
-
     const handleRefresh = () => {
       // Perform your desired action here
       socketAction.disconnect()

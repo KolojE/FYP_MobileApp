@@ -1,12 +1,12 @@
 import React from "react";
-import { View, Text, ScrollView, Alert, StyleSheet, TouchableOpacity } from "react-native";
-import { FontAwesome } from "@expo/vector-icons";
+import { View, Text, ScrollView, Alert, StyleSheet, TouchableOpacity, AsyncStorage } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { IField, inputType } from "../../types/Models/Form";
+import { IField} from "../../types/Models/Form";
 import { FieldRenderer } from "../../utils/formHandler";
 import { getForm } from "../../api/user";
 import { submitReport } from "../../api/complainant";
 import { reportSubmissionSchema } from "../../types/General";
+import { setItemAsync,getItemAsync } from "expo-secure-store";
 
 
 type ReportFormScreenProps = {
@@ -25,7 +25,6 @@ export default function ReportFormScreen({ route, navigation }: ReportFormScreen
     const [formName, setFormName] = React.useState("");
 
     const [report, setReport] = React.useState<reportSubmissionSchema>({});
-
     const params = route.params;
     const [submitted, setSubmitted] = React.useState(false);
 
@@ -36,6 +35,36 @@ export default function ReportFormScreen({ route, navigation }: ReportFormScreen
             navigation.goBack();
         }
     }, [submitted])
+
+    const saveReportToStorage = async () => {
+        try {
+          const serializedData = JSON.stringify(report);
+          await setItemAsync(params.formID, serializedData);
+          console.log(report)
+          console.log('Report data saved successfully.');
+        } catch (error) {
+          console.log('Error saving report data:', error);
+        }
+      };
+      
+      // Function to retrieve the report submission schema from AsyncStorage
+      const getReportFromStorage = async () => {
+        try {
+          const serializedData = await getItemAsync(params.formID);
+          if (serializedData !== null) {
+            const reportData = JSON.parse(serializedData);
+            setReport(reportData);
+            console.log('Report data retrieved successfully:', reportData);
+            return reportData;
+          }
+        } catch (error) {
+          console.log('Error retrieving report data:', error);
+        }
+      };
+
+    React.useEffect(() => {
+        getReportFromStorage();
+    },[])
 
     React.useEffect(
         () => {
@@ -54,7 +83,10 @@ export default function ReportFormScreen({ route, navigation }: ReportFormScreen
                             style: 'destructive',
                             // If the user confirmed, then we dispatch the action we blocked earlier
                             // This will continue the action that had triggered the removal of the screen
-                            onPress: () => navigation.dispatch(e.data.action),
+                            onPress: async() => {
+                                 await saveReportToStorage();
+                                 navigation.dispatch(e.data.action);
+                            }
                         },
                     ]
                 );
@@ -66,7 +98,7 @@ export default function ReportFormScreen({ route, navigation }: ReportFormScreen
 
             return unsubcribe
         },
-        [navigation, submitted]
+        [navigation, submitted,report,params?.formID]
     );
 
     React.useEffect(() => {
@@ -77,6 +109,7 @@ export default function ReportFormScreen({ route, navigation }: ReportFormScreen
             setFields(res.fields);
             setDefaultFields(res.defaultFields);
         }, (rej) => {
+            console.log(rej)
         });
 
     }, [])
@@ -85,7 +118,7 @@ export default function ReportFormScreen({ route, navigation }: ReportFormScreen
         () =>
             defaultFields.map((field, index) => {
                 setReport((prev) => { return { ...prev, [field._id]: null } })
-                return <FieldRenderer _id={field._id} key={index} inputType={field.inputType} label={field.label} required setReport={setReport} />
+                return <FieldRenderer _id={field._id} key={index} inputType={field.inputType} label={field.label} options={field.options} report={report} required={field.required} setReport={setReport} />
             }),
         [defaultFields]
     );
@@ -94,26 +127,48 @@ export default function ReportFormScreen({ route, navigation }: ReportFormScreen
         () =>
             fields.map((field, index) => {
                 setReport((prev) => { return { ...prev, [field._id]: null } })
-                return <FieldRenderer _id={field._id} key={index} inputType={field.inputType} label={field.label} required setReport={setReport} />
+                return <FieldRenderer _id={field._id} key={index} inputType={field.inputType} label={field.label} options={field.options} report={report}  required={field.required} setReport={setReport} />
             }),
         [fields]
     );
 
-    const onSubmitButtonPressed = () => {
-        submitReport({ formID: params.formID, report: report, fields: fields })
+    const onSubmitButtonPressed = async () => {
+        if (!checkRequiredFields()) {
+            return;
+        }
+        setItemAsync(params.formID, null);
+        await submitReport({ formID: params.formID, report: report, fields: fields })
         setSubmitted(true)
+    }
+
+    const checkRequiredFields = () => {
+        let missingFields: string[] = [];
+        [...fields, ...defaultFields].forEach((field) => {
+            if (field.required && !report[field._id]) {
+                missingFields.push(field.label);
+            }
+        })
+        if (missingFields.length > 0) {
+            Alert.alert(
+                'Missing Fields',
+                `Please fill in the following fields: ${missingFields.join(", ")}`,
+                [
+                    { text: "OK", style: 'cancel', onPress: () => { } },
+                ]
+            );
+            return false;
+        }
+        return true;
     }
 
     return (
 
         <SafeAreaView style={styles.container}>
+            <View style={styles.titleContainer}>
+                <Text style={{ color: "white", fontSize: 20 }}>Submit Report Form</Text>
+            </View>
             <ScrollView contentContainerStyle={styles.scrollView}>
-                <View style={styles.titleContainer}>
                     <Text style={styles.title}>Report {formName}</Text>
-                </View>
-                <View style={styles.IconContainer}>
-                    <FontAwesome name="fire" size={50} color="black" />
-                </View>
                 <View style={styles.formContainer}>
                     {defaultFieldElements}
                     <Text style={styles.detailsText}>Details</Text>
@@ -131,21 +186,21 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     scrollView: {
-        flexGrow: 1,
         width: "100%",
         alignItems: "center",
         paddingTop: "5%",
-        borderBottomStartRadius: 20,
-        borderBottomEndRadius: 20
+        paddingBottom: "10%"
     },
     title: {
+        fontSize: 30,
         fontWeight: "bold",
-        color: "white",
+        color: "black",
+        padding:20
     },
     titleContainer: {
         backgroundColor: "#162147",
         width: "100%",
-        height: "5%",
+        padding:15,
         alignItems: "center",
         justifyContent: "center",
         borderBottomEndRadius: 10,

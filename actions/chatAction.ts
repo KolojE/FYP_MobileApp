@@ -1,25 +1,33 @@
 import { useDispatch } from "react-redux";
-import { addMessage, readMessage, receiveMessageError, receiveMessageSuccess, sendMessageError, startSendingMessage } from "../redux/chat";
+import chat, { addMessage, readMessage, receiveMessageError, receiveMessageSuccess, retrieveAllChat, sendMessageError, startSendingMessage } from "../redux/chat";
 import { sendMessage } from "../api/socketIO";
 import { sendMessageArgs } from "../types/General";
+import { chatDBInit } from "../sqlite/sqlite";
 
 
+
+const chatDB = chatDBInit()
 
 export const useChatAction = () => {
     const dispatch = useDispatch();
-    const sendMessageAction = async ({ message, receiverID }: sendMessageArgs) => {
+    const sendMessageAction = async ({ message, receiverID,forwardedReport}: sendMessageArgs) => {
         try {
             dispatch(startSendingMessage())
-            await sendMessage({ message, receiverID });
-            dispatch(addMessage({ msg: message, receiverID, receive: false }));
+            chatDB.insertMessage({ chatId: receiverID, message, receive: false,forwardedReport })
+            await sendMessage({ message, receiverID,forwardedReport});
+            dispatch(addMessage({ msg: message, receiverID, receive: false,forwardedReport }));
         } catch (err) {
             dispatch(sendMessageError(err.message))
         }
     }
 
-    const receiveMessageAction = async ({ message, senderID }) => {
+    const receiveMessageAction = async ({ message, senderID,forwardedReport }) => {
         try {
-            dispatch(addMessage({ msg: message, receiverID: senderID, receive: true }));
+            dispatch(addMessage({ msg: message, receiverID: senderID, receive: true,forwardedReport:forwardedReport }));
+            chatDB.insertMessage({ chatId: senderID, message:message, receive: true,forwardedReport:forwardedReport })
+            chatDB.getAllMessages(senderID, (row) => {
+                console.log(row)
+            })
             dispatch(receiveMessageSuccess())
         } catch (err) {
             dispatch(receiveMessageError(err.message))
@@ -31,6 +39,39 @@ export const useChatAction = () => {
         dispatch(readMessage({ receiverID }))
     }
 
-    return { sendMessageAction, receiveMessageAction, readMessageAction }
+    const retrieveAllChatAction = async () => {
+        const chatDB = chatDBInit()
+        const chats = {}
+        chatDB.getAllChats((rows) => {
+            console.log("retrieveAllChat")
+            console.log(JSON.stringify(rows, null, 2))
+
+            rows.forEach((row) => {
+                console.log(row)
+                if (!chats[row.chatId]) {
+                    chats[row.chatId] = {
+                        chatLog: [{ msg: row.message, receive: JSON.parse(row.receive), forwardedReport:JSON.parse(row.forwardedReport??null) }],
+                        unRead: true
+                    }
+                }
+                else {
+                    chats[row.chatId].chatLog.push({ msg: row.message, receive: JSON.parse(row.receive) })
+                    chats[row.chatId].unRead = true
+                }
+            }
+            )
+            console.log(JSON.stringify(chats, null, 2))
+        dispatch(retrieveAllChat(chats))
+        }
+        )
+
+    }
+
+    return {
+        sendMessageAction,
+        receiveMessageAction,
+        readMessageAction,
+        retrieveAllChatAction
+    }
 
 }

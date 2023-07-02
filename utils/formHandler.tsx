@@ -1,6 +1,6 @@
 import RNDateTimePicker from "@react-native-community/datetimepicker";
 import React from "react";
-import { Text, TextInput, TouchableOpacity, StyleSheet, View, Modal, ScrollView, FlatList } from "react-native";
+import { Text, TextInput, TouchableOpacity, StyleSheet, View, Modal, ScrollView, FlatList, Alert } from "react-native";
 import { IField, inputType } from "../types/Models/Form";
 import LocationPickerModal from "../Modals/LocationPickerModal";
 import * as ImagePicker from "expo-image-picker";
@@ -9,13 +9,17 @@ import { reportSubmissionSchema } from "../types/General";
 import { getAddressByCoordinates } from "../api/user";
 import EvidencePhoto from "../Components/EvidencePhoto";
 import { uploadReportPhoto } from "../api/complainant";
+import { Picker } from "@react-native-picker/picker";
 
 
 type FieldRendererProps = IField & {
+    report?: reportSubmissionSchema;
     setReport?: React.Dispatch<React.SetStateAction<reportSubmissionSchema>>;
 }
 
 export function FieldRenderer(field: FieldRendererProps) {
+
+
 
     switch (field.inputType) {
         case inputType.Text:
@@ -27,16 +31,22 @@ export function FieldRenderer(field: FieldRendererProps) {
         case inputType.Map:
             return MapInputField(field);
         case inputType.Photo:
-    }       return PhotoInputField(field);
+            return PhotoInputField(field);
+        case inputType.DropDown:
+            return DropDownInputField(field);
+    }
+
 }
 
-function TextInputField({ setReport, _id, label }: FieldRendererProps) {
+function TextInputField({ setReport, _id, label, required, report }: FieldRendererProps) {
 
     const [value, setValue] = React.useState<string>("");
-
+    React.useEffect(() => {
+        if (report?.[_id]) { setValue && setValue(report[_id] as string); }
+    }, [])
     React.useEffect(() => {
         setReport && setReport(prev => ({ ...prev, [_id]: value }));
-    },[value])
+    }, [value])
 
     const onTextChange = (text: string) => {
         setValue(text);
@@ -44,7 +54,7 @@ function TextInputField({ setReport, _id, label }: FieldRendererProps) {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.label}>{label}</Text>
+            <Text style={styles.label}>{label + (required ? " *" : "")}</Text>
             <View style={styles.inputContainer}>
                 <TextInput style={styles.input} value={value} onChangeText={onTextChange} />
             </View>
@@ -53,14 +63,19 @@ function TextInputField({ setReport, _id, label }: FieldRendererProps) {
 }
 
 
-function DateInputField({ setReport, _id, label }: FieldRendererProps) {
+function DateInputField({ setReport, _id, label, required, report }: FieldRendererProps) {
+
 
     const [date, setDate] = React.useState<Date>(new Date());
     const [datePicker, setDatePicker] = React.useState<boolean>(false);
 
     React.useEffect(() => {
-        setReport && setReport(prev => ({ ...prev, [_id]: date}));
-    },[date])
+        if (report?.[_id]) { setDate && setDate(new Date(report[_id] as string)); }
+
+    }, [])
+    React.useEffect(() => {
+        setReport && setReport(prev => ({ ...prev, [_id]: date }));
+    }, [date])
 
     const onDateChange = (event: any, selectedDate: Date | undefined) => {
         const currentDate = selectedDate || date;
@@ -71,7 +86,7 @@ function DateInputField({ setReport, _id, label }: FieldRendererProps) {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.label}>{label}</Text>
+            <Text style={styles.label}>{label + (required ? " *" : "")}</Text>
             <TouchableOpacity onPress={() => setDatePicker(true)}>
                 <View style={styles.inputContainer}>
                     <TextInput
@@ -94,14 +109,17 @@ function DateInputField({ setReport, _id, label }: FieldRendererProps) {
     );
 }
 
-function TimeInputField({ setReport, _id, label }: FieldRendererProps) {
+function TimeInputField({ setReport, _id, label, required, report }: FieldRendererProps) {
+
 
     const [time, setTime] = React.useState<Date>(new Date());
     const [datePicker, setDatePicker] = React.useState<boolean>(false);
-
     React.useEffect(() => {
-        setReport && setReport(prev => ({ ...prev, [_id]: time}));
-    },[time])
+        if (report?.[_id]) { setTime && setTime(new Date(report[_id] as string)); }
+    }, [])
+    React.useEffect(() => {
+        setReport && setReport(prev => ({ ...prev, [_id]: time }));
+    }, [time])
 
     const onTimeChange = (event: any, selectedDate: Date | undefined) => {
         const currentDate = selectedDate || time;
@@ -111,7 +129,7 @@ function TimeInputField({ setReport, _id, label }: FieldRendererProps) {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.label}>{label}</Text>
+            <Text style={styles.label}>{label + (required ? " *" : "")}</Text>
             <TouchableOpacity onPress={() => setDatePicker(true)}>
                 <View style={styles.inputContainer}>
                     <TextInput
@@ -135,27 +153,43 @@ function TimeInputField({ setReport, _id, label }: FieldRendererProps) {
     );
 }
 
-function MapInputField({ setReport, _id, label }: FieldRendererProps) {
+function MapInputField({ setReport, _id, label, required, report }: FieldRendererProps) {
+
 
     const [locationPicker, setLocationPicker] = React.useState<boolean>(false);
     const [value, setValue] = React.useState<{ Lo: number, La: number }>();
     const [address, setAddress] = React.useState<string>("");
+    React.useEffect(() => {
+
+        if (report?.[_id]) {
+            setValue && setValue(report[_id] as { Lo: number, La: number });
+        }
+    }, [])
 
     React.useEffect(() => {
-        setReport && setReport(prev => ({ ...prev, [_id]: value}));
-    },[value])
+        setReport && setReport(prev => ({ ...prev, [_id]: value }));
+        try {
+
+            const setAddressAsync = async () => { setAddress((await getAddressByCoordinates(value.La, value.Lo)).display_name) }
+            setAddressAsync().then(() => {
+
+            }, () => {
+                setAddress("Location..")
+            })
+        } catch (err) {
+            console.log(err)
+        }
+    }, [value])
 
     const onLocationChange = async ({ Lo, La }: { Lo: number, La: number }) => {
         console.log(Lo, La)
         setValue({ Lo, La });
 
-        setAddress(await getAddressByCoordinates(La, Lo))
-
     }
 
     return (
         <View style={styles.container}>
-            <Text style={styles.label}>{label}</Text>
+            <Text style={styles.label}>{label + (required ? " *" : "")}</Text>
             <TouchableOpacity onPress={() => { setLocationPicker(true); setValue({ Lo: 30, La: 10 }) }}>
                 <View style={styles.inputContainer}>
                     <TextInput
@@ -174,16 +208,26 @@ function MapInputField({ setReport, _id, label }: FieldRendererProps) {
     )
 }
 
-function PhotoInputField({ setReport, _id, label }: FieldRendererProps) {
+function PhotoInputField({ setReport, _id, label, required, report }: FieldRendererProps) {
 
     const [selectedPhoto, setSelectedPhotos] = React.useState<ImagePicker.ImagePickerResult[]>([]);
     const [value, setValue] = React.useState<string[]>([]); // path to photo in server storage
 
     React.useEffect(() => {
-        setReport && setReport(prev => ({ ...prev, [_id]: value}));
-    },[value])
+        if (report?.[_id]) {
+            setValue && setValue(report[_id] as string[]);
+        }
+    }, [])
+    React.useEffect(() => {
+        setReport && setReport(prev => ({ ...prev, [_id]: value }));
+    }, [value])
 
     const onAddPhoto = async () => {
+
+        if (value.length > 10) {
+            Alert.alert("Maximum number of photos reached", "You can only add 10 photos to a report")
+            return
+        }
         let result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ImagePicker.MediaTypeOptions.All,
             base64: true,
@@ -197,19 +241,19 @@ function PhotoInputField({ setReport, _id, label }: FieldRendererProps) {
         if (!result.canceled) {
             setSelectedPhotos((prev) => { return [...prev, result] });
             const uri = result.assets[0].uri;
-            const path =await uploadReportPhoto({uri});
+            const path = await uploadReportPhoto({ uri });
             setValue((prev) => { return [...prev, path] });
         }
     };
 
-    const renderPhoto = ({ item,index }: { item: ImagePicker.ImagePickerResult,index:number }) => {
+    const renderPhoto = ({ item, index }: { item: ImagePicker.ImagePickerResult, index: number }) => {
         return <EvidencePhoto base64={item.assets[0].base64} key={index} onPressedCallBack={null} />;
     }
 
     const numberOfPhotos = selectedPhoto?.length || 0;
     return (
         <View style={{ marginBottom: "5%" }}>
-            <Text style={{ width: "100%", fontSize: 10, color: "grey" }}>{label + "," + numberOfPhotos + "/" + 10}</Text>
+            <Text style={{ width: "100%", fontSize: 10, color: "grey" }}>{label + "," + numberOfPhotos + "/" + 10 + (required ? " *" : "")}</Text>
             <View style={{ flexDirection: "row", alignItems: "center" }}>
                 <TouchableOpacity onPress={onAddPhoto} style={{ height: 100, width: 100, alignItems: "center", justifyContent: "center" }} >
                     <AntDesign name="pluscircle" size={50} color="grey" style={{}} />
@@ -226,9 +270,47 @@ function PhotoInputField({ setReport, _id, label }: FieldRendererProps) {
 
 }
 
+function DropDownInputField({ setReport, _id, label, options, report }: FieldRendererProps) {
+
+
+    const [value, setValue] = React.useState<string>(options[0]);
+
+
+    React.useEffect(() => {
+        if (report?.[_id]) {
+            setValue && setValue(report[_id] as string);
+        }
+    }, [])
+    React.useEffect(() => {
+        setReport && setReport(prev => ({ ...prev, [_id]: value }));
+    }, [value])
+
+    const onValueChange = (itemValue: string, itemIndex: number) => {
+        setValue(itemValue);
+    }
+
+    return (
+        <View style={styles.container}>
+            <Text style={styles.label}>{label}</Text>
+            <View style={styles.inputContainer}>
+                <Picker
+                    style={styles.input}
+                    selectedValue={value}
+                    onValueChange={onValueChange}
+                >
+                    {options?.map((option, index) => {
+                        return <Picker.Item key={index} label={option} value={option} />
+                    })}
+                </Picker>
+            </View>
+        </View>
+    )
+}
+
 const styles = StyleSheet.create({
     container: {
         marginBottom: 10,
+        width: "100%",
     },
     label: {
         color: "grey",

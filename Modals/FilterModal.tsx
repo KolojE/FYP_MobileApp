@@ -12,10 +12,11 @@ import { useReportAction } from "../actions/reportAction";
 
 type FilterModalProps = {
     setFilterModal: React.Dispatch<React.SetStateAction<boolean>>,
+    onFilter: (filterOptions: filterOptions) => void
 }
 
 
-export default function FilterModal({ setFilterModal }: FilterModalProps) {
+export default function FilterModal({ setFilterModal,onFilter }: FilterModalProps) {
 
     const [fromDatePicker, setFromDatePicker] = React.useState(false);
     const [toDatePicker, setToDatePicker] = React.useState(false);
@@ -55,13 +56,14 @@ export default function FilterModal({ setFilterModal }: FilterModalProps) {
 
 
     const onFilterButtonPressed = () => {
+
         if (!filterOptions.fromDate) {
             ToastAndroid.show("Please select a from date", ToastAndroid.SHORT);
             return
         }
 
+        onFilter(filterOptions)
         setFilterModal(false);
-        adminAction.fetchReportGroupedByTypeCustom(filterOptions)
     }
 
     const onSortPickerChange = (itemValue: "subDate" | "upDate", itemIndex: number) => {

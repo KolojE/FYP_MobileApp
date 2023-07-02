@@ -1,9 +1,9 @@
-import { useDispatch, useSelector } from "react-redux";
-import { getReportGroupedByType, updateReport } from "../api/admin"
-import { fetchReportError, fetchReportSuccess, startFetchingReport, updateReportStart, updateReportSuccess } from "../redux/report";
+import { useDispatch} from "react-redux";
+import { downloadReportExcel, getReportGroupedByType, updateReport } from "../api/admin"
+import { downloadReportSuccess, fetchReportError, fetchReportSuccess, startDownloadingReport, startFetchingReport, updateReportStart, updateReportSuccess } from "../redux/report";
 import { filterOptions } from "../types/General";
 import { IReport } from "../types/Models/Report";
-import { RootState } from "../redux/store";
+import * as Sharing from 'expo-sharing';
 
 
 
@@ -12,12 +12,11 @@ export const useReportAction = () => {
     const dispatch = useDispatch();
 
 
-    const fetchReportGroupedByTypeWeelky = async (offset: number) => {
+    const fetchReportGroupedByTypeWeelky = async (offset: number, download?: "xlsx" | "pdf") => {
 
         try {
             console.log("fetching report")
             console.log("offset", offset)
-            dispatch(startFetchingReport());
             const today = new Date();
             const dayOfWeek = today.getDay();
 
@@ -31,9 +30,16 @@ export const useReportAction = () => {
             sunday.setHours(23, 59, 59, 999);
 
 
+            if (download) {
+                dispatch(startDownloadingReport());
+                const result = await downloadReportExcel({ sortBy: "subDate", dateRange: { fromDate: monday, toDate: sunday } })
+                dispatch(downloadReportSuccess());
+                await Sharing.shareAsync(result.uri)
+                return
+            }
+            dispatch(startFetchingReport());
             const res = await getReportGroupedByType({ sortBy: "subDate", dateRange: { fromDate: monday, toDate: sunday } })
-
-            dispatch(fetchReportSuccess({ reports: res, dateRange: { fromDate: monday.toDateString(), toDate: sunday.toDateString()} }))
+            dispatch(fetchReportSuccess({ reports: res, dateRange: { fromDate: monday.toDateString(), toDate: sunday.toDateString() } }))
 
         } catch (err) {
             dispatch(fetchReportError(err.message))
@@ -41,10 +47,9 @@ export const useReportAction = () => {
         }
     };
 
-    const fetchReportGroupedByTypeMonthly = async (offset: number) => {
+    const fetchReportGroupedByTypeMonthly = async (offset: number, download?: "xlsx" | "pdf") => {
         try {
 
-            dispatch(startFetchingReport());
             const today = new Date();
 
             const start = new Date(today.getFullYear(), today.getMonth() - offset, 1);
@@ -52,7 +57,15 @@ export const useReportAction = () => {
             start.setHours(0, 0, 0, 0);
             end.setHours(23, 59, 59, 999);
 
+            if (download) {
+                dispatch(startDownloadingReport());
+                const result = await downloadReportExcel({ sortBy: "subDate", dateRange: { fromDate: start, toDate: end } })
+                dispatch(downloadReportSuccess());
+                await Sharing.shareAsync(result.uri)
+                return
+            }
 
+            dispatch(startFetchingReport());
             const res = await getReportGroupedByType({ sortBy: "subDate", dateRange: { fromDate: start, toDate: end } })
             dispatch(fetchReportSuccess({ reports: res, dateRange: { fromDate: start.toDateString(), toDate: end.toDateString() } }))
         } catch (err) {
@@ -60,9 +73,8 @@ export const useReportAction = () => {
             new Error(err.message)
         }
     }
-    const fetchReportGroupedByTypeDaily = async (offset: number) => {
+    const fetchReportGroupedByTypeDaily = async (offset: number, donwload?: "xlsx" | "pdf") => {
         try {
-            dispatch(startFetchingReport())
             const start = new Date()
             const end = new Date();
             start.setHours(0, 0, 0, 0);
@@ -71,40 +83,65 @@ export const useReportAction = () => {
             start.setDate(start.getDate() - offset)
             end.setDate(end.getDate() - offset)
 
-            const res =await getReportGroupedByType({ sortBy: "subDate", dateRange: { fromDate: start, toDate: end } })
+            if (donwload) {
+                dispatch(startDownloadingReport());
+                const result = await downloadReportExcel({ sortBy: "subDate", dateRange: { fromDate: start, toDate: end } })
+                dispatch(downloadReportSuccess());
+                await Sharing.shareAsync(result.uri)
+                return
+            }
+
+            dispatch(startFetchingReport())
+            const res = await getReportGroupedByType({ sortBy: "subDate", dateRange: { fromDate: start, toDate: end } })
             dispatch(fetchReportSuccess({ reports: res, dateRange: { fromDate: start.toDateString(), toDate: end.toDateString() } }))
         } catch (err) {
             dispatch(fetchReportError(err.message))
             new Error(err.message)
         }
     }
-    const fetchReportGroupedByTypeCustom = async (filter:filterOptions) => {
+    const fetchReportGroupedByTypeCustom = async (filter: filterOptions, download?: "xlsx" | "pdf") => {
 
-        try{
+        try {
             const fromDate = new Date(filter.fromDate)
             const toDate = new Date(filter.toDate)
             const status = filter.statusIDs
             const types = filter.typeIDs
+
+            if (download) {
+                console.log("download")
+                const result = await downloadReportExcel({ sortBy: "subDate", dateRange: { fromDate: fromDate, toDate: toDate }, status: status, types: types })
+                await Sharing.shareAsync(result.uri)
+                return
+            }
+            console.log("fetch")
+
             dispatch(startFetchingReport())
-            const res = await getReportGroupedByType({ sortBy: "subDate", dateRange: { fromDate: fromDate, toDate: toDate }, status: status, types:types })
+            const res = await getReportGroupedByType({ sortBy: "subDate", dateRange: { fromDate: fromDate, toDate: toDate }, status: status, types: types })
             dispatch(fetchReportSuccess({ reports: res, dateRange: { fromDate: fromDate.toDateString(), toDate: toDate.toDateString() } }))
         }
-        catch(err){
+        catch (err) {
             dispatch(fetchReportError(err.message))
             new Error(err.message)
         }
 
     }
 
-    const updateReportAction = async (updatedReport:IReport) => {
+    const updateReportAction = async (updatedReport: IReport) => {
 
         dispatch(updateReportStart())
         const res = await updateReport(updatedReport)
-        dispatch(updateReportSuccess({...res}))
+        dispatch(updateReportSuccess({ ...res }))
 
     }
 
-    return { fetchReportGroupedByTypeWeelky,  fetchReportGroupedByTypeMonthly, fetchReportGroupedByTypeDaily, fetchReportGroupedByTypeCustom,updateReportAction }
+    return {
+        fetchReportGroupedByTypeWeelky,
+        fetchReportGroupedByTypeMonthly,
+        fetchReportGroupedByTypeDaily,
+        fetchReportGroupedByTypeCustom,
+
+        updateReportAction
+    }
 }
 
 

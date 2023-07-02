@@ -12,16 +12,17 @@ type ReportListContainerPorps = {
     }
     reports: IReport[];
     onOpenModalPressed: (report:IReport)=>void;
+    onForwardPressed: (report:IReport)=>void;
 }
 
-export default function ReportListContainer({ dateRange, reports, onOpenModalPressed}: ReportListContainerPorps) {
+export default function ReportListContainer({ dateRange, reports,onForwardPressed, onOpenModalPressed}: ReportListContainerPorps) {
 
     const [reportElement, setReportElemnts] = React.useState<JSX.Element[]>([])
 
     React.useEffect(() => {
         setReportElemnts(() => {
             return reports.map<JSX.Element>((report) => {
-                return <ReportList  onPressed={onOpenModalPressed} report={report} key={report._id} />
+                return <ReportList onForwardMessagePress={onForwardPressed} onPressed={onOpenModalPressed} report={report} key={report._id} />
             })
         })
     }, [reports])

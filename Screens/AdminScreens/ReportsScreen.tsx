@@ -1,34 +1,32 @@
 import { Entypo, SimpleLineIcons } from "@expo/vector-icons";
 import React from "react";
-import { View, Text, TouchableOpacity, ScrollView, Modal, ActivityIndicator, FlatList } from "react-native";
+import { View, Text, TouchableOpacity, ScrollView, Modal,StyleSheet} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { VictoryPie, VictoryLegend, VictoryChart, VictoryArea, VictoryScatter, VictoryLine, VictoryAxis } from "victory-native";
-import Title from "../../Components/Title";
 import FilterModal from "../../Modals/FilterModal";
-import { getGroupedReportInfoForVictory } from "../../utils/victory";
 import { useReportAction } from "../../actions/reportAction";
 import { useSelector } from "react-redux";
+import Title from "../../Components/Title";
 import { RootState } from "../../redux/store";
-import { ReportGroupedByType } from "../../types/General";
-import { IReport } from "../../types/Models/Report";
-import ReportList from "../../Components/ReportList";
-import report from "../../redux/report";
-import UpdateReportModal from "../../Modals/UpdateReportModal";
+import FileDownloadModal from "../../Modals/FileDownloadModal";
+
+import PieMode from "../../Components/PieMode";
+import ListMode from "../../Components/ListMode";
+
+
+export default function ReportsScreen({ navigation }) {
 
 
 
-export default function ReportsScreen() {
     const [filterModal, setFilterModal] = React.useState(false);
 
     const [mode, setMode] = React.useState<"weekly" | "monthly" | "daily" | "custom">("weekly");
     const [displayMode, setDisplayMode] = React.useState<"pie" | "list">("pie")
     const [offset, setOffset] = React.useState<number>(0)
-
-
+    const [saveAsModal, setSaveAsModal] = React.useState<boolean>(false)
+    const [filterOptions, setFilterOptions] = React.useState<any>(null)
     const groupedReport = useSelector((state: RootState) => state.report)
-    const victoryData = getGroupedReportInfoForVictory({ groupedReport: groupedReport.groupedReports })
-
     const adminAction = useReportAction()
+
 
     React.useEffect(() => {
         if (mode === "weekly") {
@@ -52,6 +50,11 @@ export default function ReportsScreen() {
         setOffset(0)
     }, [mode])
 
+    const onFilterButtonPressed = (filterOptions) => {
+        adminAction.fetchReportGroupedByTypeCustom(filterOptions)
+        setFilterOptions(filterOptions)
+    }
+
     const onLeftButtonPressed = () => {
         setOffset(offset + 1)
 
@@ -61,165 +64,208 @@ export default function ReportsScreen() {
     }
 
     const onListButtonPressed = () => {
-
+        setDisplayMode("list")
     }
+
+    const onPieButtonPressed = () => {
+        setDisplayMode("pie")
+    }
+    const onSaveAsButtonPressed = () => {
+        setSaveAsModal(true)
+    }
+
+    const onSaveAsModalClose = () => {
+        setSaveAsModal(false)
+    }
+
+    const onFileTypeSelected = (fileType: string) => {
+        if (fileType === "csv") {
+            if (mode === "daily") {
+                adminAction.fetchReportGroupedByTypeDaily(offset, "xlsx")
+            }
+            if (mode === "weekly") {
+                adminAction.fetchReportGroupedByTypeWeelky(offset, "xlsx")
+            }
+            if (mode === "monthly") {
+                adminAction.fetchReportGroupedByTypeMonthly(offset, "xlsx")
+            }
+            if (mode === "custom") {
+                adminAction.fetchReportGroupedByTypeCustom(filterOptions, "xlsx")
+            }
+        }
+    }
+
 
 
     return (
         <SafeAreaView>
-                <Title title={"Reports"} />
-                <View style={{ alignItems: "center" }}>
-                    <View style={{ alignItems: "center" }}>
-                        <View style={{ borderWidth: 1, borderRadius: 10, width: "80%", marginTop: "5%", paddingTop: "2%", paddingBottom: "2%", flexDirection: "row" }}>
-                            <TouchableOpacity onPress={() => { setMode("daily") }} style={{ flex: 1, borderRightWidth: 1 }}>
-                                <Text style={mode === "daily" ? { textAlign: "center", color: "blue" } : { textAlign: "center" }}>
-                                    Day
-                                </Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity onPress={() => { setMode("weekly") }} style={{ flex: 1, borderRightWidth: 1 }}>
-                                <Text style={mode === "weekly" ? { textAlign: "center", color: "blue" } : { textAlign: "center" }}>
-                                    Week
-                                </Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity onPress={() => { setMode("monthly") }} style={{ flex: 1, borderRightWidth: 1 }}>
-                                <Text style={mode === "monthly" ? { textAlign: "center", color: "blue" } : { textAlign: "center" }}>
-                                    Month
-                                </Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity onPress={() => { setFilterModal(true); setMode("custom") }} style={{ flex: 1 }}>
-                                <Text style={mode === "custom" ? { textAlign: "center", color: "blue" } : { textAlign: "center" }}>
-                                    Custom
-                                </Text>
-                            </TouchableOpacity>
-                        </View>
-                        <View style={{ borderWidth: 1, borderRadius: 10, width: "65%", margin: 20, paddingTop: "2%", paddingBottom: "2%", flexDirection: "row" }}>
-                            <TouchableOpacity onPress={() => { setDisplayMode("pie") }} style={{ flex: 1, borderRightWidth: 1, alignItems: "center" }}>
-                                <Entypo name="pie-chart" size={20} color="black" style={displayMode === "pie" ? { color: "blue" } : {}} />
-                            </TouchableOpacity>
-                            <TouchableOpacity onPress={() => { setDisplayMode("list") }} style={{ flex: 1, borderRightWidth: 1, alignItems: "center" }}>
-                                <Entypo name="list" size={20} color="black" style={displayMode === "list" ? { color: "blue" } : {}} />
-                            </TouchableOpacity>
-                        </View>
-                    </View>
-                    <View style={{ flexDirection: "row", alignItems: 'center', justifyContent: "center", width: "80%" }}>
-                        {mode !== "custom" && (
-                            <View style={{ position: 'absolute', left: 0 }}>
-                                <TouchableOpacity onPress={onLeftButtonPressed} style={{ padding: 10 }}>
-                                    <SimpleLineIcons name="arrow-left" />
-                                </TouchableOpacity>
-                            </View>
-                        )}
-
-                        <View style={{ flex: 1, alignItems: 'center' }}>
-                            {
-                                !groupedReport.loading ?
-                                    <>
-                                        {
-                                            mode === "daily" ? <Text>{`${groupedReport.dateRange.fromDate}`}</Text> :
-                                                <Text>{`${groupedReport.dateRange.fromDate} - ${groupedReport.dateRange.toDate}`}</Text>
-                                        }
-                                    </> :
-                                    <Text>Loading...</Text>
-                            }
-                        </View>
-
-                        {offset !== 0 && (
-                            <View style={{ position: 'absolute', right: 0 }}>
-                                <TouchableOpacity onPress={onRightButtonPressed} style={{ padding: 10 }}>
-                                    <SimpleLineIcons name="arrow-right" />
-                                </TouchableOpacity>
-                            </View>
-                        )}
-                    </View>
+          <Title title={'Reports'} />
+          <View style={[styles.container,{overflow:"hidden"}]}>
+            <View style={styles.container}>
+              <View style={styles.rowContainer}>
+                <TouchableOpacity onPress={() => { setMode('daily') }} style={[styles.modeButton, mode === 'daily' && { borderRightWidth: 1 }]}>
+                  <Text style={mode === 'daily' ? styles.activeModeButtonText : styles.modeButtonText}>
+                    Day
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => { setMode('weekly') }} style={[styles.modeButton, mode === 'weekly' && { borderRightWidth: 1 }]}>
+                  <Text style={mode === 'weekly' ? styles.activeModeButtonText : styles.modeButtonText}>
+                    Week
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => { setMode('monthly') }} style={[styles.modeButton, mode === 'monthly' && { borderRightWidth: 1 }]}>
+                  <Text style={mode === 'monthly' ? styles.activeModeButtonText : styles.modeButtonText}>
+                    Month
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => { setFilterModal(true); setMode('custom') }} style={styles.modeButton}>
+                  <Text style={mode === 'custom' ? styles.activeModeButtonText : styles.modeButtonText}>
+                    Custom
+                  </Text>
+                </TouchableOpacity>
+              </View>
+              <View style={styles.displayButtonContainer}>
+                <TouchableOpacity onPress={onPieButtonPressed} style={[styles.displayButton, displayMode === 'pie' && { borderRightWidth: 1 }]}>
+                  <Entypo name="pie-chart" size={20} color="black" style={displayMode === 'pie' ? styles.activePieChartIcon : styles.pieChartIcon} />
+                </TouchableOpacity>
+                <TouchableOpacity onPress={onListButtonPressed} style={styles.displayButton}>
+                  <Entypo name="list" size={20} color="black" style={displayMode === 'list' ? styles.activeListIcon : styles.listIcon} />
+                </TouchableOpacity>
+              </View>
+            </View>
+            <View style={styles.dateRowContainer}>
+              {mode !== 'custom' && (
+                <View style={styles.leftButtonContainer}>
+                  <TouchableOpacity onPress={onLeftButtonPressed} style={styles.arrowIcon}>
+                    <SimpleLineIcons name="arrow-left" />
+                  </TouchableOpacity>
                 </View>
-                {
-                    displayMode === "pie" &&
-                    <PieMode />
-                }
-                {
-                    displayMode === "list" &&
-                    <ListMode/>
-                }
-            <Modal animationType="slide" visible={filterModal}>
-                <FilterModal setFilterModal={setFilterModal} />
-            </Modal>
+              )}
+              <View style={{ flex: 1, alignItems: 'center' }}>
+                {!groupedReport.loading ? (
+                  <>
+                    {mode === 'daily' ? (
+                      <Text>{`${groupedReport.dateRange.fromDate}`}</Text>
+                    ) : (
+                      <Text>{`${groupedReport.dateRange.fromDate} - ${groupedReport.dateRange.toDate}`}</Text>
+                    )}
+                  </>
+                ) : (
+                  <Text style={styles.loadingText}>Loading...</Text>
+                )}
+              </View>
+              {offset !== 0 && (
+                <View style={styles.rightButtonContainer}>
+                  <TouchableOpacity onPress={onRightButtonPressed} style={styles.arrowIcon}>
+                    <SimpleLineIcons name="arrow-right" />
+                  </TouchableOpacity>
+                </View>
+              )}
+            </View>
+          </View>
+          {displayMode === 'pie' && (
+            <ScrollView style={{ height: '70%' }}>
+              <PieMode navigation={navigation} />
+              <TouchableOpacity
+                style={styles.exportButton}
+                onPress={onSaveAsButtonPressed}
+              >
+                <Text style={styles.exportButtonText}>Export Data As Excel</Text>
+              </TouchableOpacity>
+              <FileDownloadModal
+                visible={saveAsModal}
+                onClose={onSaveAsModalClose}
+                onFileTypeSelect={onFileTypeSelected}
+              />
+            </ScrollView>
+          )}
+          {displayMode === 'list' && <ListMode navigation={navigation} />}
+          <Modal animationType="slide" visible={filterModal}>
+            <FilterModal setFilterModal={setFilterModal} onFilter={onFilterButtonPressed} />
+          </Modal>
         </SafeAreaView>
-    );
+      );
 }
-
-
-function PieMode() {
-
-    const groupedReport = useSelector((state: RootState) => state.report)
-    const victoryData = getGroupedReportInfoForVictory({ groupedReport: groupedReport.groupedReports })
-
-    return (
-        <>
-            {
-                !groupedReport.loading ?
-                    <>
-                        {
-                            groupedReport.groupedReports.length > 0 ?
-                                <View style={{ alignItems: "center", justifyContent: "center", minHeight: 300, minWidth: 300 }}>
-                                    <VictoryPie width={300} height={300} style={{ labels: { fontSize: 10 } }} colorScale={["navy", "tomato", "grey"]} data={victoryData.pie} />
-                                    <VictoryLegend width={300} itemsPerRow={3} title={"Report Type"} height={100} data={victoryData.legend} gutter={20} colorScale={["navy", "tomato", "grey"]} orientation={"horizontal"} />
-                                </View> :
-                                <View style={{ alignItems: "center", justifyContent: "center", minHeight: 300, minWidth: 300 }}>
-                                    <Text>No report found</Text>
-                                </View>
-                        }
-                    </> :
-                    <View style={{ alignItems: "center", justifyContent: "center", minHeight: 300, minWidth: 300 }}>
-                        <ActivityIndicator size={"large"} /></View>
-            }
-            <TouchableOpacity style={{ alignSelf: "center", padding: 10, marginBottom: "5%", borderRadius: 100, backgroundColor: "#4d8ef7" }}>
-                <Text style={{ color: "white", fontWeight: "700" }}>Save As</Text>
-            </TouchableOpacity>
-        </>
-    )
-}
-
-function ListMode()
-{
-    const groupedReport = useSelector((state: RootState) => state.report)
-
-    let reports:IReport[] = []
-     groupedReport.groupedReports.map((report:ReportGroupedByType)=>{
-        report.reports.map((r:IReport)=>{
-            reports.push({...r,name:report.name}) // retrive the name from the GroupedReport
-        })
-    })
-
-    const [selectedReport,setSelectedReport]    = React.useState<IReport>(null)
-
-
-    function renderItem({item}:{item:IReport}){
-        return (
-        <View style={{width:"90%",alignSelf:"center"}}>
-        <ReportList onPressed={onReportPressed} report={item} key={item._id}/>
-        </View>
-        )
-
-    }
-
-    const onReportPressed = (report:IReport) => {
-        console.log(report)
-        setSelectedReport(report)
-    }
-    
-    const onModalClose = () => {
-        setSelectedReport(null)
-    }
-
-    return (
-        <>
-        <FlatList 
-        data={reports}
-        renderItem={renderItem}
-        />
-        <Modal visible={!!selectedReport} >
-            <UpdateReportModal closeModal={onModalClose} report={selectedReport}  />
-        </Modal>
-        </>
-    )
-}
+const styles = StyleSheet.create({
+    container: {
+      alignItems: 'center',
+    },
+    rowContainer: {
+      borderWidth: 1,
+      borderRadius: 10,
+      width: '80%',
+      marginTop: '5%',
+      paddingTop: '2%',
+      paddingBottom: '2%',
+      flexDirection: 'row',
+    },
+    modeButton: {
+      flex: 1,
+      borderRightWidth: 1,
+    },
+    modeButtonText: {
+      textAlign: 'center',
+    },
+    activeModeButtonText: {
+      textAlign: 'center',
+      color: 'blue',
+    },
+    displayButtonContainer: {
+      borderWidth: 1,
+      borderRadius: 10,
+      width: '65%',
+      margin: 20,
+      paddingTop: '2%',
+      paddingBottom: '2%',
+      flexDirection: 'row',
+    },
+    displayButton: {
+      flex: 1,
+      borderRightWidth: 1,
+      alignItems: 'center',
+    },
+    pieChartIcon: {
+      color: 'black',
+    },
+    activePieChartIcon: {
+      color: 'blue',
+    },
+    listIcon: {
+      color: 'black',
+    },
+    activeListIcon: {
+      color: 'blue',
+    },
+    dateRowContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      width: '80%',
+    },
+    leftButtonContainer: {
+      position: 'absolute',
+      left: 0,
+    },
+    rightButtonContainer: {
+      position: 'absolute',
+      right: 0,
+    },
+    arrowIcon: {
+      padding: 10,
+    },
+    loadingText: {
+      textAlign: 'center',
+    },
+    exportButton: {
+      alignSelf: 'center',
+      padding: 10,
+      marginTop: '20%',
+      marginBottom: '10%',
+      borderRadius: 100,
+      backgroundColor: '#4d8ef7',
+    },
+    exportButtonText: {
+      color: 'white',
+      fontWeight: '700',
+    },
+  });

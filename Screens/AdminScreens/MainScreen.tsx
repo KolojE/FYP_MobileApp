@@ -32,10 +32,12 @@ export default function MainScreen() {
                     tabBarIcon: ({ }) => {
                         return <Ionicons name="documents" size={22} />;
                     },
+                    unmountOnBlur: true
                 }}
+                
             />
             <Tab.Screen
-                name="Chat Room"
+                name="ChatRoom"
                 component={ChatRoomList}
                 options={{
                     tabBarIcon: ({ }) => {

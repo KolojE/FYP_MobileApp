@@ -56,7 +56,7 @@ export default function MainScreen() {
                     },
                 }}
             >
-                {()=><ChatScreen selectedUser={admin} setChatRoomModal={null}/>}
+                {({route})=><ChatScreen selectedUser={admin} onChatRoomClose={null} route={route}/>}
             </Tab.Screen>
             <Tab.Screen
                 name="Logout"

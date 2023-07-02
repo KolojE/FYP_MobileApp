@@ -7,7 +7,7 @@ export function getGroupedReportInfoForVictory({ groupedReport }: { groupedRepor
         totalReport: 0,
     }
 
-    groupedReport.length > 0 &&
+    groupedReport?.length > 0 &&
         groupedReport.forEach((res) => {
             reports.legend.push({ name: res.name })
             reports.pie.push({ x: res.reports.length, y: res.reports.length })

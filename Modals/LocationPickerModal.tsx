@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from "react";
-import { View, Text, TouchableOpacity, FlatList, Modal, Alert } from "react-native";
+import { View, Text, TouchableOpacity, FlatList, Modal, Alert, ActivityIndicator } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 import MapView, { Marker } from "react-native-maps";
 import * as Location from 'expo-location';
@@ -16,12 +16,17 @@ type LocationPickerModalProps = {
 export default function LocationPickerModal({ onLocationChange, setOpenLocationPicker }: LocationPickerModalProps) {
     const [cameraLocation, setCameraLocation] = useState<{ lo: number, la: number }>();
     const [markerlocation, setMarkerLocation] = useState<{ lo: number, la: number }>();
+    const [mapReady, setMapReady] = useState<boolean>(false);
     const [searchText, setSearchText] = useState<string>("");
     const [address, setAddress] = useState<string>("");
+
 
     const [textInputFocus, setTextInputFocus] = useState<boolean>(false);
     const [suggestions, setSuggestions] = useState<Openstreetmap[]>([]);
     const map = useRef<MapView>(null);
+
+
+
 
     useEffect(() => {
         const requestLocationPermission = async () => {
@@ -35,6 +40,16 @@ export default function LocationPickerModal({ onLocationChange, setOpenLocationP
 
         requestLocationPermission();
     }, []);
+
+    //for development only
+    const [refresh, setRefresh] = useState<boolean>(false);
+
+    useEffect(() => {
+        setTimeout(() => {
+        console.log("refresh");
+        setRefresh(!refresh);
+        }, 1000);
+    }, [mapReady]);
 
     useEffect(() => {
         const fetchSuggestionsAsync = async () => {
@@ -74,7 +89,7 @@ export default function LocationPickerModal({ onLocationChange, setOpenLocationP
 
     const onMarkerDragEnd = async (e) => {
         setMarkerLocation({ la: e.nativeEvent.coordinate.latitude, lo: e.nativeEvent.coordinate.longitude });
-        setAddress(await getAddressByCoordinates(e.nativeEvent.coordinate.latitude, e.nativeEvent.coordinate.longitude));
+        setAddress((await getAddressByCoordinates(e.nativeEvent.coordinate.latitude, e.nativeEvent.coordinate.longitude)).display_name).;
     }
 
     const confirmLocation = () => {
@@ -89,6 +104,7 @@ export default function LocationPickerModal({ onLocationChange, setOpenLocationP
                 {cameraLocation && (
                     <MapView
                         ref={map}
+                        onMapLoaded={() => {setMapReady(true)}}
                         style={{ flex: 1, width: "100%" }}
                         initialRegion={{
                             latitude: cameraLocation.la,
@@ -110,6 +126,7 @@ export default function LocationPickerModal({ onLocationChange, setOpenLocationP
                 <TouchableOpacity
                     onPress={confirmLocation}
                     style={{
+                        position: "absolute",
                         backgroundColor: "#050e2d",
                         width: "30%",
                         height: "5%",
@@ -117,8 +134,7 @@ export default function LocationPickerModal({ onLocationChange, setOpenLocationP
                         alignItems: "center",
                         justifyContent: "center",
                         borderRadius: 100,
-                        marginTop: "auto",
-                        marginBottom: "5%",
+                        bottom: "5%",
                     }}
                 >
                     <Text style={{ color: "white", fontWeight: "bold" }}>Confirm</Text>
@@ -176,6 +192,11 @@ export default function LocationPickerModal({ onLocationChange, setOpenLocationP
                         renderItem={renderSuggestions}
                         keyExtractor={(item) => item.place_id}
                     />
+                </View>
+            </Modal>
+            <Modal visible={!mapReady} animationType="fade">
+                <View style={{height:"100%",alignItems: "center", justifyContent: "center" }}>
+                    <ActivityIndicator size="large" color="#0000ff" />
                 </View>
             </Modal>
         </View>

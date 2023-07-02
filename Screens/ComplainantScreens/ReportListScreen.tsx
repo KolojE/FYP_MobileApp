@@ -1,13 +1,8 @@
+import React, { useEffect, useState, useCallback } from "react";
+import { ScrollView, View, Text, TouchableOpacity, FlatList, RefreshControl, Modal, StyleSheet } from "react-native";
 import { AntDesign, Ionicons } from "@expo/vector-icons";
-import React from "react";
-import {
-  ScrollView,
-  View,
-  Text,
-  TouchableOpacity,
-} from "react-native";
-import { Modal } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useFocusEffect } from "@react-navigation/native";
 import ReportListContainer from "../../Components/ReportListContainer";
 import ReportScreen from "../../Modals/ReportModal";
 import { IReport } from "../../types/Models/Report";
@@ -16,123 +11,148 @@ import { RootState } from "../../redux/store";
 import { useSelector } from "react-redux";
 
 type ReportListScreenProps = {
-  reports: IReport[];
   navigation: any;
-}
+};
 
 export default function ReportListScreen({ navigation }: ReportListScreenProps) {
+  const [reportModalVisible, setReportModalVisible] = useState(false);
+  const [reports, setReports] = useState<IReport[]>([]);
+  const [selectedReport, setSelectedReport] = useState<IReport>(null);
+  const [reportListContainerElements, setReportListContainerElements] = useState<JSX.Element>();
 
-  const [ReportModal, setReportModal] = React.useState(false);
-  const [reports, setReports] = React.useState<IReport[]>([]);
-  const [selectedReport,setSelectedReport] = React.useState<IReport>(null);
-  const [reportListContainerElements, setReportListContainerElements] = React.useState<JSX.Element>();
+  useFocusEffect(
+    useCallback(() => {
+      fetchReports();
+    }, [])
+  );
 
-  const loggedInUser = useSelector((state: RootState) => state.authentication.loggedInUser);
+  const fetchReports = () => {
+    getReport({
+      dateRange: {
+        subToDate: new Date(),
+      },
+      limit: 10,
+      sortBy: "subDate",
+    }).then((reports) => {
+      setReports(reports as IReport[]);
+    });
+  };
 
-  React.useEffect(() => {
-    getReport({ sortBy: "subDate", limit: 20 }).then(
-      (res) => {
-        setReports(res);
-      }
-    )
-  }, [])
+  const updateReports = () => {
+    fetchReports();
+  };
 
-  const onOpenModalPressed = (report:IReport) => {
+  const openReportModal = (report: IReport) => {
     setSelectedReport(report);
-    setReportModal(true);
-  }
+    setReportModalVisible(true);
+  };
 
-  const onCloseModalPressed = () => {
-    setReportModal(false);
-  }
+  const closeReportModal = () => {
+    setReportModalVisible(false);
+  };
 
+  const forwardReport = (report: IReport) => {
+    navigation.navigate("Chat", { report: report });
+  };
 
-  React.useEffect(() => {
-    setReportListContainerElements((prev) => {
-      return <ReportListContainer reports={reports} onOpenModalPressed={onOpenModalPressed}/>
-    })
-  }, [reports])
+  useEffect(() => {
+    setReportListContainerElements(
+      <ReportListContainer
+        onForwardPressed={forwardReport}
+        reports={reports}
+        onOpenModalPressed={openReportModal}
+      />
+    );
+  }, [reports]);
 
-
-  const getReportToDate = () => {
-    getReport((
-      {
-        dateRange: {
-          subToDate: new Date(reports[reports.length - 1].submissionDate)
-        }
-        , limit: 10,
-        sortBy: "subDate"
-      })).then((reports) => {
-
-        setReports((prev) => {
-          return reports.concat(prev).filter((report, index, self) => {
-            index === self.findIndex((t) => t._id === report._id)
-          })
-        })
-
-      })
-  }
-
-
+  const getReportsToDate = () => {
+    const lastSubmissionDate = reports[reports.length - 1].submissionDate;
+    getReport({
+      dateRange: {
+        subToDate: new Date(lastSubmissionDate),
+      },
+      limit: 10,
+      sortBy: "subDate",
+    }).then((newReports) => {
+      const uniqueReports = (newReports as IReport[]).filter(
+        (report, index, self) => index === self.findIndex((t) => t._id === report._id)
+      );
+      setReports((prevReports) => [...uniqueReports, ...prevReports]);
+    });
+  };
 
   const isCloseToBottom = ({ layoutMeasurement, contentOffset, contentSize }) => {
     const paddingToBottom = 20;
-    return layoutMeasurement.height + contentOffset.y >=
-      contentSize.height - paddingToBottom;
+    return layoutMeasurement.height + contentOffset.y >= contentSize.height - paddingToBottom;
   };
 
-  const onScroll = ({ nativeEvent }) => {
+  const handleScroll = ({ nativeEvent }) => {
     if (isCloseToBottom(nativeEvent)) {
-      getReportToDate()
+      getReportsToDate();
     }
-  }
+  };
 
   return (
-    <SafeAreaView>
-
-      <View style={{ height: "100%", width: "100%" }}>
-        <View
-          style={{
-            alignItems: "center",
-            justifyContent: "center",
-            paddingTop: "7%",
-            paddingBottom: "5%",
-            backgroundColor: "#162147",
-            width: "100%",
-            flexDirection: "row",
-            borderBottomEndRadius: 20,
-            borderBottomStartRadius: 30,
+    <SafeAreaView style={styles.container}>
+      <View style={styles.header}>
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => {
+            navigation.goBack();
           }}
         >
-          <TouchableOpacity
-            style={{ marginLeft: "5%" }}
-            onPress={() => {
-              navigation.goBack();
-            }}
-          >
-            <AntDesign name="back" size={18} color="white" />
-          </TouchableOpacity>
-          <Text style={{ color: "white", marginLeft: "15%", fontWeight: "bold", fontSize: 16 }}>
-            Reports
-          </Text>
-          <TouchableOpacity style={{ marginLeft: "auto", marginRight: "10%" }}>
-            <Ionicons name="filter" size={18} color="white" />
-          </TouchableOpacity>
-        </View>
-        <ScrollView contentContainerStyle={{ alignItems: "center" }} onScroll={onScroll}>
-          <View style={{ width: "95%" }}>
-            {reportListContainerElements}
-          </View>
-        </ScrollView>
-        <Modal statusBarTranslucent={true} visible={ReportModal && selectedReport !== null}
-          animationType="slide"
-        >
-          <ReportScreen
-            closeModal={onCloseModalPressed}
-            report={selectedReport}
-          />
-        </Modal>
+          <AntDesign name="back" size={18} color="white" />
+        </TouchableOpacity>
+        <Text style={styles.title}>Reports</Text>
+        <TouchableOpacity style={styles.filterButton}>
+          <Ionicons name="filter" size={18} color="white" />
+        </TouchableOpacity>
       </View>
+      <ScrollView contentContainerStyle={styles.contentContainer} onScroll={handleScroll}>
+        <View style={styles.reportListContainer}>{reportListContainerElements}</View>
+      </ScrollView>
+      <Modal statusBarTranslucent={true} visible={reportModalVisible && selectedReport !== null} animationType="slide">
+        <ReportScreen
+          closeModal={closeReportModal}
+          reportID={selectedReport && selectedReport._id}
+          onForwardPressed={forwardReport}
+        />
+      </Modal>
     </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  contentContainer: {
+    flexGrow: 1,
+    paddingBottom: 20,
+  },
+  header: {
+    backgroundColor: "#162147",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingTop: 20,
+    paddingBottom: 15,
+    paddingHorizontal: 20,
+    borderBottomEndRadius: 20,
+    borderBottomStartRadius: 30,
+  },
+  backButton: {
+    marginRight: 10,
+  },
+  title: {
+    color: "white",
+    fontWeight: "bold",
+    fontSize: 16,
+  },
+  filterButton: {
+    marginLeft: "auto",
+  },
+  reportListContainer: {
+    paddingHorizontal: 10,
+  },
+});

@@ -7,9 +7,7 @@ import IComplainant from "../types/Models/Complainant";
 import IUser from "../types/Models/User";
 import { ReportGroupedByType, updateOrganizaitonInfoArgs } from "../types/General";
 import { IReport } from "../types/Models/Report";
-
-
-
+import * as FileSystem from 'expo-file-system';
 axios.interceptors.request.use(jwtTokenInterception);
 
 
@@ -111,21 +109,30 @@ export async function deleteDeactivatedMember(id: string): Promise<IComplainant>
 
 
 
-export async function getReportGroupedByType({ sortBy, limit, dateRange, status, types: type }: { sortBy: "subDate" | "upDate", limit?: number, dateRange?: { fromDate?: Date, toDate?: Date }, status?: string[], types?: string[] }): Promise<ReportGroupedByType[]> {
+export async function getReportGroupedByType({ sortBy, limit, dateRange, status, types,groupedByType=true,reportID}: { sortBy: "subDate" | "upDate", limit?: number, dateRange?: { fromDate?: Date, toDate?: Date }, status?: string[], types?: string[],groupedByType?:boolean,reportID?:string }): Promise<ReportGroupedByType[] | IReport> {
     try {
 
         const statusParams = status ? status.length > 0 ? status.toString() : undefined : undefined
-        const typeParams = type ? type.length > 0 ? type.toString() : undefined : undefined
+        const typeParams = types ? types.length > 0 ? types.toString() : undefined : undefined
+        console.log(reportID+"Report ID ========================")
         const res = await axios.get(`${api_url}/admin/getReport`, {
             params: {
                 sortBy: sortBy,
                 limit: limit,
-                subFromDate: dateRange.fromDate,
-                subToDate: dateRange.toDate,
+                subFromDate: dateRange?.fromDate,
+                subToDate: dateRange?.toDate,
                 status: statusParams,
                 type: typeParams,
+                groupByType: groupedByType,
+                reportID:reportID
             }
         })
+
+        if(reportID)
+        {
+            const report:IReport = res.data.report
+            return report
+        }
         const groupedReports: ReportGroupedByType[] = res.data.reports;
         const reportGroupedByType: ReportGroupedByType[] = groupedReports.map((groupedReport) => {
             return {
@@ -134,10 +141,15 @@ export async function getReportGroupedByType({ sortBy, limit, dateRange, status,
                     return {
                         _id: report._id.toString(),
                         status: report.status,
-                        submissionDate: report.submissionDate,
-                        updateDate: report.updateDate,
+                        submissionDate: report?.submissionDate,
+                        updateDate: report?.updateDate,
                         name: report.name,
                         details: report.details,
+                        complainant: report.complainant,
+                        location: {
+                           latitude : report.location?.latitude,
+                           longitude: report.location?.longitude,
+                        },
                     };
                 }),
                 name: groupedReport.name,
@@ -145,9 +157,36 @@ export async function getReportGroupedByType({ sortBy, limit, dateRange, status,
         });
         return reportGroupedByType;
     } catch (err) {
+        console.log(err)
         errorHandler(err)
     }
 
+}
+
+export async function downloadReportExcel({ sortBy, limit, dateRange, status, types: type }: { sortBy: "subDate" | "upDate", limit?: number, dateRange?: { fromDate?: Date, toDate?: Date }, status?: string[], types?: string[]})
+{
+    try{
+        const res = await axios.get(`${api_url}/admin/downloadReportExcel`,{
+            params:{
+                sortBy: sortBy,
+                limit: limit,
+                subFromDate: dateRange?.fromDate,
+                subToDate: dateRange?.toDate,
+                status: status,
+                type: type,
+            },
+        })
+
+        console.log(`${api_url}/${res.data.fileUrl}`)
+        const result = await FileSystem.downloadAsync(`${api_url}/${res.data.fileUrl}`,FileSystem.documentDirectory + "report.xlsx")
+        console.log(result.uri)
+        return result
+
+    }catch(err)
+    {
+        console.log(err)
+        errorHandler(err)
+    }
 }
 
 

@@ -8,9 +8,7 @@ import store, { RootState } from "./redux/store";
 import LoginScreen from "./Screens/LoginScreen";
 import LandingScreen from "./Screens/LandingScreen";
 import RegisterScreen from "./Screens/RegisterScreen";
-import { AppState } from "react-native";
-import { useSocketAction } from "./actions/socketAction.";
-
+import * as FileSystem from "expo-file-system";
 const Stack = createNativeStackNavigator();
 
 export default function App() {
@@ -21,6 +19,7 @@ export default function App() {
   )
 }
 
+console.log(FileSystem.documentDirectory);
 export function AppContent() {
   const loggedInUser = useSelector((state: RootState) => state.authentication.loggedInUser);
 
