@@ -21,7 +21,7 @@ export const useAuthAction = () => {
       dispatch(loginStart());
       const user = await login(credentials);
       dispatch(loginSuccess(user));
-      socketActions.establishConnection();
+      await socketActions.establishConnection();
       if (user.role === "admin") {
         complainantActions.getComplainants();
       }

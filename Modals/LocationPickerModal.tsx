@@ -89,7 +89,7 @@ export default function LocationPickerModal({ onLocationChange, setOpenLocationP
 
     const onMarkerDragEnd = async (e) => {
         setMarkerLocation({ la: e.nativeEvent.coordinate.latitude, lo: e.nativeEvent.coordinate.longitude });
-        setAddress((await getAddressByCoordinates(e.nativeEvent.coordinate.latitude, e.nativeEvent.coordinate.longitude)).display_name).;
+        setAddress((await getAddressByCoordinates(e.nativeEvent.coordinate.latitude, e.nativeEvent.coordinate.longitude)).display_name);
     }
 
     const confirmLocation = () => {

@@ -28,8 +28,6 @@ export default function FormListModal(props) {
         }))
     }, [forms])
 
-
-    2
     return (
         <View style={styles.container}>
             <View style={styles.searchContainer}>

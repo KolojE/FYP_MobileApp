@@ -52,7 +52,6 @@ export default function HomeScreen({navigation}) {
     }
 
     const onForwardReportPressed = (report:IReport) => {
-      console.log(report+"===============")
       navigation.navigate("Chat", { report: report } );
     };
 

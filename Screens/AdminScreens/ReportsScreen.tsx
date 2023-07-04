@@ -11,6 +11,7 @@ import FileDownloadModal from "../../Modals/FileDownloadModal";
 
 import PieMode from "../../Components/PieMode";
 import ListMode from "../../Components/ListMode";
+import DocumentMode from "../../Components/DcoumentMode";
 
 
 export default function ReportsScreen({ navigation }) {
@@ -20,7 +21,7 @@ export default function ReportsScreen({ navigation }) {
     const [filterModal, setFilterModal] = React.useState(false);
 
     const [mode, setMode] = React.useState<"weekly" | "monthly" | "daily" | "custom">("weekly");
-    const [displayMode, setDisplayMode] = React.useState<"pie" | "list">("pie")
+    const [displayMode, setDisplayMode] = React.useState<"pie" | "list"|"document">("pie")
     const [offset, setOffset] = React.useState<number>(0)
     const [saveAsModal, setSaveAsModal] = React.useState<boolean>(false)
     const [filterOptions, setFilterOptions] = React.useState<any>(null)
@@ -65,6 +66,10 @@ export default function ReportsScreen({ navigation }) {
 
     const onListButtonPressed = () => {
         setDisplayMode("list")
+    }
+
+    const onDocumentButtonPressed = () => {
+      setDisplayMode("document")
     }
 
     const onPieButtonPressed = () => {
@@ -131,6 +136,9 @@ export default function ReportsScreen({ navigation }) {
                 <TouchableOpacity onPress={onListButtonPressed} style={styles.displayButton}>
                   <Entypo name="list" size={20} color="black" style={displayMode === 'list' ? styles.activeListIcon : styles.listIcon} />
                 </TouchableOpacity>
+                <TouchableOpacity onPress={onDocumentButtonPressed} style={styles.displayButton}>
+                  <Entypo name="documents" size={20} color="black" style={displayMode === 'document' ? styles.activeListIcon : styles.listIcon} />
+                </TouchableOpacity>
               </View>
             </View>
             <View style={styles.dateRowContainer}>
@@ -180,6 +188,7 @@ export default function ReportsScreen({ navigation }) {
             </ScrollView>
           )}
           {displayMode === 'list' && <ListMode navigation={navigation} />}
+          {displayMode === 'document' && <DocumentMode navigation={navigation} />}
           <Modal animationType="slide" visible={filterModal}>
             <FilterModal setFilterModal={setFilterModal} onFilter={onFilterButtonPressed} />
           </Modal>

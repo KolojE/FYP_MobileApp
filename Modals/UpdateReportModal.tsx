@@ -39,7 +39,7 @@ export default function UpdateReportModal({
 
   React.useEffect(() => {
     getReportGroupedByType({ groupedByType: false, sortBy: "subDate", reportID: reportID._id }).then((report) => {
-      console.log(JSON.stringify(report, null, 2));
+      console.log(JSON.stringify(report, null, 2)+"update report modal");
       setReport({
         ...report,
         name: reportID.name,
@@ -49,8 +49,14 @@ export default function UpdateReportModal({
     })
   }, []);
 
+  React.useEffect(() => {
+    if (report == null) return;
+    setComment(report.status.comment);
+    setUpdatedStatus(report.status._id);
+  },[report])
+
   const onStatusChange = (itemValue: string, itemIndex: number) => {
-    console.log(itemValue);
+    console.log(itemValue,statuses);
     setUpdatedStatus(itemValue);
   }
 
@@ -65,6 +71,8 @@ export default function UpdateReportModal({
   }
 
   const updateReport = () => {
+    console.log(statuses);
+    console.log(updatedStatus);
     const reportToUpdate: IReport = {
       ...report,
       status: {

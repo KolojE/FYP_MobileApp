@@ -130,7 +130,12 @@ export async function getReportGroupedByType({ sortBy, limit, dateRange, status,
 
         if(reportID)
         {
-            const report:IReport = res.data.report
+            console.log(JSON.stringify(res.data.report),"asd")
+            const report:IReport = {
+                ...res.data.report,
+                status: {...res.data.report.status._id,
+                comment: res.data.report.status.comment,},
+            }
             return report
         }
         const groupedReports: ReportGroupedByType[] = res.data.reports;
@@ -240,7 +245,7 @@ export async function updateCreateOrganizaitonInfoAndStatues({organization,statu
     }
 }
 
-export async function updateReport(report:IReport)
+export async function updateReport(report:IReport):Promise<IReport>
 {
     console.log(api_url)
     try{
@@ -249,7 +254,10 @@ export async function updateReport(report:IReport)
             status:report.status,
             comment:report.status.comment,
         })
-        return res.data.report;
+        return {
+            ...report,
+            status:res.data.report.status._id,
+        };
     }catch(err)
     {
         errorHandler(err)

@@ -130,6 +130,7 @@ export const useReportAction = () => {
 
         dispatch(updateReportStart())
         const res = await updateReport(updatedReport)
+        console.log(JSON.stringify(res)+"updated report")
         dispatch(updateReportSuccess({ ...res }))
 
     }

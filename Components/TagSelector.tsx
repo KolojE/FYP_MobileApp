@@ -1,6 +1,5 @@
 import React from "react";
 import { View, Text, TouchableOpacity, StyleProp, ViewStyle, StyleSheet } from "react-native";
-import { filterOptions } from "../types/General";
 
 
 type TagSelectorProps = {
@@ -16,6 +15,7 @@ export default function TagSelector({ tagName, tagValue,onSelect }:TagSelectorPr
 
     
     const onTagPressed = ()=>{
+        console.log("tag pressed" + tagName + " " + tagValue + " " + selected);
         setSelected(prev=>!prev);
     }
 
@@ -23,7 +23,9 @@ export default function TagSelector({ tagName, tagValue,onSelect }:TagSelectorPr
 
     return (
         <View style={[{ flexDirection: "row", alignItems: "center",borderWidth: 1, padding: 10, borderRadius: 100 },tagSelectedStyle]}>
-            <TouchableOpacity onPress={onTagPressed}>
+            <TouchableOpacity onPress={()=>{
+                onTagPressed()
+            }}>
             <Text>{tagName}</Text>
             </TouchableOpacity>
         </View>

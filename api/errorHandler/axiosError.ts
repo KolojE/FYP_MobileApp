@@ -27,11 +27,12 @@ export class axiosError extends Error {
 export default function errorHandler(err:any)
 {
 if(err instanceof AxiosError)
-{
+{   
     const axiosError_ = new axiosError(err)
     console.error(axiosError_.toString());
 }
 else{
+    console.error("errorHandler: ",err)
     console.error(JSON.stringify(err,null,2))
 }
 }

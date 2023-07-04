@@ -7,7 +7,7 @@ import { FieldRenderer } from "../../utils/formHandler";
 import { IField, inputType } from "../../types/Models/Form";
 import { addNewForm, updateForm } from "../../api/admin";
 import { getForm } from "../../api/user";
-
+import nativeColorPicker from "react-native-color-picker";
 
 export function FormBuilderScreen({ route, navigation }) {
 
@@ -158,6 +158,7 @@ export function FormBuilderScreen({ route, navigation }) {
                         value={formName}
                         onChangeText={setFormName}
                     />
+                    
                 </View>
                 <View>
                     <Text>Default Fields</Text>

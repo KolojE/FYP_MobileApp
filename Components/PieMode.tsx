@@ -1,165 +1,42 @@
 import { useSelector } from "react-redux"
 import { RootState } from "../redux/store"
 import { getGroupedReportInfoForVictory } from "../utils/victory"
-import React from "react"
+import { useEffect, useRef, useState } from "react"
 import { IReport } from "../types/Models/Report"
-import MapView, { Marker } from "react-native-maps"
-import CustomMarker from "./CustomMarker"
 import { VictoryLegend, VictoryPie } from "victory-native"
-import { ActivityIndicator, Modal, TouchableOpacity, View,StyleSheet,Text } from "react-native"
-import { Entypo, FontAwesome, Foundation } from "@expo/vector-icons"
+import { ActivityIndicator, Modal,View,StyleSheet,Text } from "react-native"
 import UpdateReportModal from "../Modals/UpdateReportModal"
-import FadeInView from "./FadeInView"
+import MapViewWithReportMarker from "./MapViewWithReportMarker"
 
 export default function PieMode({ navigation }) {
 
-    const groupedReport = useSelector((state: RootState) => state.report)
-    const victoryData = getGroupedReportInfoForVictory({ groupedReport: groupedReport.groupedReports })
+    const {loading,groupedReports}= useSelector((state: RootState) => state.report)
+    const victoryData = getGroupedReportInfoForVictory({ groupedReport: groupedReports })
 
-    const [reportLocationMarker, setReportLocationMarker] = React.useState<Array<{ report: IReport, location: { lo: number, la: number }, marker: JSX.Element }>>([])
+    const [reports,setReports] = useState<IReport[]>([])
+    const [selectedReport, setSelectedReport] = useState<IReport | null>(null)
 
-    const [selectedReport, setSelectedReport] = React.useState<IReport | null>(null)
-    const [focusedLocation, setFocusedLocation] = React.useState<number>(-1)
-    const [isFocused, setIsFocused] = React.useState<boolean>(false)
-
-    const mapRef = React.useRef<MapView | null>(null)
-    React.useEffect(() => {
-        setReportLocationMarker(() => [])
-        setFocusedLocation(() => -1)
-        setIsFocused(() => false)
-        groupedReport.groupedReports.forEach((group) => {
-
-            group.reports.forEach((report, index) => {
-                setReportLocationMarker((prev) => {
-                    return [...prev, {
-                        location: {
-                            lo: report.location.longitude,
-                            la: report.location.latitude
-                        },
-                        report: { ...report, name: group.name },
-                        marker: <Marker
-                            coordinate={{ latitude: report.location.latitude, longitude: report.location.longitude }}
-                            tracksViewChanges={false}
-                        >
-                            <FontAwesome name="dot-circle-o" size={35} color="blue" />
-                        </Marker>,
-                    }]
-                })
-            })
-        })
-    }, [groupedReport])
-
-    console.log("reportLocationMarker", reportLocationMarker.length)
-
-    React.useEffect(() => {
-
-
-        setReportLocationMarker((prev) => prev.map((marker, index) => {
-
-            if (!isFocused) {
-                return {
-                    ...marker,
-                    marker: <CustomMarker
-                        key={index}
-                        report={marker.report}
-                        focusedLocation={focusedLocation}
-                        index={index} latitude={marker.location.la}
-                        longitude={marker.location.lo}
-                        onMarkerPress={onMarkerPress} />
-                }
-            }
-
-            if (index !== focusedLocation) {
-                return {
-                    ...marker,
-                    marker: <CustomMarker
-                        key={index}
-                        report={marker.report}
-                        focusedLocation={focusedLocation}
-                        index={index} latitude={marker.location.la}
-                        longitude={marker.location.lo}
-                        onMarkerPress={onMarkerPress} />
-                }
-            }
-            return {
-                ...marker,
-                marker: <CustomMarker
-                    key={index}
-                    report={marker.report}
-                    focusedLocation={focusedLocation}
-                    index={index} latitude={marker.location.la}
-                    longitude={marker.location.lo}
-                    onMarkerPress={onMarkerPress}
-                    animated={true} />
-            }
+    const mapRef = useRef<React.ElementRef<typeof MapViewWithReportMarker>>(null)
+    useEffect(() => {
+      const reports:IReport[] = []
+      groupedReports.forEach((group) => {
+        group.reports.forEach((report) => {
+          reports.push({
+            ...report,
+            name: group.name,
+          })
         }
-        ))
-    }
-        , [focusedLocation, isFocused]
-    )
+      )})
+      setReports(reports)
+    }, [groupedReports])
 
+ 
 
-
-    const onMarkerPress = (report: IReport) => {
-        console.log(report)
-
-    }
-
-    const onNextPressed = () => {
-        if (focusedLocation < reportLocationMarker.length - 1 && reportLocationMarker.length > 0) {
-            setFocusedLocation(focusedLocation + 1)
-            setIsFocused(true)
-            mapRef.current?.animateToRegion({
-                latitude: reportLocationMarker[focusedLocation + 1].location.la + 0.0015,
-                longitude: reportLocationMarker[focusedLocation + 1].location.lo,
-                latitudeDelta: 0.005,
-                longitudeDelta: 0.005,
-            })
-        }
-    }
-
-    const onPreviousPressed = () => {
-        if (focusedLocation > 0) {
-            setFocusedLocation(focusedLocation - 1)
-            setIsFocused(true)
-            mapRef.current?.animateToRegion({
-                latitude: reportLocationMarker[focusedLocation - 1].location.la + 0.0015,
-                longitude: reportLocationMarker[focusedLocation - 1].location.lo,
-                latitudeDelta: 0.005,
-                longitudeDelta: 0.005
-            })
-        }
-    }
-
-    const onRefreshPressed = () => {
-        setFocusedLocation(-1)
-        setIsFocused(false)
-        fitToCoordinates();
-    }
-    console.log(JSON.stringify(groupedReport, null, 2))
-    const fitToCoordinates = () => {
-
-        mapRef.current?.fitToCoordinates(reportLocationMarker.map((marker) => {
-            return {
-                latitude: marker.location.la,
-                longitude: marker.location.lo
-            }
-        }), {
-            edgePadding: {
-                top: 100,
-                right: 100,
-                bottom: 100,
-                left: 100,
-
-            },
-            animated: true
-        })
-    }
     return (
         <>
-          {!groupedReport.loading ? (
+          {!loading ? (
             <>
-              {groupedReport.groupedReports.length > 0 ? (
+              {groupedReports.length > 0 ? (
                 <>
                   <View style={styles.container}>
                     <VictoryPie
@@ -180,77 +57,14 @@ export default function PieMode({ navigation }) {
                       orientation={"horizontal"}
                     />
                   </View>
-                  <View>
-                    <Text style={[styles.reportText, { textAlign: "center", fontWeight: "700" }]}>Reported Incident Location</Text>
-                    <View style={styles.reportLocationContainer}>
-                      <Entypo name="chevron-left" size={30} color="black" onPress={onPreviousPressed} />
-                      <Text>
-                        {isFocused ? `${focusedLocation + 1}/${reportLocationMarker.length}` : `Total Reports: ${reportLocationMarker.length}`}
-                      </Text>
-                      <Entypo name="chevron-right" size={30} color="black" onPress={onNextPressed} />
-                    </View>
-                  </View>
-                  <View style={styles.mapContainer}>
-                    <MapView
-                      ref={mapRef}
-                      key={reportLocationMarker.length}
-                      zoomEnabled={true}
-                      rotateEnabled={false}
-                      scrollEnabled={false}
-                      style={styles.mapView}
-                      initialRegion={{
-                        latitude: reportLocationMarker[focusedLocation]?.location?.la ?? 0,
-                        longitude: reportLocationMarker[focusedLocation]?.location?.lo ?? 0,
-                        latitudeDelta: 0.0922,
-                        longitudeDelta: 0.0421
-                      }}
-                      onLayout={fitToCoordinates}
-                    >
-                      {reportLocationMarker.map(marker => marker.marker)}
-                    </MapView>
-                    <View style={styles.overlayContainer}>
-                      <FadeInView
-                        style={styles.overlayView}
-                        duration={500}
-                        isVisible={isFocused}
-                      >
-                        <TouchableOpacity
-                          onPress={() => {
-                            setSelectedReport(reportLocationMarker[focusedLocation]?.report);
-                          }}
-                          style={styles.reportInfoContainer}
-                        >
-                          <Text style={styles.reportName}>
-                            {reportLocationMarker[focusedLocation]?.report?.name}
-                          </Text>
-                          <View style={styles.reportDetail}>
-                            <Text style={styles.reportDetailLabel}>Report ID: </Text>
-                            <Text>{reportLocationMarker[focusedLocation]?.report?._id}</Text>
-                          </View>
-                          <View style={styles.reportDetail}>
-                            <Text style={styles.reportDetailLabel}>Report Date: </Text>
-                            <Text>
-                              {new Date(reportLocationMarker[focusedLocation]?.report?.submissionDate).toUTCString()}
-                            </Text>
-                          </View>
-                          <View style={styles.reportDetail}>
-                            <Text style={styles.reportDetailLabel}>Submitted BY: </Text>
-                            <Text>{reportLocationMarker[focusedLocation]?.report?.complainant.name}</Text>
-                          </View>
-                          <View style={styles.reportDetail}>
-                            <Text style={styles.reportDetailLabel}>Report Status: </Text>
-                            <Text>{reportLocationMarker[focusedLocation]?.report?.status.desc}</Text>
-                          </View>
-                        </TouchableOpacity>
-                      </FadeInView>
-                    </View>
-                    <TouchableOpacity
-                      style={styles.refreshButton}
-                      onPress={onRefreshPressed}
-                    >
-                      <Foundation name="refresh" size={20} color="black" style={{}} />
-                    </TouchableOpacity>
-                  </View>
+                  <MapViewWithReportMarker 
+                  reports={reports}
+                  onReportCardPress={(report) => {
+                    setSelectedReport(report)
+                  }}
+                  key={reports.length}
+                  ref={mapRef}
+                  />
                   <Modal visible={!!selectedReport}>
                     {selectedReport && (
                       <UpdateReportModal
@@ -361,6 +175,7 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     elevation: 2
   },
+  
   reportName: {
     fontWeight: "700",
     fontSize: 18,
@@ -378,3 +193,4 @@ const styles = StyleSheet.create({
     flex: 1
   }
 });
+
