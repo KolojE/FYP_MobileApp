@@ -1,6 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { UserInfo } from "../types/General";
-import IUser from "../types/Models/User";
 
 type initialState = {
     userinfo: UserInfo,
@@ -34,8 +33,7 @@ export const userSlice = createSlice({
             state.error = null;
         },
         uploadProfilePictureSuccess: (state, action) => {
-            console.log(action.payload)
-            state.userinfo.user.base64ProfilePicture = action.payload;
+                        state.userinfo.user.base64ProfilePicture = action.payload;
             state.loading = false;
             state.error = null;
         },
@@ -48,8 +46,7 @@ export const userSlice = createSlice({
             state.error = null;
         },
         updateUserInfoSuccess: (state, action) => {
-            console.log(action.type+ "action.payload")
-            state.userinfo.user = {...state.userinfo.user, ...action.payload};
+                        state.userinfo.user = {...state.userinfo.user, ...action.payload};
             state.loading = false;
             state.error = null;
         },

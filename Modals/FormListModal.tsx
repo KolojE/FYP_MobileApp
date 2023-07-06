@@ -16,8 +16,7 @@ export default function FormListModal(props) {
 
     useEffect(() => {
         getForms().then((res) => {
-            console.log(res)
-            setForms(res);
+                        setForms(res);
         });
     }, [])
 

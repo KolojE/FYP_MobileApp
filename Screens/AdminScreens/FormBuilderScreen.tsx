@@ -1,4 +1,4 @@
-import { AntDesign } from "@expo/vector-icons";
+import { AntDesign, Entypo, Ionicons } from "@expo/vector-icons";
 import React, { useEffect, useState } from "react";
 import { TextInput, View, StyleSheet, Text, Modal, BackHandler, TouchableOpacity, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -7,7 +7,8 @@ import { FieldRenderer } from "../../utils/formHandler";
 import { IField, inputType } from "../../types/Models/Form";
 import { addNewForm, updateForm } from "../../api/admin";
 import { getForm } from "../../api/user";
-import nativeColorPicker from "react-native-color-picker";
+import { ColorPicker } from "react-native-color-picker";
+import { getContrastColor } from "../../utils/colors";
 
 export function FormBuilderScreen({ route, navigation }) {
 
@@ -17,6 +18,8 @@ export function FormBuilderScreen({ route, navigation }) {
     const [formFieldElements, setFormFieldElements] = useState([]);
     const [fields, setFields] = React.useState<Array<IField>>([]);
     const [formName, setFormName] = useState('');
+    const [formColor, setFormColor] = useState('#000000');
+    const [colocPickerModal, setColorPickerModal] = useState(false);
 
     const defaultFieldElements = [
         <FieldRenderer inputType={inputType.Date} label="Date of Occurence" required={false} />,
@@ -24,17 +27,16 @@ export function FormBuilderScreen({ route, navigation }) {
         <FieldRenderer inputType={inputType.Map} label="Location" required={false} />,
     ]
 
-    console.log(fields)
-
+    
     useEffect(() => {
 
         if (params?.formID) {
             getForm(params.formID).then((res) => {
                 setFormName(res.name);
                 setFields(res.fields);
+                setFormColor(res.color);
             }, (rej) => {
-                console.log(rej)
-            });
+                            });
         }
     }, [])
 
@@ -108,8 +110,7 @@ export function FormBuilderScreen({ route, navigation }) {
     }, [fields]);
 
     const handleAddField = (field) => {
-        console.log(field)
-        setFields([...fields, field]);
+                setFields([...fields, field]);
     };
 
     const validateForm = () => {
@@ -127,17 +128,26 @@ export function FormBuilderScreen({ route, navigation }) {
         }
 
         if (params?.formID) {
-            updateForm({ fields: fields, activation_Status: true, name: formName, _id: params.formID })
+            updateForm({ fields: fields, activation_Status: true, name: formName, _id: params.formID, color: formColor })
             navigation.navigate("dashBoard")
             return;
 
         }
-        addNewForm({ fields: fields, activation_Status: false, name: formName })
+        addNewForm({ fields: fields, activation_Status: false, name: formName,color: formColor })
         navigation.goBack()
     }
 
     const onAddFieldButtonClicked = () => {
         setAddFieldModal(true)
+    }
+
+    const onColorPickerClicked = () => {
+        setColorPickerModal(true);
+        }
+
+    const onColorSelected = (color) => {
+        setFormColor(color);
+        setColorPickerModal(false);
     }
 
     return (
@@ -158,7 +168,15 @@ export function FormBuilderScreen({ route, navigation }) {
                         value={formName}
                         onChangeText={setFormName}
                     />
-                    
+                        <TouchableOpacity onPress={onColorPickerClicked} 
+                        style={
+                            [styles.colorPickerButton,{
+                                backgroundColor: formColor,
+                            }]
+                        }
+                        >
+                            <Ionicons name="color-palette" color={getContrastColor(formColor)} size={20} />
+                        </TouchableOpacity>
                 </View>
                 <View>
                     <Text>Default Fields</Text>
@@ -169,6 +187,25 @@ export function FormBuilderScreen({ route, navigation }) {
                     <View style={styles.formFields}>{formFieldElements}</View>
                 </View>
             </View>
+            <Modal
+                transparent={true}
+                visible={colocPickerModal}
+                animationType="fade"
+            >
+                <View
+                    style={{
+                        flex: 1,
+                        justifyContent: "center",
+                        alignItems: "center",
+                        backgroundColor: "#000000aa",
+                    }}
+                >
+                <ColorPicker
+            style={styles.colorPicker}
+            onColorSelected={onColorSelected}
+                />
+                </View>
+            </Modal>
             <Modal transparent={true} visible={addFieldModal}>
                 <FieldSelectionModal setModal={setAddFieldModal} updateField={handleAddField} />
             </Modal>
@@ -193,9 +230,13 @@ const styles = StyleSheet.create({
     },
     formName: {
         marginBottom: 20,
+        flexDirection: "row",
+        alignItems: "center",
+        
     },
     formNameInput: {
         borderWidth: 1,
+        width: "90%",
         paddingLeft: 20,
         fontSize: 20,
         height: 40,
@@ -205,5 +246,17 @@ const styles = StyleSheet.create({
     },
     saveButton: {
         marginRight: "auto",
+    },
+    colorPickerButton:{
+        width: 30,
+        height: 30,
+        borderRadius: 20,
+        marginLeft: 10,
+        justifyContent: "center",
+        alignItems: "center",
+    },
+    colorPicker:{
+        width: 300,
+        height: 300,
     }
 });

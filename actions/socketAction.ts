@@ -21,8 +21,7 @@ export const useSocketAction = () => {
             getPendingMessages();
             dispatch(socketSuccess());
         } catch (err) {
-            console.log(err)
-            dispatch(socketFailure(err.message));
+                        dispatch(socketFailure(err.message));
             socket.removeAllListeners()
         }
 
@@ -33,8 +32,7 @@ export const useSocketAction = () => {
             disconnectSocket();
             dispatch(socketDisconnect());
         }catch(err){
-            console.log(err)
-            dispatch(socketFailure(err.message));
+                        dispatch(socketFailure(err.message));
         }
     }
         return { establishConnection, disconnect }

@@ -1,36 +1,24 @@
 import { useSelector } from "react-redux"
 import { RootState } from "../redux/store"
 import { getGroupedReportInfoForVictory } from "../utils/victory"
-import { useEffect, useRef, useState } from "react"
 import { IReport } from "../types/Models/Report"
 import { VictoryLegend, VictoryPie } from "victory-native"
 import { ActivityIndicator, Modal,View,StyleSheet,Text } from "react-native"
+import { useGroupedReports } from "../utils/hooks/useGroupedReport"
+import { useRef, useState } from "react"
 import UpdateReportModal from "../Modals/UpdateReportModal"
 import MapViewWithReportMarker from "./MapViewWithReportMarker"
 
 export default function PieMode({ navigation }) {
 
-    const {loading,groupedReports}= useSelector((state: RootState) => state.report)
-    const victoryData = getGroupedReportInfoForVictory({ groupedReport: groupedReports })
+    const {loading, reports}= useSelector((state: RootState) => state.report)
+    const groupedReports = useGroupedReports();
+    const victoryData = getGroupedReportInfoForVictory({groupedReport: groupedReports })
 
-    const [reports,setReports] = useState<IReport[]>([])
     const [selectedReport, setSelectedReport] = useState<IReport | null>(null)
 
     const mapRef = useRef<React.ElementRef<typeof MapViewWithReportMarker>>(null)
-    useEffect(() => {
-      const reports:IReport[] = []
-      groupedReports.forEach((group) => {
-        group.reports.forEach((report) => {
-          reports.push({
-            ...report,
-            name: group.name,
-          })
-        }
-      )})
-      setReports(reports)
-    }, [groupedReports])
 
- 
 
     return (
         <>
@@ -68,10 +56,10 @@ export default function PieMode({ navigation }) {
                   <Modal visible={!!selectedReport}>
                     {selectedReport && (
                       <UpdateReportModal
-                        reportID={selectedReport}
+                        reportID={selectedReport._id}
                         closeModal={() => setSelectedReport(null)}
                         onForwardPressed={report => {
-                          console.log(report.name);
+                          ;
                           setSelectedReport(null);
                           navigation.navigate("ChatRoom", { report: report, complainantID: report.complainant._id });
                         }}

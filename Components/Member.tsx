@@ -11,8 +11,7 @@ onPressed:(user:IComplainant) => void
 export default function Member({user, onPressed}:MemberProps) {
 
     const onTouchablePressed= () => {
-        console.log(JSON.stringify(user)+"Pressed")
-        onPressed(user);
+                onPressed(user);
     }
 
     return (

@@ -10,6 +10,7 @@ type CustomMarkerProps = {
     latitude: number,
     longitude: number,
     animated?: boolean,
+    color?: string,
     onMarkerPress: (report: any) => void,
     focusedLocation: number
     report: IReport
@@ -21,9 +22,9 @@ export default function CustomMarker({
   longitude,
   onMarkerPress,
   report,
-  focusedLocation,
-  animated =false
-}) {
+  animated =false,
+  color="blue"
+}:CustomMarkerProps) {
   const scaleValue = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
@@ -72,10 +73,10 @@ export default function CustomMarker({
             alignItems: 'center',
           }}
         >
-          <FontAwesome name="dot-circle-o" size={30} color={focusedLocation === index ? 'blue' : 'blue'} />
+          <FontAwesome name="dot-circle-o" size={30} color={color} />
         </Animated.View>
       ) : (
-        <FontAwesome name="dot-circle-o" size={30} color={focusedLocation === index ? 'blue' : 'blue'} />
+        <FontAwesome name="dot-circle-o" size={30} color={color} />
       )}
     </Marker>
   );

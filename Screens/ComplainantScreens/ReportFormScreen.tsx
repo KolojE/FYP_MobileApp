@@ -6,7 +6,7 @@ import { FieldRenderer } from "../../utils/formHandler";
 import { getForm } from "../../api/user";
 import { submitReport } from "../../api/complainant";
 import { reportSubmissionSchema } from "../../types/General";
-import { setItemAsync,getItemAsync } from "expo-secure-store";
+import { setItemAsync,getItemAsync, deleteItemAsync } from "expo-secure-store";
 
 
 type ReportFormScreenProps = {
@@ -23,11 +23,10 @@ export default function ReportFormScreen({ route, navigation }: ReportFormScreen
     const [defaultFields, setDefaultFields] = React.useState<IField[]>([]);
     const [fields, setFields] = React.useState<IField[]>([]);
     const [formName, setFormName] = React.useState("");
-
     const [report, setReport] = React.useState<reportSubmissionSchema>({});
-    const params = route.params;
     const [submitted, setSubmitted] = React.useState(false);
 
+    const {formID}= route.params;
 
 
     React.useEffect(() => {
@@ -39,28 +38,24 @@ export default function ReportFormScreen({ route, navigation }: ReportFormScreen
     const saveReportToStorage = async () => {
         try {
           const serializedData = JSON.stringify(report);
-          await setItemAsync(params.formID, serializedData);
-          console.log(report)
-          console.log('Report data saved successfully.');
+          await setItemAsync(formID, serializedData);
         } catch (error) {
-          console.log('Error saving report data:', error);
+            console.log(error)
         }
-      };
+      }
       
       // Function to retrieve the report submission schema from AsyncStorage
       const getReportFromStorage = async () => {
         try {
-          const serializedData = await getItemAsync(params.formID);
+          const serializedData = await getItemAsync(formID);
           if (serializedData !== null) {
             const reportData = JSON.parse(serializedData);
             setReport(reportData);
-            console.log('Report data retrieved successfully:', reportData);
             return reportData;
           }
         } catch (error) {
-          console.log('Error retrieving report data:', error);
         }
-      };
+      }
 
     React.useEffect(() => {
         getReportFromStorage();
@@ -98,19 +93,18 @@ export default function ReportFormScreen({ route, navigation }: ReportFormScreen
 
             return unsubcribe
         },
-        [navigation, submitted,report,params?.formID]
+        [navigation, submitted,report,formID]
     );
 
     React.useEffect(() => {
-        if (!params?.formID) { throw new Error("Form ID not provided!") }
+        if (!formID) { throw new Error("Form ID not provided!") }
 
-        getForm(params.formID).then((res) => {
+        getForm(formID).then((res) => {
             setFormName(res.name);
             setFields(res.fields);
             setDefaultFields(res.defaultFields);
         }, (rej) => {
-            console.log(rej)
-        });
+                    });
 
     }, [])
 
@@ -136,8 +130,13 @@ export default function ReportFormScreen({ route, navigation }: ReportFormScreen
         if (!checkRequiredFields()) {
             return;
         }
-        setItemAsync(params.formID, null);
-        await submitReport({ formID: params.formID, report: report, fields: fields })
+        try{
+            await deleteItemAsync(formID);
+            await submitReport({ formID: formID, report: report})
+        }
+        catch(err){
+            console.log(err);
+        }
         setSubmitted(true)
     }
 

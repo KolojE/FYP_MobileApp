@@ -18,7 +18,7 @@ const getSocket = async () => {
   return new Promise<Socket>((resolve, reject) => {
     if (socket) {
       socket.connect();
-      console.log("Socket connected");
+      ;
       resolve(socket);
     } else {
       socket = io(`${api_url}`, {
@@ -28,10 +28,10 @@ const getSocket = async () => {
         reconnectionDelayMax: 200,
         reconnectionAttempts: Infinity,
       });
-      console.log("New socket created");
+      ;
 
       socket.on("connect", () => {
-        console.log("Socket connected");
+        ;
         resolve(socket);
       });
 
@@ -48,7 +48,7 @@ const getSocket = async () => {
       });
 
       socket.on("disconnect", (reason) => {
-        console.log(reason + " Socket disconnected");
+        ;
       });
     }
   });
@@ -57,7 +57,7 @@ const getSocket = async () => {
 export function sendMessage({ receiverID, message, forwardedReport }: emitSendMessageArgs) {
   if (!socket) throw new Error("Socket not initialized");
   socket.emit("sendMessage", receiverID, { message, forwardedReport }, (ack) => {
-    console.log("ack", ack);
+    ;
   });
 }
 
@@ -66,14 +66,14 @@ export function getPendingMessages() {
 }
 
 export function addOnMessageReceiveListener(callBack: onMessageReceiveCallback) {
-  console.log("Add on message receive listener");
+  ;
 
   return new Promise((resolve, reject) => {
     try {
       resolve(
         socket.on("receiveMessage", (...args) => {
           const [senderID, message] = args;
-          console.log("Message received", args);
+          ;
           callBack({ senderID: senderID, message: message.message, forwardedReport: message.forwardedReport });
         })
       );
@@ -87,7 +87,7 @@ export function disconnectSocket() {
   socket.disconnect();
   socket.removeAllListeners();
   socket = null;
-  console.log("Socket disconnected", socket);
+  ;
 }
 
 export default getSocket;

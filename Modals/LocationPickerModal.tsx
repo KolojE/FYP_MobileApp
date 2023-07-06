@@ -46,7 +46,7 @@ export default function LocationPickerModal({ onLocationChange, setOpenLocationP
 
     useEffect(() => {
         setTimeout(() => {
-        console.log("refresh");
+        ;
         setRefresh(!refresh);
         }, 1000);
     }, [mapReady]);
@@ -61,8 +61,7 @@ export default function LocationPickerModal({ onLocationChange, setOpenLocationP
     }, [searchText]);
 
     const onTextInputFocus = () => {
-        console.log("focus")
-        setTextInputFocus(true);
+                setTextInputFocus(true);
     };
 
     const onSearchtextChange = (text) => {
@@ -95,8 +94,7 @@ export default function LocationPickerModal({ onLocationChange, setOpenLocationP
     const confirmLocation = () => {
         setOpenLocationPicker(false);
         onLocationChange({ La: markerlocation.la, Lo: markerlocation.lo });
-        console.log(markerlocation)
-    };
+            };
 
     return (
         <View style={{ flex: 1 }}>

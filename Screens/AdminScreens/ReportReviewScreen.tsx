@@ -9,7 +9,7 @@ const ReportReviewScreen = () => {
   const submitReport = () => {
     // Perform the necessary logic to update the report in the database
     // You can use an API call or any other method to send the updated report data
-    console.log('Updated report:', updatedReport);
+    ;
   };
 
   return (

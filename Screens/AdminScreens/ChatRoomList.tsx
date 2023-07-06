@@ -23,7 +23,7 @@ export default function ChatRoomList({route,navigation}) {
     const report:IReport = route?.params?.report;
 
 React.useEffect(()=>{
-    console.log("complainantID",complainantID);
+    ;
     if(complainantID && report)
     {
         setSelectedUser(complainants.find((user)=>user._id == complainantID));

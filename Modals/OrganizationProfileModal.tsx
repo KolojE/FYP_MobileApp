@@ -56,8 +56,7 @@ export default function OrganizationProfileScreen({
 
 
   const onOrganizationInfoChange = (text: string, field: string) => {
-    console.log(organizationInfo)
-    setOrganizationInfo((prev) => {
+        setOrganizationInfo((prev) => {
       return {
         ...prev,
         [field]: text,

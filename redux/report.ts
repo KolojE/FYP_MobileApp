@@ -7,7 +7,7 @@ import { IReport } from "../types/Models/Report"
 type initialState = {
     loading: boolean,
     error: string | null,
-    groupedReports: ReportGroupedByType[],
+    reports: IReport[],
     dateRange: {
         fromDate: string,
         toDate: string,
@@ -19,7 +19,7 @@ const reportSlice = createSlice({
     initialState: {
         loading: false,
         error: null,
-        groupedReports: [],
+        reports: [],
         dateRange: {
             fromDate: "",
             toDate: "",
@@ -32,7 +32,7 @@ const reportSlice = createSlice({
             state.error = null
         },
         fetchReportSuccess: (state, action) => {
-            state.groupedReports = action.payload.reports
+            state.reports = action.payload.reports
             state.dateRange.fromDate = action.payload.dateRange.fromDate
             state.dateRange.toDate = action.payload.dateRange.toDate
             state.loading = false
@@ -61,16 +61,7 @@ const reportSlice = createSlice({
         },
         updateReportSuccess: (state, action) => {
             const report: IReport = action.payload
-            state.groupedReports = state.groupedReports.map((group) => {
-                group.reports = group.reports.map((r) => {
-                    if (r._id === report._id) {
-                        return report
-                    }
-                    return r
-                })
-                return group;
-            }
-            )
+            state.reports = state.reports.map((report) =>report._id === action.payload._id ? report = action.payload : report)
             state.loading = false
             state.error = null
         },

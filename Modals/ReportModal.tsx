@@ -4,7 +4,7 @@ import { AntDesign, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons"
 import { SafeAreaView } from "react-native-safe-area-context";
 import { IReport } from "../types/Models/Report";
 import { detailRenderer } from "../utils/reportHandler";
-import { getReport } from "../api/complainant";
+import { useReport } from "../utils/hooks/useReports";
 
 type ReportModalProps = {
     forwardButton?: boolean,
@@ -22,18 +22,14 @@ export default function ReportModal({
 
     const [detailElements, setDetailElements] = React.useState<JSX.Element[]>([]);
     const [photoUri, setPhotoUri] = React.useState<string>(null);
-    const [report, setReport] = React.useState<IReport>(null);
+
+    const {
+        report,
+        loading,
+    } = useReport(reportID);
 
     React.useEffect(() => {
-        getReport({ reportID: reportID }).then((report) => {
-            console.log(JSON.stringify(report,null,2));
-            setReport(report as IReport);
-        })
-
-    }, []);
-
-    React.useEffect(() => {
-        if(report == null) return;
+        if (report == null) return;
         const details = report.details;
         let detailElements: JSX.Element[] = [];
         for (const key in details) {
@@ -52,9 +48,9 @@ export default function ReportModal({
 
         <SafeAreaView style={styles.container}>
             {
-                report == null ? <ActivityIndicator 
+                loading ? <ActivityIndicator
                     size={30}
-                />: <>
+                /> : <>
                     <ScrollView contentContainerStyle={styles.contentContainer}>
                         <TouchableOpacity
                             style={styles.closeButton}
@@ -62,18 +58,51 @@ export default function ReportModal({
                         >
                             <AntDesign name="close" size={24} color="black" />
                         </TouchableOpacity>
-                        <Text style={styles.reportId}>{report._id}</Text>
+                        <View
+                            style={{
+                                flexDirection: "row",
+                                alignItems: "center",
+                             }}
+                        >
+                        <Text style={styles.reportId}>Report ID: {report._id}</Text>
+                        {
+                            forwardButton &&
+                            <Ionicons name="send" size={24} color="black" onPress={() => { onForwardButtonPressed() }} />
+                        }
+                        </View>
                         <View style={styles.detailsContainer}>
                             <View style={styles.detailRow}>
                                 <Text style={styles.detailLabel}>Title</Text>
+                                <View
+                                    style={[styles.detailValueContainer, {
+                                        flexDirection: "column",
+                                    }]}
+                                >
                                 <View style={styles.detailValueContainer}>
-                                    <Text style={styles.detailValue}>{report.name}</Text>
+                                    <Text style={styles.detailValue}>{report.form.name}</Text>
                                     <MaterialCommunityIcons
                                         name="waterfall"
                                         size={20}
                                         color="black"
-                                    />
-                                </View>
+                                        />
+                                        </View>
+                                    {
+                                        report.form.isDeleted &&
+                                        <View 
+                                        style={{
+                                            flexDirection: "row",
+                                            alignItems: "center",
+                                        }}
+                                        >
+                                            <Ionicons name="warning" size={20} color="red" />
+                                        <Text
+                                            style={[styles.detailValue, { color: "red",fontSize:10 }]}
+                                            >
+                                            (Report Type Is Deleted)
+                                        </Text>
+                                            </View>
+                                    }
+                                    </View>
                             </View>
                             <View style={styles.detailRow}>
                                 <Text style={styles.detailLabel}>Submission Date</Text>
@@ -101,11 +130,6 @@ export default function ReportModal({
                                 {report.status.comment}
                             </Text>
                         </View>
-                        
-            {
-              forwardButton &&
-              <Ionicons name="arrow-forward-circle" size={24} color="black" onPress={()=>{onForwardButtonPressed()}}/>
-            }
                         <View style={styles.detailRow}>
                             <Text style={styles.detailLabel}>Status</Text>
                             <Text style={styles.detailValue}>
@@ -137,7 +161,8 @@ const styles = StyleSheet.create({
     reportId: {
         fontSize: 16,
         fontWeight: "bold",
-        marginBottom: 20,
+        paddingVertical: 10,
+        marginRight: 10,
     },
     detailsContainer: {
         backgroundColor: "white",

@@ -15,7 +15,7 @@ export default function TagSelector({ tagName, tagValue,onSelect }:TagSelectorPr
 
     
     const onTagPressed = ()=>{
-        console.log("tag pressed" + tagName + " " + tagValue + " " + selected);
+        ;
         setSelected(prev=>!prev);
     }
 

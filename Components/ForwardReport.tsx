@@ -33,7 +33,7 @@ export default function ForwardRerpot({report,onForwardMessagePress}:ForwardRepo
             style={
               style.detailsFont
             }
-            >{report.name}</Text>
+            >{report.form.name}</Text>
             </View>
           </View>
             </TouchableOpacity>

@@ -1,24 +1,15 @@
-import { useSelector } from "react-redux"
-import { RootState } from "../redux/store"
 import { IReport } from "../types/Models/Report"
-import { ReportGroupedByType } from "../types/General"
 import ReportList from "./ReportList"
 import { FlatList, Modal, View } from "react-native"
 import UpdateReportModal from "../Modals/UpdateReportModal"
 import React from "react"
+import { useSelector } from "react-redux"
+import { RootState } from "../redux/store"
 
 export default function ListMode({ navigation }) {
-    const groupedReport = useSelector((state: RootState) => state.report)
 
-    let reports: IReport[] = []
-    groupedReport.groupedReports.map((report: ReportGroupedByType) => {
-        report.reports.map((r: IReport) => {
-            reports.push({ ...r, name: report.name }) // retrive the name from the GroupedReport
-        })
-    })
-
+    let reports: IReport[] = useSelector((state:RootState) => state.report.reports)
     const [selectedReport, setSelectedReport] = React.useState<IReport>(null)
-
 
 
     const onReportPressed = (report: IReport) => {
@@ -41,16 +32,19 @@ export default function ListMode({ navigation }) {
         )
 
     }
-
     return (
         <>
+        <View style={{flex: 1,marginBottom:20}}>
             <FlatList
+                style={{ width: "100%"}}
                 data={reports}
+                scrollEnabled={true}
                 renderItem={renderItem}
             />
             <Modal visible={!!selectedReport} >
-                <UpdateReportModal onForwardPressed={onReportForwardPressed} closeModal={onModalClose} reportID={selectedReport} />
+                <UpdateReportModal onForwardPressed={onReportForwardPressed} closeModal={onModalClose} reportID={selectedReport._id} />
             </Modal>
+         </View>
         </>
     )
 }

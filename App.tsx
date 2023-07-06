@@ -19,7 +19,7 @@ export default function App() {
   )
 }
 
-console.log(FileSystem.documentDirectory);
+;
 export function AppContent() {
   const loggedInUser = useSelector((state: RootState) => state.authentication.loggedInUser);
 

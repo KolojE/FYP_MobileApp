@@ -72,8 +72,7 @@ export default function MemeberListModal({ setMemberListModal }: MemeberListModa
             return true
 
         })
-        console.log(filteredMembers)
-        setFilteredMembers(filteredMembers)
+                setFilteredMembers(filteredMembers)
 
         
     }
@@ -122,7 +121,7 @@ export default function MemeberListModal({ setMemberListModal }: MemeberListModa
             <Modal visible={profileModal} transparent={true} animationType="slide">
                 <Modal transparent={true} visible={profileModal} animationType="fade">
                     <TouchableOpacity
-                        onPress={() => { console.log("this"); setProfileModal(false) }}
+                        onPress={() => {  }}
                         style={{
                             position: "absolute",
                             height: "100%",

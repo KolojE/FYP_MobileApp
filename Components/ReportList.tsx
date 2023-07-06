@@ -1,8 +1,6 @@
 import React from "react";
 import { View, TouchableOpacity, Text, StyleSheet } from "react-native";
 import { IReport } from "../types/Models/Report";
-import { useSelector } from "react-redux";
-import { RootState } from "../redux/store";
 import { Ionicons } from "@expo/vector-icons";
 
 type ReportListProps = {
@@ -12,10 +10,10 @@ type ReportListProps = {
 };
 
 export default function ReportList({ onPressed, onForwardMessagePress, report }: ReportListProps) {
-  const { submissionDate, _id, name } = report;
-  const status = useSelector((state: RootState) => state.userinfo).userinfo.statuses.find(
-    (status) => status._id === report.status._id
-  );
+  const { submissionDate, _id,form, status } = report;
+
+  
+
 
   return (
     <TouchableOpacity
@@ -28,7 +26,7 @@ export default function ReportList({ onPressed, onForwardMessagePress, report }:
           <Text style={styles.submissionDate}>{new Date(submissionDate).toDateString()}</Text>
         </View>
         <View style={styles.nameContainer}>
-          <Text style={styles.name}>{name}</Text>
+          <Text style={styles.name}>{form.name}</Text>
         </View>
         <TouchableOpacity
           style={styles.statusContainer}

@@ -40,7 +40,6 @@ export default function ChatScreen({ onChatRoomClose, unSelectedUser, selectedUs
   const flatListRef = React.useRef<FlatList>(null)
 
 
-  console.log(JSON.stringify(chat))
 
   React.useEffect(() => {
     setReport(params?.report)
@@ -54,11 +53,7 @@ export default function ChatScreen({ onChatRoomClose, unSelectedUser, selectedUs
     await chatAction.sendMessageAction({
       message: message, receiverID: selectedUser._id, forwardedReport: report ? {
         _id: report?._id,
-        details: null,
-        name: report?.name,
-        status: report?.status,
-        submissionDate: null,
-        updateDate: null,
+        form: report?.form,
       } : null
     })
     setMessage("")
@@ -69,8 +64,7 @@ export default function ChatScreen({ onChatRoomClose, unSelectedUser, selectedUs
   
 
   function onMessageChange(text) {
-    console.log(text)
-    setMessage(text);
+        setMessage(text);
 
   }
 
@@ -79,8 +73,7 @@ export default function ChatScreen({ onChatRoomClose, unSelectedUser, selectedUs
   }
 
   function renderChatBubble({ item }) {
-    console.log("item" + JSON.stringify(item))
-    return <ChatBuble
+        return <ChatBuble
       msg={item.msg}
       receive={item.receive}
       reportForward={item.forwardedReport}
@@ -179,7 +172,7 @@ export default function ChatScreen({ onChatRoomClose, unSelectedUser, selectedUs
         {
           loggedInUser.role == roles.admin?
           <UpdateReportModal
-          reportID={selectedReport}
+          reportID={selectedReport._id}
           closeModal={() => { setSelectedReport(null) }}
           forwardButton={false}
           />

@@ -14,7 +14,7 @@ export const getContrastColor = (color:string) => {
   
     const luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b;
 
-    console.log(luminance)  
+      
   
     // Determine contrast color based on luminance
     return luminance > 0.5 ? 'black' : 'white';

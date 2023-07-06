@@ -21,6 +21,7 @@ export interface IField{
 export default interface IForm {
     _id?:string;
     name: string;
+    color: string;
     defaultFields?:Array<IField>;
     fields: Array<IField>;
     activation_Status: boolean;

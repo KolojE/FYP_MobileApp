@@ -23,7 +23,7 @@ export default function LandingScreen({ route, navigation }) {
     const handleRefresh = () => {
       // Perform your desired action here
       socketAction.disconnect()
-      console.log('Expo refreshed!');
+      ;
 
     };
     AppState.addEventListener('change', handleRefresh);

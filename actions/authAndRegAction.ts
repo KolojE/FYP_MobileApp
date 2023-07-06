@@ -9,17 +9,19 @@ import { LoginCredentials, RegistrationCredentials } from "../types/General";
 import { useSocketAction } from "./socketAction";
 import { useChatAction } from "./chatAction";
 import { useComplainantAction } from "./complainantAction";
+import { useUserInfoAction } from "./userAction";
 
 export const useAuthAction = () => {
   const dispatch = useDispatch();
   const socketActions = useSocketAction();
   const chatActions = useChatAction();
   const complainantActions = useComplainantAction();
-
+  const userAcion = useUserInfoAction();
   const loginAction = async (credentials: LoginCredentials) => {
     try {
       dispatch(loginStart());
       const user = await login(credentials);
+      await userAcion.fetchUserInfoAction();
       dispatch(loginSuccess(user));
       await socketActions.establishConnection();
       if (user.role === "admin") {
@@ -44,21 +46,22 @@ export const useAuthAction = () => {
       socketActions.disconnect();
       dispatch(logout());
     } catch (err) {
-      console.log(err);
+      ;
     }
   };
 
   const tokenLoginAction = async () => {
     const token = await secureStore.getItemAsync("jwt");
     dispatch(loginStart());
-
+    
     if (!token) {
       dispatch(logout());
       return;
     }
-
+    
     const user = await tokenLogin(token);
     dispatch(loginSuccess(user));
+    await userAcion.fetchUserInfoAction();
     socketActions.establishConnection();
     chatActions.retrieveAllChatAction();
 
@@ -91,3 +94,5 @@ export const useRegistrationAction = () => {
     registrationAction,
   };
 };
+
+

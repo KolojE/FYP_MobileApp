@@ -15,6 +15,7 @@ export async function addNewForm(form: IForm) {
     try {
         const res = await axios.post(`${api_url}/admin/addForm`, {
             name: form.name,
+            color: form.color,
             activation: form.activation_Status,
             fields: form.fields
         })
@@ -34,6 +35,7 @@ export async function updateForm(form: IForm) {
             _id: form._id,
             name: form.name,
             activation: form.activation_Status,
+            color: form.color,
             fields: form.fields
         })
 
@@ -64,7 +66,6 @@ export async function getMembers(): Promise<IComplainant[]> {
         const members: Array<IComplainant> = [];
         res.data.members.forEach(async (member) => {
             const user: IUser = member.user
-            console.log(user)
             delete member.user
             members.push({
                 ...member,
@@ -108,13 +109,33 @@ export async function deleteDeactivatedMember(id: string): Promise<IComplainant>
 }
 
 
+export async function getReport(id: string): Promise<IReport> {
+    const res = await axios.get(`${api_url}/admin/getReport`, {
+        params: {
+            reportID: id
+        }
+    })
+    const report: IReport = {
+        _id: res.data.report._id,
+        status: res.data.report.status,
+        submissionDate: res.data.report.submissionDate,
+        updateDate  : res.data.report.updateDate,
+        form: res.data.report.form,
+        details: res.data.report.details,
+        complainant: res.data.report.complainant,
+        location: {
+            latitude: res.data.report.location.latitude,
+            longitude: res.data.report.location.longitude
+        }
+    }
+    return report
+}
 
-export async function getReportGroupedByType({ sortBy, limit, dateRange, status, types,groupedByType=true,reportID}: { sortBy: "subDate" | "upDate", limit?: number, dateRange?: { fromDate?: Date, toDate?: Date }, status?: string[], types?: string[],groupedByType?:boolean,reportID?:string }): Promise<ReportGroupedByType[] | IReport> {
+export async function getReports({ sortBy, limit, dateRange, status, types, reportID }: { sortBy: "subDate" | "upDate", limit?: number, dateRange?: { fromDate?: Date, toDate?: Date }, status?: string[], types?: string[], reportID?: string }): Promise<IReport[]> {
     try {
 
         const statusParams = status ? status.length > 0 ? status.toString() : undefined : undefined
         const typeParams = types ? types.length > 0 ? types.toString() : undefined : undefined
-        console.log(reportID+"Report ID ========================")
         const res = await axios.get(`${api_url}/admin/getReport`, {
             params: {
                 sortBy: sortBy,
@@ -123,56 +144,40 @@ export async function getReportGroupedByType({ sortBy, limit, dateRange, status,
                 subToDate: dateRange?.toDate,
                 status: statusParams,
                 type: typeParams,
-                groupByType: groupedByType,
-                reportID:reportID
+                reportID: reportID
             }
         })
 
-        if(reportID)
-        {
-            console.log(JSON.stringify(res.data.report),"asd")
-            const report:IReport = {
-                ...res.data.report,
-                status: {...res.data.report.status._id,
-                comment: res.data.report.status.comment,},
-            }
-            return report
-        }
-        const groupedReports: ReportGroupedByType[] = res.data.reports;
-        const reportGroupedByType: ReportGroupedByType[] = groupedReports.map((groupedReport) => {
-            return {
-                _id: groupedReport._id.toString(),
-                reports: groupedReport.reports.map((report) => {
-                    return {
-                        _id: report._id.toString(),
-                        status: report.status,
-                        submissionDate: report?.submissionDate,
-                        updateDate: report?.updateDate,
-                        name: report.name,
-                        details: report.details,
-                        complainant: report.complainant,
-                        location: {
-                           latitude : report.location?.latitude,
-                           longitude: report.location?.longitude,
-                        },
-                    };
-                }),
-                name: groupedReport.name,
-            };
-        });
-        return reportGroupedByType;
+        const result= res.data.reports
+
+        const reports: IReport[] = [];
+        result.forEach(async (report) => {
+            reports.push({
+                _id: report._id,
+                status: report.status,
+                submissionDate: report.submissionDate,
+                updateDate  : report.updateDate,
+                form: report.form,
+                details: report.details,
+                complainant: report.complainant,
+                location: {
+                    latitude: report.location.latitude,
+                    longitude: report.location.longitude
+                }
+            })
+        })
+
+        return reports
     } catch (err) {
-        console.log(err)
         errorHandler(err)
     }
 
 }
 
-export async function downloadReportExcel({ sortBy, limit, dateRange, status, types: type }: { sortBy: "subDate" | "upDate", limit?: number, dateRange?: { fromDate?: Date, toDate?: Date }, status?: string[], types?: string[]})
-{
-    try{
-        const res = await axios.get(`${api_url}/admin/downloadReportExcel`,{
-            params:{
+export async function downloadReportExcel({ sortBy, limit, dateRange, status, types: type }: { sortBy: "subDate" | "upDate", limit?: number, dateRange?: { fromDate?: Date, toDate?: Date }, status?: string[], types?: string[] }) {
+    try {
+        const res = await axios.get(`${api_url}/admin/downloadReportExcel`, {
+            params: {
                 sortBy: sortBy,
                 limit: limit,
                 subFromDate: dateRange?.fromDate,
@@ -182,14 +187,10 @@ export async function downloadReportExcel({ sortBy, limit, dateRange, status, ty
             },
         })
 
-        console.log(`${api_url}/${res.data.fileUrl}`)
-        const result = await FileSystem.downloadAsync(`${api_url}/${res.data.fileUrl}`,FileSystem.documentDirectory + "report.xlsx")
-        console.log(result.uri)
+        const result = await FileSystem.downloadAsync(`${api_url}/${res.data.fileUrl}`, FileSystem.documentDirectory + "report.xlsx")
         return result
 
-    }catch(err)
-    {
-        console.log(err)
+    } catch (err) {
         errorHandler(err)
     }
 }
@@ -223,43 +224,36 @@ export async function getReportElement({ includeType, includeStatus }: { include
     }
 }
 
-export async function updateCreateOrganizaitonInfoAndStatues({organization,statuses,statusesToDelete}:updateOrganizaitonInfoArgs)
-{
+export async function updateCreateOrganizaitonInfoAndStatues({ organization, statuses, statusesToDelete }: updateOrganizaitonInfoArgs) {
 
-    console.log(organization)
-    try{
-        const res = await axios.post(`${api_url}/admin/updateOrganization`,{
-            organization:organization,
-            statuses:statuses,
-            statusesToDelete:statusesToDelete,
+    try {
+        const res = await axios.post(`${api_url}/admin/updateOrganization`, {
+            organization: organization,
+            statuses: statuses,
+            statusesToDelete: statusesToDelete,
         })
 
-        console.log(JSON.stringify(res.data,null,2))
         return {
-            newStatuses:res.data.statuses,
-            newOrganizationInfo:res.data.organization,
+            newStatuses: res.data.statuses,
+            newOrganizationInfo: res.data.organization,
         }
-    }catch (err)
-    {
+    } catch (err) {
         errorHandler(err)
     }
 }
 
-export async function updateReport(report:IReport):Promise<IReport>
-{
-    console.log(api_url)
-    try{
-        const res = await axios.post(`${api_url}/admin/updateReport`,{
-            reportID:report._id,
-            status:report.status,
-            comment:report.status.comment,
+export async function updateReport(report: IReport): Promise<IReport> {
+    try {
+        const res = await axios.post(`${api_url}/admin/updateReport`, {
+            reportID: report._id,
+            status: report.status,
+            comment: report.status.comment,
         })
         return {
             ...report,
-            status:res.data.report.status._id,
+            status: res.data.report.status._id,
         };
-    }catch(err)
-    {
+    } catch (err) {
         errorHandler(err)
     }
 }

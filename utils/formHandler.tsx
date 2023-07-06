@@ -177,13 +177,11 @@ function MapInputField({ setReport, _id, label, required, report }: FieldRendere
                 setAddress("Location..")
             })
         } catch (err) {
-            console.log(err)
-        }
+                    }
     }, [value])
 
     const onLocationChange = async ({ Lo, La }: { Lo: number, La: number }) => {
-        console.log(Lo, La)
-        setValue({ Lo, La });
+                setValue({ Lo, La });
 
     }
 
@@ -236,7 +234,7 @@ function PhotoInputField({ setReport, _id, label, required, report }: FieldRende
             quality: 1,
         });
 
-        console.log(result);
+        ;
 
         if (!result.canceled) {
             setSelectedPhotos((prev) => { return [...prev, result] });

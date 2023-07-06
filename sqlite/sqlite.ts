@@ -49,8 +49,7 @@ const insertMessage = ({chatId,message,receive,forwardedReport}:insertMessageArg
   const dropTable = () => {
     db.transaction(tx => {
       tx.executeSql('DROP TABLE chats', [], (_, { rows }) => {
-        console.log("drop table")
-      });})
+              });})
   }
 
 

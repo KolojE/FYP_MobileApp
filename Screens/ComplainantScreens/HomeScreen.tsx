@@ -14,38 +14,25 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import RecentReportList from "../../Components/RecenReportList";
 import { IReport } from "../../types/Models/Report";
 import errorHandler from "../../api/errorHandler/axiosError";
-import { getReport } from "../../api/complainant";
+import { getReports } from "../../api/complainant";
 import { Image } from "react-native";
-import { useUserInfoAction } from "../../actions/userAction";
 import { RootState } from "../../redux/store";
 import { useSelector } from "react-redux";
-import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import { useReports } from "../../utils/hooks/useReports";
 
 export default function HomeScreen({navigation}) {
   const [profileModal, setProfileModal] = React.useState(false);
-  const [recentReport, setRecentReports] = React.useState<IReport[]>([]);
 
-  const userInfoAction = useUserInfoAction();
 
   const userinfo= useSelector((state: RootState) => state.userinfo);
 
   const {user,organization,totalReportCount,totalResolvedCount} = {...userinfo.userinfo}
-
-
-  useFocusEffect(
-
-    useCallback(() => {
-      const getLoggedInUserInfoAsync = async () => {
-        userInfoAction.fetchUserInfoAction();
-      }
-      getLoggedInUserInfoAsync();
-      
-      const setReportsAsync = async () => {
-        setRecentReports(await getReport({ limit: 5, sortBy: "subDate" })as IReport[]);
-      }
-      setReportsAsync();
-    }, [])
-    )
+  const recentReport = useReports({
+    filter:{
+      limit: 5,
+      toDate:new Date() 
+    }
+  });
     
     const onCloseModalPressed = () => {
       setProfileModal(false);
@@ -101,10 +88,9 @@ export function LatestUpdatedComponent() {
 
   const [lastestUpdatedReprot, setLastestUpdatedReport] = React.useState<IReport>();
   React.useEffect(() => {
-    getReport({ limit: 1, sortBy: "upDate" }).then((res) => {
+    getReports({ limit: 1, sortBy: "upDate" }).then((res) => {
       setLastestUpdatedReport(res[0]);
-      console.log(res[0])
-    }, (err) => {
+          }, (err) => {
       errorHandler(err);
     })
   }, [])
@@ -159,7 +145,7 @@ export function LatestUpdatedComponent() {
                   paddingBottom: 10,
                 }}
               >
-                {lastestUpdatedReprot.name}
+                {lastestUpdatedReprot.form.name}
               </Text>
               <Text
                 style={{

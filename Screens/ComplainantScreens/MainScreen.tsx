@@ -20,9 +20,9 @@ export default function MainScreen() {
         authAction.logoutAction();
     }
     const userinfo= useSelector((state: RootState) => state.userinfo).userinfo
-
     const admin = userinfo?.organizationAdmins!=undefined?userinfo?.organizationAdmins[0]:null
 
+    
     return (
         <Tab.Navigator
             screenOptions={{

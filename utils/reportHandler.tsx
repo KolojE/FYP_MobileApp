@@ -121,8 +121,7 @@ export function PhotoValue(data: DataProps) {
     const [photoModalUri, setPhotoModalUri] = React.useState<string>(null)
 
     const onPressed = (uri: string) => {
-        console.log(uri)
-        setPhotoModalUri(uri)
+                setPhotoModalUri(uri)
     }
 
     const windowWidth = Dimensions.get('window').width;
@@ -138,8 +137,7 @@ export function PhotoValue(data: DataProps) {
             <FlatList
                 data={value}
                 renderItem={({ item }) => {
-                    console.log(`${api_url}${item}`)
-                    return <EvidencePhoto onPressedCallBack={onPressed} uri={`${api_url}${item}`} />
+                                        return <EvidencePhoto onPressedCallBack={onPressed} uri={`${api_url}${item}`} />
                 }}
                 horizontal={true}
             />

@@ -69,9 +69,7 @@ export default function NumberOfReportByStateVictoryChart({ victoryBarData }: Nu
         }
     }, [victoryBarData])
 
-    console.log(victoryBar)
-    console.log("victory bar data", victoryBarData, " from victory chart")
-    return (
+            return (
         <>
             <VictoryChart
                 horizontal

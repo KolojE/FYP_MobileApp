@@ -11,9 +11,7 @@ export interface IDetails {
  };
 
 export interface IReport {
-    form_id?: any;
     _id: string;
-    name: string;
     location?:{
         latitude: number;
         longitude: number;
@@ -30,5 +28,11 @@ export interface IReport {
         email: string;
         _id:string;
         name:string;
+    };
+    form?: {
+        _id: string;
+        name: string;
+        color: string;
+        isDeleted: boolean;
     };
 }

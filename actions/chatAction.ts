@@ -26,8 +26,7 @@ export const useChatAction = () => {
             dispatch(addMessage({ msg: message, receiverID: senderID, receive: true,forwardedReport:forwardedReport }));
             chatDB.insertMessage({ chatId: senderID, message:message, receive: true,forwardedReport:forwardedReport })
             chatDB.getAllMessages(senderID, (row) => {
-                console.log(row)
-            })
+                            })
             dispatch(receiveMessageSuccess())
         } catch (err) {
             dispatch(receiveMessageError(err.message))
@@ -43,12 +42,9 @@ export const useChatAction = () => {
         const chatDB = chatDBInit()
         const chats = {}
         chatDB.getAllChats((rows) => {
-            console.log("retrieveAllChat")
-            console.log(JSON.stringify(rows, null, 2))
-
+                        
             rows.forEach((row) => {
-                console.log(row)
-                if (!chats[row.chatId]) {
+                                if (!chats[row.chatId]) {
                     chats[row.chatId] = {
                         chatLog: [{ msg: row.message, receive: JSON.parse(row.receive), forwardedReport:JSON.parse(row.forwardedReport??null) }],
                         unRead: true
@@ -60,8 +56,7 @@ export const useChatAction = () => {
                 }
             }
             )
-            console.log(JSON.stringify(chats, null, 2))
-        dispatch(retrieveAllChat(chats))
+                    dispatch(retrieveAllChat(chats))
         }
         )
 

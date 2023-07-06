@@ -25,25 +25,23 @@ export default function ReportsScreen({ navigation }) {
     const [offset, setOffset] = React.useState<number>(0)
     const [saveAsModal, setSaveAsModal] = React.useState<boolean>(false)
     const [filterOptions, setFilterOptions] = React.useState<any>(null)
-    const groupedReport = useSelector((state: RootState) => state.report)
+    const reports = useSelector((state: RootState) => state.report)
     const adminAction = useReportAction()
 
 
     React.useEffect(() => {
         if (mode === "weekly") {
-            console.log("weekly")
-            adminAction.fetchReportGroupedByTypeWeelky(offset)
+                        adminAction.fetchReportByWeekly(offset)
             return
         }
 
         if (mode === "daily") {
-            console.log("daily")
-            adminAction.fetchReportGroupedByTypeDaily(offset)
+                        adminAction.fetchReportByDaily(offset)
             return
         }
 
         if (mode === "monthly") {
-            adminAction.fetchReportGroupedByTypeMonthly(offset)
+            adminAction.fetchReportByMonthly(offset)
         }
     }, [offset, mode])
 
@@ -52,7 +50,7 @@ export default function ReportsScreen({ navigation }) {
     }, [mode])
 
     const onFilterButtonPressed = (filterOptions) => {
-        adminAction.fetchReportGroupedByTypeCustom(filterOptions)
+        adminAction.fetchReportCustom(filterOptions)
         setFilterOptions(filterOptions)
     }
 
@@ -86,16 +84,16 @@ export default function ReportsScreen({ navigation }) {
     const onFileTypeSelected = (fileType: string) => {
         if (fileType === "csv") {
             if (mode === "daily") {
-                adminAction.fetchReportGroupedByTypeDaily(offset, "xlsx")
+                adminAction.fetchReportByDaily(offset, "xlsx")
             }
             if (mode === "weekly") {
-                adminAction.fetchReportGroupedByTypeWeelky(offset, "xlsx")
+                adminAction.fetchReportByWeekly(offset, "xlsx")
             }
             if (mode === "monthly") {
-                adminAction.fetchReportGroupedByTypeMonthly(offset, "xlsx")
+                adminAction.fetchReportByMonthly(offset, "xlsx")
             }
             if (mode === "custom") {
-                adminAction.fetchReportGroupedByTypeCustom(filterOptions, "xlsx")
+                adminAction.fetchReportCustom(filterOptions, "xlsx")
             }
         }
     }
@@ -103,7 +101,8 @@ export default function ReportsScreen({ navigation }) {
 
 
     return (
-        <SafeAreaView>
+        <SafeAreaView
+            style={{ flex: 1, backgroundColor: "white" }}>
           <Title title={'Reports'} />
           <View style={[styles.container,{overflow:"hidden"}]}>
             <View style={styles.container}>
@@ -150,12 +149,12 @@ export default function ReportsScreen({ navigation }) {
                 </View>
               )}
               <View style={{ flex: 1, alignItems: 'center' }}>
-                {!groupedReport.loading ? (
+                {!reports.loading ? (
                   <>
                     {mode === 'daily' ? (
-                      <Text>{`${groupedReport.dateRange.fromDate}`}</Text>
+                      <Text>{`${reports.dateRange.fromDate}`}</Text>
                     ) : (
-                      <Text>{`${groupedReport.dateRange.fromDate} - ${groupedReport.dateRange.toDate}`}</Text>
+                      <Text>{`${reports.dateRange.fromDate} - ${reports.dateRange.toDate}`}</Text>
                     )}
                   </>
                 ) : (
@@ -196,6 +195,7 @@ export default function ReportsScreen({ navigation }) {
       );
 }
 const styles = StyleSheet.create({
+
     container: {
       alignItems: 'center',
     },

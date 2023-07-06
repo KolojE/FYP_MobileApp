@@ -21,13 +21,12 @@ function MapViewWithReportMarker({ onReportCardPress,reports}: MapViewWithReport
 
     const [focusedLocationIndex, setFocusedLocationIndex] = useState<number>(-1)
     const [isFocused, setIsFocused] = useState<boolean>(false)
-    const {markers,LatLng} = useReportMekerLocation(reports, focusedLocationIndex, )
+    const {markers,LatLng} = useReportMekerLocation(reports, focusedLocationIndex )
     const mapRef = useRef<MapView>(null)
 
 
     const onNextPressed = () => {
-        console.log(focusedLocationIndex, "focusedLocationIndex - log from DocumentMode.tsx", focusedLocationIndex >= reports.length - 1, reports.length, focusedLocationIndex)
-        if (focusedLocationIndex >= reports.length - 1) {
+                if (focusedLocationIndex >= reports.length - 1) {
             return
         }
         setFocusedLocationIndex(prev => prev + 1)
@@ -79,8 +78,7 @@ function MapViewWithReportMarker({ onReportCardPress,reports}: MapViewWithReport
             return
         }
 
-        console.log(LatLng, "LatLng - log from DocumentMode.tsx")
-        if (LatLng.length <= 1 && LatLng.length > 0) {
+                if (LatLng.length <= 1 && LatLng.length > 0) {
             mapRef.current?.animateToRegion({
                 latitude: LatLng[0].latitude,
                 longitude: LatLng[0].longitude,
@@ -117,7 +115,6 @@ function MapViewWithReportMarker({ onReportCardPress,reports}: MapViewWithReport
                 alignSelf: "center",
             }}
         >
-        
             <MapView
                 style={{
                     width: "100%",
@@ -130,6 +127,7 @@ function MapViewWithReportMarker({ onReportCardPress,reports}: MapViewWithReport
                 pitchEnabled={false}
                 onLayout={fitToCoordinates}
                 ref={mapRef}
+                liteMode={false}
             >
                 {markers}
             </MapView>
@@ -167,7 +165,7 @@ function MapViewWithReportMarker({ onReportCardPress,reports}: MapViewWithReport
                     >
                         <Text style={styles.reportName}>
                             <Text>
-                                {reports[focusedLocationIndex]?.name}
+                                {reports[focusedLocationIndex]?.form?.name}
                             </Text>
                         </Text>
                         <View style={styles.reportDetail}>

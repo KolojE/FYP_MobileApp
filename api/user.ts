@@ -17,6 +17,7 @@ export async function getLoggedInUserInfo(): Promise<UserInfo> {
 
     try {
         const res = await axios.get(`${api_url}/user/getUserInfo`)
+        
         const userinfo: UserInfo = {
             organization: res.data.organization,
             user: res.data.user,
@@ -72,8 +73,7 @@ export async function uploadProfilePicture(uri: string) {
             }
         });
 
-        console.log(uploadResult)
-    } catch (err) {
+            } catch (err) {
         errorHandler(err)
     }
 }
@@ -149,8 +149,7 @@ export async function updateProfile(userInfo: updateProfileArgs): Promise<IUser>
 export async function getOrganizationAdmins(): Promise<Array<IUser>> {
     try {
         const res = await axios.get(`${api_url}/user/getOrganizationAdmins`)
-        console.log(res)
-        return res.data.admins
+                return res.data.admins
     } catch (err) {
         errorHandler(err)
     }

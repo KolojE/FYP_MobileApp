@@ -8,13 +8,14 @@ import { Picker } from "@react-native-picker/picker";
 import { useSelector } from "react-redux";
 import { RootState } from "../redux/store";
 import { useReportAction } from "../actions/reportAction";
-import { getReportGroupedByType } from "../api/admin";
+import { useReport } from "../utils/hooks/useReports";
+import { useAdminReport } from "../utils/hooks/useReportGroupedByLocation";
 
 
 type ReportModalProps = {
   onForwardPressed?: (report:IReport) => void;
   closeModal: () => void;
-  reportID: IReport;
+  reportID: string;
   forwardButton?: boolean;
 
 };
@@ -25,7 +26,8 @@ export default function UpdateReportModal({
   forwardButton = true,
   closeModal
 }: ReportModalProps) {
-  const [report, setReport] = React.useState<IReport>(null);
+
+  const {report}= useAdminReport(reportID) ;
   const [comment, setComment] = React.useState(report?.status.comment ?? "");
   const [updatedStatus, setUpdatedStatus] = React.useState<string>(report?.status._id);
   const [photoUri, setPhotoUri] = React.useState<string>(null);
@@ -37,26 +39,7 @@ export default function UpdateReportModal({
     return <Picker.Item label={status.desc} value={status._id} key={status._id} />
   }))
 
-  React.useEffect(() => {
-    getReportGroupedByType({ groupedByType: false, sortBy: "subDate", reportID: reportID._id }).then((report) => {
-      console.log(JSON.stringify(report, null, 2)+"update report modal");
-      setReport({
-        ...report,
-        name: reportID.name,
-      }as IReport);
-    }, (err) => {
-      console.log(err);
-    })
-  }, []);
-
-  React.useEffect(() => {
-    if (report == null) return;
-    setComment(report.status.comment);
-    setUpdatedStatus(report.status._id);
-  },[report])
-
   const onStatusChange = (itemValue: string, itemIndex: number) => {
-    console.log(itemValue,statuses);
     setUpdatedStatus(itemValue);
   }
 
@@ -65,14 +48,11 @@ export default function UpdateReportModal({
   }
 
   const onForwardButtonPressed = () => {
-      console.log("onForwardButtonPressed");
       onForwardPressed(report);
       closeModal();
   }
 
   const updateReport = () => {
-    console.log(statuses);
-    console.log(updatedStatus);
     const reportToUpdate: IReport = {
       ...report,
       status: {
@@ -123,7 +103,7 @@ export default function UpdateReportModal({
               <View style={styles.detailRow}>
                 <Text style={styles.detailLabel}>Title</Text>
                 <View style={styles.detailValueContainer}>
-                  <Text style={styles.detailValue}>{report.form_id.name}</Text>
+                  <Text style={styles.detailValue}>{report.form.name}</Text>
                   <MaterialCommunityIcons
                     name="waterfall"
                     size={20}
@@ -173,7 +153,7 @@ export default function UpdateReportModal({
             </View>
             {
               forwardButton &&
-              <Ionicons name="arrow-forward-circle" size={24} color="black" onPress={()=>{console.log("pressed"); onForwardButtonPressed()}}/>
+              <Ionicons name="arrow-forward-circle" size={24} color="black" onPress={onForwardButtonPressed}/>
             }
             <View style={styles.detailRow}>
               <Text style={styles.detailLabel}>Status</Text>

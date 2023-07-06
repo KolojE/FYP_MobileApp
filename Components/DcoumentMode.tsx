@@ -29,9 +29,7 @@ export default function DocumentMode({ navigation }) {
     const { data } = useNumberOfReportByStateVictoryData(selectedStates, selectedCities, reportGroupedByLocation)
 
     const mapViewWithMarkerRef = useRef<React.ElementRef<typeof MapViewWithReportMarker>>(null)
-    // console.log(reports, "reports - log from DocumentMode.tsx")
-    // console.log(markers, "markers- log from DocumentMode.tsx")
-
+    //     // 
     //Use effect to update the cities list when the selected states change
     useEffect(() => {
         const reports: IReport[] = []
@@ -44,14 +42,11 @@ export default function DocumentMode({ navigation }) {
                     if (selectedCities.length > 0 && !selectedCities.includes(city)) {
                         return
                     }
-
-                    console.log(reportGroupedByLocation[state][city], "reportGroupedByLocation[state][city] - log from DocumentMode.tsx")
                     reports.push(...reportGroupedByLocation[state][city].map((group) => group.reports).flat())
-                    console.log(reports, "reports - log from DocumentMode.tsx - ")
-                })
+                                    
+        })
             })
-            console.log(reports, "reports - log from DocumentMode.tsx - ")
-            mapViewWithMarkerRef.current?.resetCamera()
+                        mapViewWithMarkerRef.current?.resetCamera()
             setReports(reports)
             setStateCities(stateCities)
             return
@@ -220,7 +215,7 @@ export default function DocumentMode({ navigation }) {
                                 selectedReport &&
                                 <UpdateReportModal
                                     closeModal={() => { setSelectedReport(null) }}
-                                    reportID={selectedReport}
+                                    reportID={selectedReport._id}
                                 />
                             }
                         </Modal>

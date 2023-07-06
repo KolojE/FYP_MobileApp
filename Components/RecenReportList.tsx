@@ -15,9 +15,9 @@ export default function RecentReportList({ navigation, reports,onForwardPressed 
     const [reportRecentReportElement, setRecentReportElement] = React.useState<JSX.Element[]>([])
 
     const recentReport = reports.sort((report1, report2) => {
+        ;
         return report1.updateDate.getDate() - report2.updateDate.getDate();
     })
-
 
     React.useEffect(() => {
         setRecentReportElement(

@@ -61,7 +61,7 @@ export type onMessageReceiveCallback = ({ senderID, message,forwardedReport }) =
 
 export type sendMessageArgs = {
     receiverID: string,
-    forwardedReport?: IReport,
+    forwardedReport?:  Pick<IReport,"_id"|"form"|"location">,
     message: string,
 }
 
@@ -79,6 +79,7 @@ export type ReportGroupedByType = {
 }
 
 export type filterOptions = {
+    limit?: number,
     fromDate?: Date,
     toDate: Date,
     statusIDs?: string[],

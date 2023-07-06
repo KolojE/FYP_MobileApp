@@ -11,7 +11,6 @@ export const useUserInfoAction = () => {
             dispatch(fetchUserInfoStart());
             const UserInfo = await getLoggedInUserInfo();
             const user = UserInfo.user;
-            console.log(UserInfo)
             const profilePicture = await getProfilePicture(user._id);
             user.base64ProfilePicture = profilePicture;
             const userinfo: UserInfo = { user: user, organization: UserInfo.organization, totalReportCount: UserInfo.totalReportCount, totalResolvedCount: UserInfo.totalResolvedCount, organizationAdmins: UserInfo.organizationAdmins, statuses: UserInfo.statuses }
@@ -41,16 +40,15 @@ export const useUserInfoAction = () => {
         }
     }
 
-    const updateOrganizaitonInfo = async (organizationInfo:updateOrganizaitonInfoArgs) => {
+    const updateOrganizaitonInfo = async (organizationInfo: updateOrganizaitonInfoArgs) => {
         try {
             dispatch(updateOrganizationInfoStart());
-            const res = await updateCreateOrganizaitonInfoAndStatues({organization:organizationInfo.organization,statuses:organizationInfo.statuses,statusesToDelete:organizationInfo.statusesToDelete})
-            console.log(res)
-            dispatch(updateOrganizationInfoSuccess({organization:res.newOrganizationInfo,statuses:res.newStatuses}))
+            const res = await updateCreateOrganizaitonInfoAndStatues({ organization: organizationInfo.organization, statuses: organizationInfo.statuses, statusesToDelete: organizationInfo.statusesToDelete })
+            dispatch(updateOrganizationInfoSuccess({ organization: res.newOrganizationInfo, statuses: res.newStatuses }))
         } catch (err) {
-            dispatch (updateOrganizationInfoFailure(err.message))  
+            dispatch(updateOrganizationInfoFailure(err.message))
         }
-        
+
 
     }
 

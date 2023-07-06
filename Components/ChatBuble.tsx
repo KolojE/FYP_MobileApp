@@ -12,7 +12,7 @@ type ChatBubleProps = {
 }
 
 export default function ChatBuble({ receive, msg,reportForward,onForwardMessagePress}: ChatBubleProps) {
-    console.log(msg+"=============================");
+    ;
     const isReceive = receive ? 10 : "auto"
     const color = receive ? "white" : "#80ff88"
     return (

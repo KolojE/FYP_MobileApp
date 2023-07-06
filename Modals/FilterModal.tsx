@@ -51,8 +51,7 @@ export default function FilterModal({ setFilterModal,onFilter }: FilterModalProp
                 return <TagSelector key={index} onSelect={onStatusTagSelect} tagName={status.desc} tagValue={status._id} />
             })
         )
-        console.log(filterElement.type)
-    }, [filterElement])
+            }, [filterElement])
 
 
     const onFilterButtonPressed = () => {
@@ -96,8 +95,7 @@ export default function FilterModal({ setFilterModal,onFilter }: FilterModalProp
 
         setFilterOptions((prev) => { return { ...prev, statusIDs: prev.statusIDs.filter((id) => { return id !== statusID }) } })
     }
-    console.log(filterOptions)
-
+    
     return (
 
         <ScrollView style={{}}>
