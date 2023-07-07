@@ -8,7 +8,7 @@ type EvidencePhotoProps = {
 
 }
 
-export default function EvidencePhoto({ onPressedCallBack, base64,uri}: EvidencePhotoProps) {
+export default function Photo({ onPressedCallBack, base64,uri}: EvidencePhotoProps) {
 
     if (!base64 && !uri)
         return null

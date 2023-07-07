@@ -4,6 +4,7 @@ import { StyleSheet } from "react-native";
 import IconText from "../Components/IconText";
 import { AntDesign, MaterialCommunityIcons, Octicons } from "@expo/vector-icons";
 import { useComplainantAction } from "../actions/complainantAction";
+import { useBackButton } from "../utils/hooks/useBackButton";
 
 
 type MemberProfileModalProps = {

@@ -5,9 +5,13 @@ import { IDetail } from "../types/Models/Report";
 import MapView, { Marker } from "react-native-maps";
 import { getAddressByCoordinates } from "../api/user";
 import { api_url } from "../env";
-import EvidencePhoto from "../Components/EvidencePhoto";
+
+import Photo from "../Components/EvidencePhoto";
+import VideoPlayerModal from "../Modals/VideoPlayerModal";
+import * as VideoThumbnails from "expo-video-thumbnails";
 
 export function detailRenderer(detail: IDetail, key) {
+
     switch (detail.inputType) {
         case inputType.Date:
             return (
@@ -30,7 +34,9 @@ export function detailRenderer(detail: IDetail, key) {
                 <PhotoValue label={detail.label} value={detail.value} key={key} />
             );
         case inputType.DropDown:
-            return <DropDownValue label={detail.label} value={detail.value} />; // Handle the DropDown input type
+            return (<DropDownValue label={detail.label} value={detail.value} />); // Handle the DropDown input type
+        case inputType.Video:
+            return <VideoValue label={detail.label} value={detail.value} key={key} />;
     }
 }
 
@@ -69,7 +75,6 @@ export function MapValue(data: DataProps) {
     const value = data.value as { La: number; Lo: number };
     const [address, setAddress] = React.useState<string>("");
 
-    const [pictures, setPictures] = React.useState<string[]>([]);
 
 
     React.useEffect(() => {
@@ -121,15 +126,12 @@ export function PhotoValue(data: DataProps) {
     const [photoModalUri, setPhotoModalUri] = React.useState<string>(null)
 
     const onPressed = (uri: string) => {
-                setPhotoModalUri(uri)
+        setPhotoModalUri(uri)
     }
 
-    const windowWidth = Dimensions.get('window').width;
-    const windowHeight = Dimensions.get('window').height;
-  
     // Calculate the aspect ratio of the image
     const imageAspectRatio = Dimensions.get('window').width / Dimensions.get('window').height;
-  
+
 
     return (
         <View style={styles.container}>
@@ -137,22 +139,96 @@ export function PhotoValue(data: DataProps) {
             <FlatList
                 data={value}
                 renderItem={({ item }) => {
-                                        return <EvidencePhoto onPressedCallBack={onPressed} uri={`${api_url}${item}`} />
+                    return <Photo onPressedCallBack={onPressed} uri={`${api_url}${item}`} />
                 }}
                 horizontal={true}
             />
             <Modal visible={!!photoModalUri}>
-                <TouchableOpacity onPress={()=>{setPhotoModalUri(null)}}>
-                    <Image source={{uri:`${photoModalUri}`}}
+                <TouchableOpacity onPress={() => { setPhotoModalUri(null) }}>
+                    <Image source={{ uri: `${photoModalUri}` }}
                         resizeMode="contain"
-                    style={{
-                        aspectRatio: imageAspectRatio 
-                    }}/>
+                        style={{
+                            aspectRatio: imageAspectRatio
+                        }} />
                 </TouchableOpacity>
             </Modal>
         </View>
     );
 }
+export function VideoValue(data: DataProps) {
+    type Video = {
+        video_uri: string,
+        thumbnail_uri: string
+    }
+    const label = data.label;
+    const value = data.value as string[];
+
+    const [videoModalUri, setVideoModalUri] = React.useState<string>(null)
+    const [videos, setVideos] = React.useState<Video[]>([])
+
+    React.useEffect(() => {
+        try {
+            const setVideoAsync = async () => {
+                const thumbnails_video_uri = value.map(async (video_uri) => {
+                    const uri = await VideoThumbnails.getThumbnailAsync(
+                        `${api_url}/${video_uri}`,
+                        {
+                            time: 15000,
+                        }
+                    )
+                    return {
+                        video_uri: video_uri,
+                        thumbnail_uri: uri.uri
+                    }
+                }
+                )
+                const result = await Promise.all(thumbnails_video_uri)
+                setVideos(
+                    result
+                )
+            }
+            setVideoAsync();
+        } catch (e) {
+            console.error(e)
+        }
+    }, [value])
+
+    const onPressed = (uri: string) => {
+        setVideoModalUri(uri)
+    }
+
+    const renderItem = ({ item }) => {
+        return <Photo onPressedCallBack={()=>{
+            onPressed(`${api_url}/${item.video_uri}`)
+        }} uri={item.thumbnail_uri} />
+    }
+    // Calculate the aspect ratio of the image
+    return (
+        <View style={styles.container}>
+            <Text style={styles.label}>{label}</Text>
+            <FlatList
+                data={videos}
+                renderItem={renderItem}
+                horizontal={true}
+            />
+            <Modal
+             visible={!!videoModalUri}
+             onRequestClose={
+                    ()=>{
+                        setVideoModalUri(null)
+                    }  
+             }
+             animationType="slide"
+            >
+                <VideoPlayerModal
+                    uri={videoModalUri}
+                    key={videoModalUri}
+                />
+            </Modal>
+        </View>
+    );
+}
+
 
 export function DropDownValue(data: DataProps) {
     const label = data.label;
@@ -193,7 +269,7 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         marginTop: 8,
     },
-    image:{
+    image: {
         flex: 1,
         maxWidth: '100%',
         maxHeight: '100%',

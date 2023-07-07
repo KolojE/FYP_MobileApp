@@ -29,6 +29,10 @@ export default function DocumentMode({ navigation }) {
     const { data } = useNumberOfReportByStateVictoryData(selectedStates, selectedCities, reportGroupedByLocation)
 
     const mapViewWithMarkerRef = useRef<React.ElementRef<typeof MapViewWithReportMarker>>(null)
+
+    const onForwardButtonPressed = (report: IReport) => {
+        navigation.navigate("ChatRoom", { report: report, complainantID: report.complainant._id })
+    }
     //     // 
     //Use effect to update the cities list when the selected states change
     useEffect(() => {
@@ -215,6 +219,7 @@ export default function DocumentMode({ navigation }) {
                                 selectedReport &&
                                 <UpdateReportModal
                                     closeModal={() => { setSelectedReport(null) }}
+                                    onForwardPressed={onForwardButtonPressed}
                                     reportID={selectedReport._id}
                                 />
                             }

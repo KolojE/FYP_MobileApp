@@ -118,6 +118,7 @@ export async function getReport(id: string): Promise<IReport> {
     const report: IReport = {
         _id: res.data.report._id,
         status: res.data.report.status,
+        comment: res.data.report.comment,
         submissionDate: res.data.report.submissionDate,
         updateDate  : res.data.report.updateDate,
         form: res.data.report.form,
@@ -155,6 +156,7 @@ export async function getReports({ sortBy, limit, dateRange, status, types, repo
             reports.push({
                 _id: report._id,
                 status: report.status,
+                comment: report.comment,
                 submissionDate: report.submissionDate,
                 updateDate  : report.updateDate,
                 form: report.form,
@@ -246,12 +248,13 @@ export async function updateReport(report: IReport): Promise<IReport> {
     try {
         const res = await axios.post(`${api_url}/admin/updateReport`, {
             reportID: report._id,
-            status: report.status,
-            comment: report.status.comment,
+            status: report.status._id,
+            comment:report.comment.comment,
         })
         return {
             ...report,
-            status: res.data.report.status._id,
+            status: res.data.report.status,
+            comment: res.data.report.comment,
         };
     } catch (err) {
         errorHandler(err)

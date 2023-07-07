@@ -1,6 +1,6 @@
 import { AntDesign, Entypo } from "@expo/vector-icons";
-import React from "react";
-import { View, Text, StyleSheet, Modal, FlatList, TouchableOpacity, RefreshControl } from "react-native";
+import React, { useEffect } from "react";
+import { View, Text, StyleSheet, Modal, FlatList, TouchableOpacity, RefreshControl, Alert, BackHandler } from "react-native";
 import IconTextInput from "../Components/IconTextInput";
 import Member from "../Components/Member";
 import IComplainant from "../types/Models/Complainant";
@@ -8,6 +8,8 @@ import { useSelector } from "react-redux";
 import { RootState } from "../redux/store";
 import { useComplainantAction } from "../actions/complainantAction";
 import MemberProfileModal from "./MemberProfileModal";
+import { useBackButton } from "../utils/hooks/useBackButton";
+import SearchBar from "../Components/SearchBar";
 
 
 
@@ -21,24 +23,24 @@ export default function MemeberListModal({ setMemberListModal }: MemeberListModa
     const [profileModal, setProfileModal] = React.useState<boolean>(false);
     const [selectedMember, setSelectedMember] = React.useState<IComplainant>();
     const [filteredMembers, setFilteredMembers] = React.useState<IComplainant[]>([])
-
     const complaiantAction = useComplainantAction();
     const complainant = useSelector((state: RootState) => state.complainant)
     const members = complainant.complainants;
     const [deactivatedMembers,setDeactivatedMembers] = React.useState<IComplainant[]>([])
     const [activatedMembers,setActivatedMembers] = React.useState<IComplainant[]>([])
-    
-    React.useEffect(() => {
+
+
+    useEffect(() => {
         if (members.length === 0)
             complaiantAction.getComplainants()
     }, [])
 
-    React.useEffect(() => {
+    useEffect(() => {
         setDeactivatedMembers(members.filter((member) => !member.activation))
         setActivatedMembers(members.filter((member) => member.activation))
     }, [members])
 
-    React.useEffect(() => {
+    useEffect(() => {
         if(filteredMembers.length!==0)
         {
             setDeactivatedMembers(filteredMembers.filter((member) => !member.activation))
@@ -82,7 +84,7 @@ export default function MemeberListModal({ setMemberListModal }: MemeberListModa
     return (
         <View style={styles.container}>
             <AntDesign onPress={() => { setMemberListModal(false) }} name="down" size={24} style={{ marginRight: "auto", marginLeft: "5%", marginTop: "5%" }} />
-                <IconTextInput icon={<Entypo name="magnifying-glass" style={{ marginRight: 10}} />} placeholder="Enter any keyword, ID, name etc.." viewContainerStyle={styles.searchBox} editable={true} onTextChange={onSearchTextChanged}/>
+            <SearchBar onSearchTextChanged={onSearchTextChanged} />
             <View style={{alignItems:'center',width:"100%"}} >
 
                 <FlatList
@@ -118,10 +120,16 @@ export default function MemeberListModal({ setMemberListModal }: MemeberListModa
                     </>
                 }
             </View>
-            <Modal visible={profileModal} transparent={true} animationType="slide">
+            <Modal visible={profileModal} transparent={true} animationType="slide" 
+                onRequestClose={() => {
+                    setProfileModal(false)
+                }}
+            >
                 <Modal transparent={true} visible={profileModal} animationType="fade">
                     <TouchableOpacity
-                        onPress={() => {  }}
+                        onPress={() => {
+                            setProfileModal(false)
+                          }}
                         style={{
                             position: "absolute",
                             height: "100%",
@@ -134,7 +142,7 @@ export default function MemeberListModal({ setMemberListModal }: MemeberListModa
                 </Modal>
                 {
                     selectedMember &&
-                    <MemberProfileModal closeModal={()=>{setProfileModal(false)}} member={selectedMember} key={selectedMember._id} />
+                    <MemberProfileModal closeModal={()=>{setProfileModal(false)}} member={selectedMember} key={selectedMember._id}  />
                 }
             </Modal>
         </View>)
@@ -145,15 +153,5 @@ const styles = StyleSheet.create({
         width: "100%",
         alignItems: "center",
     },
-    searchBox: {
-        borderWidth: 1,
-        width: "90%",
-        marginTop: "5%",
-        flexDirection: "row",
-        alignItems:"center",
-        borderRadius: 100,
-        paddingLeft: 10,
-        paddingTop: 2,
-        paddingBottom: 2,
-    }
+
 });

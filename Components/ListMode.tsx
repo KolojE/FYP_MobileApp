@@ -42,7 +42,10 @@ export default function ListMode({ navigation }) {
                 renderItem={renderItem}
             />
             <Modal visible={!!selectedReport} >
-                <UpdateReportModal onForwardPressed={onReportForwardPressed} closeModal={onModalClose} reportID={selectedReport._id} />
+                {
+                    selectedReport &&
+                    <UpdateReportModal onForwardPressed={onReportForwardPressed} closeModal={onModalClose} reportID={selectedReport._id} />
+                }
             </Modal>
          </View>
         </>

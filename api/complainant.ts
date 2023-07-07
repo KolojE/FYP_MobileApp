@@ -22,7 +22,7 @@ export async function submitReport({ report, formID }: { report: object, formID:
     }
 }
 
-export async function uploadReportPhoto({ uri }): Promise<string> {
+export async function uploadreportPhotoVideo({ uri }): Promise<string> {
 
     try {
         const uploadResult = await FileSystem.uploadAsync(`${api_url}/report/uploadReportPhoto`, uri, {
@@ -52,7 +52,6 @@ export async function getReport({ reportID }: { reportID: string }): Promise<IRe
             _id: res.data.report._id,
             details: res.data.report.details,
             status: {
-                comment: res.data.report.status.comment,
                 desc: res.data.report.status.desc,
                 _id: res.data.report.status._id
             },
@@ -71,6 +70,7 @@ export async function getReport({ reportID }: { reportID: string }): Promise<IRe
                 latitude:res.data.report.location.latitude,
                 longitude:res.data.report.location.longitude
             },
+            comment: res.data.report.comment,
             submissionDate: new Date(res.data.report.submissionDate),
             updateDate: new Date(res.data.report.updateDate)
         };
@@ -100,7 +100,6 @@ export async function getReport({ reportID }: { reportID: string }): Promise<IRe
                     status:{
                         _id:report.status._id,
                         desc:report.status.desc,
-                        comment:report.status.comment
                     },
                     form:{
                         _id:report.form._id,
@@ -118,7 +117,8 @@ export async function getReport({ reportID }: { reportID: string }): Promise<IRe
                     location:{
                         latitude:report.location.latitude,
                         longitude:report.location.longitude
-                    }
+                    },
+                    comment:report.comment
                 }
             })
 

@@ -42,6 +42,7 @@ export default function NumberOfReportByStateVictoryChart({ victoryBarData }: Nu
             })
 
             victoryBar.push(<VictoryBar
+            key={index}
                 colorScale={colors}
                 data={data}
                 style={{

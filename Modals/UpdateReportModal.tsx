@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Image, View, ScrollView, Text, StyleSheet, TouchableOpacity, Modal, TextInput, ActivityIndicator } from "react-native";
 import { AntDesign, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -8,12 +8,11 @@ import { Picker } from "@react-native-picker/picker";
 import { useSelector } from "react-redux";
 import { RootState } from "../redux/store";
 import { useReportAction } from "../actions/reportAction";
-import { useReport } from "../utils/hooks/useReports";
 import { useAdminReport } from "../utils/hooks/useReportGroupedByLocation";
 
 
 type ReportModalProps = {
-  onForwardPressed?: (report:IReport) => void;
+  onForwardPressed?: (report: IReport) => void;
   closeModal: () => void;
   reportID: string;
   forwardButton?: boolean;
@@ -27,10 +26,9 @@ export default function UpdateReportModal({
   closeModal
 }: ReportModalProps) {
 
-  const {report}= useAdminReport(reportID) ;
-  const [comment, setComment] = React.useState(report?.status.comment ?? "");
+  const { report } = useAdminReport(reportID);
+  const [comment, setComment] = React.useState(report?.comment.comment ?? "");
   const [updatedStatus, setUpdatedStatus] = React.useState<string>(report?.status._id);
-  const [photoUri, setPhotoUri] = React.useState<string>(null);
 
   const reportAction = useReportAction();
 
@@ -38,6 +36,13 @@ export default function UpdateReportModal({
   const statuesOptions = useSelector((state: RootState) => statuses.map((status) => {
     return <Picker.Item label={status.desc} value={status._id} key={status._id} />
   }))
+
+  useEffect(() => {
+    if (report == null) return;
+    setUpdatedStatus(report.status._id);
+    setComment(report.comment.comment);
+  },
+    [report])
 
   const onStatusChange = (itemValue: string, itemIndex: number) => {
     setUpdatedStatus(itemValue);
@@ -48,8 +53,8 @@ export default function UpdateReportModal({
   }
 
   const onForwardButtonPressed = () => {
-      onForwardPressed(report);
-      closeModal();
+    onForwardPressed(report);
+    closeModal();
   }
 
   const updateReport = () => {
@@ -57,8 +62,10 @@ export default function UpdateReportModal({
       ...report,
       status: {
         _id: updatedStatus,
-        comment: comment,
         desc: statuses.find((status) => status._id === updatedStatus).desc
+      },
+      comment: {
+        comment: comment,
       }
     };
     reportAction.updateReportAction(reportToUpdate);
@@ -98,7 +105,19 @@ export default function UpdateReportModal({
             >
               <AntDesign name="close" size={24} color="black" />
             </TouchableOpacity>
-            <Text style={styles.reportId}>{report._id}</Text>
+            <View style={styles.reportIdContainer} >
+              <Text style={styles.reportId}>{report._id}</Text>
+              {
+                forwardButton &&
+                <Ionicons
+                  name="send"
+                  size={24}
+                  color="black"
+                  onPress={onForwardButtonPressed}
+                  style={{ marginLeft: 10 }}
+                />
+              }
+            </View>
             <View style={styles.detailsContainer}>
               <View style={styles.detailRow}>
                 <Text style={styles.detailLabel}>Title</Text>
@@ -151,10 +170,6 @@ export default function UpdateReportModal({
                 </Text>
               </View>
             </View>
-            {
-              forwardButton &&
-              <Ionicons name="arrow-forward-circle" size={24} color="black" onPress={onForwardButtonPressed}/>
-            }
             <View style={styles.detailRow}>
               <Text style={styles.detailLabel}>Status</Text>
               <Picker style={{ flex: 1 }} selectedValue={updatedStatus} onValueChange={onStatusChange}>
@@ -168,9 +183,6 @@ export default function UpdateReportModal({
             </TouchableOpacity>
           </ScrollView>
       }
-      <Modal visible={photoUri != null}>
-        <Image source={{ uri: photoUri }} />
-      </Modal>
     </SafeAreaView>
   );
 }
@@ -182,16 +194,22 @@ const styles = StyleSheet.create({
   contentContainer: {
     paddingHorizontal: 20,
     paddingTop: 20,
+    paddingBottom: 40,
   },
   closeButton: {
     alignSelf: "flex-end",
     marginBottom: 20,
   },
+  reportIdContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
   reportId: {
     fontSize: 16,
     fontWeight: "bold",
-    marginBottom: 20,
+    paddingVertical: 10,
   },
+
   detailsContainer: {
     backgroundColor: "white",
     borderRadius: 8,

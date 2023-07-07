@@ -172,7 +172,7 @@ export default function ChatScreen({ onChatRoomClose, unSelectedUser, selectedUs
         {
           loggedInUser.role == roles.admin?
           <UpdateReportModal
-          reportID={selectedReport._id}
+          reportID={selectedReport?._id}
           closeModal={() => { setSelectedReport(null) }}
           forwardButton={false}
           />

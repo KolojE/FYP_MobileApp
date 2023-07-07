@@ -66,6 +66,7 @@ const reportSlice = createSlice({
             state.error = null
         },
         updateReportError: (state, action) => {
+            state.reports = []
             state.loading = false
             state.error = action.payload
         }

@@ -53,6 +53,7 @@ export function FieldSelectionModal({ setModal, updateField }) {
                     <Picker.Item label="Photo" value={inputType.Photo} />
                     <Picker.Item label="Location" value={inputType.Map} />
                     <Picker.Item label="Drop Down" value={inputType.DropDown} />
+                    <Picker.Item label="Video" value={inputType.Video} />
                 </Picker>
                 {
                     selectedInputType === inputType.DropDown ?

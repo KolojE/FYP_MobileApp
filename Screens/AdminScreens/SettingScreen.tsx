@@ -56,7 +56,9 @@ export default function SettingScreen({ navigation }) {
             </Modal>
             <Modal visible={formListModal} presentationStyle="pageSheet"
                 style={{ margin: 0 }} animationType="slide">
-                <FormListModal setFormListModal={setFormListModal} isVisible={formListModal} navigation={navigation} />
+                <FormListModal closeModal={()=>{
+                    setFormListModal(false)
+                }} navigation={navigation} />
             </Modal>
             <Modal visible={profileModal} animationType="slide">
                 <ProfileModal closeModal={()=>{setProfileModal(false)}} userInfo={userInfo}/> 

@@ -22,7 +22,6 @@ export interface IReport {
     status: {
         _id: string;
         desc: string;
-        comment: string;
     };
     complainant?:{
         email: string;
@@ -35,4 +34,8 @@ export interface IReport {
         color: string;
         isDeleted: boolean;
     };
+    comment?: {
+        comment: string;
+        adminID?: string;
+    }
 }

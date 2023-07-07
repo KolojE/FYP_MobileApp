@@ -127,7 +127,7 @@ export default function ReportModal({
                         <View style={styles.detailRow}>
                             <Text style={styles.detailLabel}>Updates Comment</Text>
                             <Text style={styles.detailValue}>
-                                {report.status.comment}
+                                {report.comment.comment}
                             </Text>
                         </View>
                         <View style={styles.detailRow}>

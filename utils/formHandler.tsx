@@ -1,15 +1,17 @@
 import RNDateTimePicker from "@react-native-community/datetimepicker";
 import React from "react";
-import { Text, TextInput, TouchableOpacity, StyleSheet, View, Modal, ScrollView, FlatList, Alert } from "react-native";
+import { Text, TextInput, TouchableOpacity, StyleSheet, View, Modal, FlatList, Alert, Linking } from "react-native";
+import * as VideoThumbnails from "expo-video-thumbnails";
 import { IField, inputType } from "../types/Models/Form";
 import LocationPickerModal from "../Modals/LocationPickerModal";
 import * as ImagePicker from "expo-image-picker";
 import { AntDesign } from "@expo/vector-icons";
 import { reportSubmissionSchema } from "../types/General";
 import { getAddressByCoordinates } from "../api/user";
-import EvidencePhoto from "../Components/EvidencePhoto";
-import { uploadReportPhoto } from "../api/complainant";
+import Photo from "../Components/EvidencePhoto";
+import { uploadreportPhotoVideo } from "../api/complainant";
 import { Picker } from "@react-native-picker/picker";
+import VideoPlayerModal from "../Modals/VideoPlayerModal";
 
 
 type FieldRendererProps = IField & {
@@ -34,6 +36,8 @@ export function FieldRenderer(field: FieldRendererProps) {
             return PhotoInputField(field);
         case inputType.DropDown:
             return DropDownInputField(field);
+        case inputType.Video:
+            return VideoInputField(field);
     }
 
 }
@@ -111,7 +115,6 @@ function DateInputField({ setReport, _id, label, required, report }: FieldRender
 
 function TimeInputField({ setReport, _id, label, required, report }: FieldRendererProps) {
 
-
     const [time, setTime] = React.useState<Date>(new Date());
     const [datePicker, setDatePicker] = React.useState<boolean>(false);
     React.useEffect(() => {
@@ -155,7 +158,6 @@ function TimeInputField({ setReport, _id, label, required, report }: FieldRender
 
 function MapInputField({ setReport, _id, label, required, report }: FieldRendererProps) {
 
-
     const [locationPicker, setLocationPicker] = React.useState<boolean>(false);
     const [value, setValue] = React.useState<{ Lo: number, La: number }>();
     const [address, setAddress] = React.useState<string>("");
@@ -177,11 +179,12 @@ function MapInputField({ setReport, _id, label, required, report }: FieldRendere
                 setAddress("Location..")
             })
         } catch (err) {
-                    }
+            console.error(err)
+        }
     }, [value])
 
     const onLocationChange = async ({ Lo, La }: { Lo: number, La: number }) => {
-                setValue({ Lo, La });
+        setValue({ Lo, La });
 
     }
 
@@ -223,29 +226,28 @@ function PhotoInputField({ setReport, _id, label, required, report }: FieldRende
     const onAddPhoto = async () => {
 
         if (value.length > 10) {
-            Alert.alert("Maximum number of photos reached", "You can only add 10 photos to a report")
+            Alert.alert("Maximum number of photos reached", "You can only add 10 photos to a field")
             return
         }
+
         let result = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.All,
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
             base64: true,
             allowsEditing: true,
             aspect: [4, 3],
             quality: 1,
         });
 
-        ;
-
         if (!result.canceled) {
             setSelectedPhotos((prev) => { return [...prev, result] });
             const uri = result.assets[0].uri;
-            const path = await uploadReportPhoto({ uri });
+            const path = await uploadreportPhotoVideo({ uri });
             setValue((prev) => { return [...prev, path] });
         }
     };
 
     const renderPhoto = ({ item, index }: { item: ImagePicker.ImagePickerResult, index: number }) => {
-        return <EvidencePhoto base64={item.assets[0].base64} key={index} onPressedCallBack={null} />;
+        return <Photo base64={item.assets[0].base64} key={index} onPressedCallBack={null} />;
     }
 
     const numberOfPhotos = selectedPhoto?.length || 0;
@@ -267,6 +269,99 @@ function PhotoInputField({ setReport, _id, label, required, report }: FieldRende
     )
 
 }
+
+function VideoInputField({ setReport, _id, label, required, report }: FieldRendererProps) {
+    type Video = {
+        thumbnail_uri: string,
+        video_uri: string,
+    }
+    const [video_uri, setVideo_uri] = React.useState<string>(null);
+    const [selectedVideo, setSelectedVideo] = React.useState<Video[]>([]);
+    const [value, setValue] = React.useState<string[]>([]); // path to photo in server storage
+
+    React.useEffect(() => {
+        if (report?.[_id]) {
+            setValue && setValue(report[_id] as string[]);
+        }
+    }, [])
+    React.useEffect(() => {
+        setReport && setReport(prev => ({ ...prev, [_id]: value }));
+    }, [value])
+
+    const onAddVideo = async () => {
+
+        if (value.length > 10) {
+            Alert.alert("Maximum number of photos reached", "You can only add 10 photos to a field")
+            return
+        }
+
+        let result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Videos,
+            base64: true,
+            allowsEditing: true,
+            aspect: [4, 3],
+            quality: 1,
+        });
+
+        if (!result.canceled) {
+            const video_uri = result.assets[0].uri;
+            const thumbnail = await VideoThumbnails.getThumbnailAsync(video_uri, { time: 15000 });
+            const path = await uploadreportPhotoVideo({ uri: video_uri });
+            setValue((prev) => { return [...prev, path] });
+            setSelectedVideo((prev) => {
+                return [...prev, {
+                    thumbnail_uri: thumbnail.uri,
+                    video_uri: video_uri,
+                }]
+            });
+        }
+    };
+
+    const onVideoPress = (uri: string) => {
+        setVideo_uri(uri);
+    }
+
+    const renderVideo = ({ item, index }: { item: Video, index: number }) => {
+        return (
+            <View>
+                <Photo uri={item.thumbnail_uri} key={index} onPressedCallBack={() => {
+                    onVideoPress(item.video_uri);
+                }} />
+            </View>
+        )
+    }
+
+    const numberOfPhotos = selectedVideo?.length || 0;
+    return (
+        <View style={{ marginBottom: "5%" }}>
+            <Text style={{ width: "100%", fontSize: 10, color: "grey" }}>{label + "," + numberOfPhotos + "/" + 10 + (required ? " *" : "")}</Text>
+            <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <TouchableOpacity onPress={onAddVideo} style={{ height: 100, width: 100, alignItems: "center", justifyContent: "center" }} >
+                    <AntDesign name="pluscircle" size={50} color="grey" style={{}} />
+                </TouchableOpacity>
+                <FlatList
+                    data={selectedVideo}
+                    renderItem={renderVideo}
+                    style={{ width: "80%", height: 100 }}
+                    horizontal
+                />
+                <Modal
+                    visible={video_uri ? true : false}
+                    animationType="slide"
+                    onRequestClose={() => {
+                        setVideo_uri(null);
+                    }}
+                >
+                    <VideoPlayerModal
+                        uri={video_uri}
+                        key={video_uri}
+                    />
+                </Modal>
+            </View>
+        </View>
+    )
+}
+
 
 function DropDownInputField({ setReport, _id, label, options, report }: FieldRendererProps) {
 

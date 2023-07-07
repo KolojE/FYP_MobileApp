@@ -6,6 +6,7 @@ export enum inputType {
     DropDown = "DropDown",
     Map = "Map",
     Photo = "Photo",
+    Video = "Video"
 }
 
 

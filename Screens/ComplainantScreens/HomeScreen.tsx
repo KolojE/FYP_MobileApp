@@ -18,7 +18,7 @@ import { getReports } from "../../api/complainant";
 import { Image } from "react-native";
 import { RootState } from "../../redux/store";
 import { useSelector } from "react-redux";
-import { useReports } from "../../utils/hooks/useReports";
+import { useReport, useReports } from "../../utils/hooks/useReports";
 
 export default function HomeScreen({navigation}) {
   const [profileModal, setProfileModal] = React.useState(false);
@@ -86,17 +86,13 @@ export default function HomeScreen({navigation}) {
 
 export function LatestUpdatedComponent() {
 
-  const [lastestUpdatedReprot, setLastestUpdatedReport] = React.useState<IReport>();
-  React.useEffect(() => {
-    getReports({ limit: 1, sortBy: "upDate" }).then((res) => {
-      setLastestUpdatedReport(res[0]);
-          }, (err) => {
-      errorHandler(err);
-    })
-  }, [])
+  const report= useReports({filter:{
+    limit: 1,
+    toDate:new Date(),
+    sortBy: "upDate",
+  }})
 
-  
-
+  const lastestUpdatedReprot = report && report[0];
 
   return (
     <TouchableOpacity
@@ -156,7 +152,7 @@ export function LatestUpdatedComponent() {
                   minHeight: 80,
                 }}
               >
-                {lastestUpdatedReprot.status.comment}
+                {lastestUpdatedReprot.comment.comment}
               </Text>
             </View>
             <Text

@@ -20,6 +20,10 @@ export default function PieMode({ navigation }) {
     const mapRef = useRef<React.ElementRef<typeof MapViewWithReportMarker>>(null)
 
 
+    const onForwardButtonPressed = (report: IReport) => {
+        navigation.navigate("ChatRoom", { report: report, complainantID: report.complainant._id })
+    }
+
     return (
         <>
           {!loading ? (
@@ -58,11 +62,7 @@ export default function PieMode({ navigation }) {
                       <UpdateReportModal
                         reportID={selectedReport._id}
                         closeModal={() => setSelectedReport(null)}
-                        onForwardPressed={report => {
-                          ;
-                          setSelectedReport(null);
-                          navigation.navigate("ChatRoom", { report: report, complainantID: report.complainant._id });
-                        }}
+                        onForwardPressed={onForwardButtonPressed}
                       />
                     )}
                   </Modal>

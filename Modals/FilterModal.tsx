@@ -34,7 +34,6 @@ export default function FilterModal({ setFilterModal,onFilter }: FilterModalProp
             const res = await getReportElement({ includeStatus: true, includeType: true });
             setFilterElement((prev) => { return { status: res.status, type: res.type } })
         }
-
         getReportElementAsync();
     }, [])
 
