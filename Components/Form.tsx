@@ -3,6 +3,7 @@ import React from "react";
 import { View, Text, Modal } from "react-native";
 import { getForms } from "../api/user";
 import IForm from "../types/Models/Form";
+import FormIcon from "./FormIcon";
 
 type FormProps = {
     form:IForm,
@@ -30,8 +31,8 @@ export default function Form({form,closeModal,onDeletePress,navigation}:FormProp
 
 
     return (<View style={{ flexDirection: "row", width: "80%", marginTop: "5%" }}>
-        <View style={{ width: "20%" }}>
-            {null}
+        <View style={{ width: "20%",alignItems:"center",justifyContent:"center" }}>
+            <FormIcon icon={form.icon} size={24} />
         </View>
         <View >
             <View style={{ alignItems: "center", flexDirection: "row" }}>

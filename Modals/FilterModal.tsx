@@ -4,9 +4,8 @@ import { Picker } from "@react-native-picker/picker";
 import React from "react";
 import { View, Text, TextInput, TouchableOpacity, ScrollView, ToastAndroid } from "react-native";
 import TagSelector from "../Components/TagSelector";
-import { ReprotElement, getReportElement } from "../api/admin";
 import { filterOptions } from "../types/General";
-import { useReportAction } from "../actions/reportAction";
+import { ReprotElement, getReportElement } from "../api/user";
 
 
 
@@ -27,9 +26,7 @@ export default function FilterModal({ setFilterModal,onFilter }: FilterModalProp
     const [typeTag, setTypeTag] = React.useState<JSX.Element[]>([]);
     const [statusTag, setStatusTag] = React.useState<JSX.Element[]>([]);
 
-    const adminAction = useReportAction();
     React.useEffect(() => {
-
         const getReportElementAsync = async () => {
             const res = await getReportElement({ includeStatus: true, includeType: true });
             setFilterElement((prev) => { return { status: res.status, type: res.type } })
@@ -133,10 +130,8 @@ export default function FilterModal({ setFilterModal,onFilter }: FilterModalProp
                 </View>
                 <Text style={{ marginTop: "5%", fontSize: 16, color: "black", fontWeight: "500" }}>Sort By</Text>
                 <Picker onValueChange={onSortPickerChange} >
-                    <Picker.Item label="Submission Date (Descending)" value={"subDate"} />
-                    <Picker.Item label="Submission Date (Ascending)" value={"subDate"} />
-                    <Picker.Item label="UP Date (Descending)" value={"upDate"} />
-                    <Picker.Item label="UP Date (Ascending)" value={"upDate"} />
+                    <Picker.Item label="Submission Date" value={"subDate"} />
+                    <Picker.Item label="UP Date" value={"upDate"} />
                 </Picker>
 
             </View>

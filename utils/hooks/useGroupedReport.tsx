@@ -6,7 +6,10 @@ import { useSelector } from "react-redux"
 
 export const useGroupedReports = () => {
     const [groupedReports, setGroupedReports] = useState<ReportGroupedByType[]>([])
-    const reports = useSelector((state: RootState) => state.report.reports)
+    const {
+        reports,
+        loading
+    } = useSelector((state: RootState) => state.report)
 
     useEffect(() => {
 
@@ -34,5 +37,8 @@ export const useGroupedReports = () => {
 
     console.log(groupedReports)
 
-    return groupedReports
+    return {
+        groupedReports,
+        loading
+    }
 }

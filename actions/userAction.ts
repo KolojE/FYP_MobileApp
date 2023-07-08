@@ -43,7 +43,7 @@ export const useUserInfoAction = () => {
     const updateOrganizaitonInfo = async (organizationInfo: updateOrganizaitonInfoArgs) => {
         try {
             dispatch(updateOrganizationInfoStart());
-            const res = await updateCreateOrganizaitonInfoAndStatues({ organization: organizationInfo.organization, statuses: organizationInfo.statuses, statusesToDelete: organizationInfo.statusesToDelete })
+            const res = await updateCreateOrganizaitonInfoAndStatues({ organization: organizationInfo.organization, statuses: organizationInfo.statuses, statusesToDelete: organizationInfo.statusesToDelete,statusReplacementMapper:organizationInfo.statusReplacementMapper })
             dispatch(updateOrganizationInfoSuccess({ organization: res.newOrganizationInfo, statuses: res.newStatuses }))
         } catch (err) {
             dispatch(updateOrganizationInfoFailure(err.message))

@@ -58,7 +58,7 @@ export default function FormListModal({ navigation, closeModal }: FormListModalP
             setForms(await getForms())
         }
         setConfirmModalVisible(false);
-        return;
+        return;23
     }
 
     const onSearchTextChanged = (text: string) => {
@@ -72,7 +72,7 @@ export default function FormListModal({ navigation, closeModal }: FormListModalP
     return (
         <View style={styles.container}>
             <View style={styles.rowContainer}>
-                <AntDesign onPress={() => { closeModal }} name="down" size={24} style={styles.iconStyle} />
+                <AntDesign onPress={() => { closeModal() }} name="down" size={24} style={styles.iconStyle} />
                 <AntDesign onPress={() => { closeModal(); navigation.navigate("formBuilder"); }} name="plus" size={24} style={[styles.iconStyle, styles.iconMarginLeft]} />
             </View>
             <SearchBar
@@ -80,13 +80,13 @@ export default function FormListModal({ navigation, closeModal }: FormListModalP
             />
             <FlatList
                 style={styles.scrollViewContainer}
+                contentContainerStyle={{ alignItems: "center" }}
                 data={filteredForms.length > 0 ? filteredForms : forms}
                 renderItem={({ item, index }) => renderItem(item, index)}
             />
 
             <Modal
                 animationType="fade"
-                transparent={true}
                 visible={confirmModalVisible}
                 onRequestClose={() => {
                     setConfirmModalVisible(!confirmModalVisible);

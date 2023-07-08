@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Image, View, ScrollView, Text, StyleSheet, TouchableOpacity, Modal, TextInput, ActivityIndicator } from "react-native";
+import { Image, View, ScrollView, Text, StyleSheet, TouchableOpacity, Modal, TextInput, ActivityIndicator, Alert } from "react-native";
 import { AntDesign, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { IReport } from "../types/Models/Report";
@@ -9,6 +9,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "../redux/store";
 import { useReportAction } from "../actions/reportAction";
 import { useAdminReport } from "../utils/hooks/useReportGroupedByLocation";
+import FormIcon from "../Components/FormIcon";
 
 
 type ReportModalProps = {
@@ -26,9 +27,9 @@ export default function UpdateReportModal({
   closeModal
 }: ReportModalProps) {
 
-  const { report } = useAdminReport(reportID);
-  const [comment, setComment] = React.useState(report?.comment.comment ?? "");
-  const [updatedStatus, setUpdatedStatus] = React.useState<string>(report?.status._id);
+  const { report,error,loading } = useAdminReport(reportID);
+  const [comment, setComment] = React.useState(report?.comment?.comment ?? "");
+  const [updatedStatus, setUpdatedStatus] = React.useState<string>(report?.status?._id ?? "");
 
   const reportAction = useReportAction();
 
@@ -36,6 +37,12 @@ export default function UpdateReportModal({
   const statuesOptions = useSelector((state: RootState) => statuses.map((status) => {
     return <Picker.Item label={status.desc} value={status._id} key={status._id} />
   }))
+
+  if(error)
+  {
+    Alert.alert("Error",error);
+    closeModal();
+  }
 
   useEffect(() => {
     if (report == null) return;
@@ -90,7 +97,7 @@ export default function UpdateReportModal({
   return (
     <SafeAreaView style={styles.container}>
       {
-        !report ? <ActivityIndicator
+        loading? <ActivityIndicator
           size={100}
           color="#0000ff"
           style={{
@@ -123,11 +130,7 @@ export default function UpdateReportModal({
                 <Text style={styles.detailLabel}>Title</Text>
                 <View style={styles.detailValueContainer}>
                   <Text style={styles.detailValue}>{report.form.name}</Text>
-                  <MaterialCommunityIcons
-                    name="waterfall"
-                    size={20}
-                    color="black"
-                  />
+                  <FormIcon icon={report.form.icon?report.form.icon:"file-document"} size={24} />
                 </View>
               </View>
               <View style={styles.detailRow}>

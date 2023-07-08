@@ -1,3 +1,4 @@
+import { statusReplacementMapper } from "../Modals/StatusReplaceSelectionModal"
 import IOrganization from "./Models/Organization"
 import { IReport } from "./Models/Report"
 import { IStatus } from "./Models/Status"
@@ -103,4 +104,5 @@ export type updateOrganizaitonInfoArgs = {
     organization:IOrganization,
     statuses:IStatus[],
     statusesToDelete:IStatus[],
+    statusReplacementMapper?:statusReplacementMapper
 }

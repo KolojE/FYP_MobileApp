@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   FlatList,
   ToastAndroid,
+  Modal,
 } from 'react-native';
 
 
@@ -19,6 +20,7 @@ import {
   Entypo,
   Octicons,
 } from '@expo/vector-icons';
+import StatusReplaceSelectionModal, { statusReplacementMapper } from './StatusReplaceSelectionModal';
 
 type OrganizationProfileScreenProps = {
   organization: IOrganization;
@@ -42,6 +44,8 @@ export default function OrganizationProfileScreen({
   const [edited, setEdited] = useState<boolean>(false);
   const [defaultStatus, setDefaultStatus] = useState<string>(organization.system.defaultStatus);
   const [customStatus, setCustomStatus] = useState<string>("")
+
+  const [statusReplaceModalVisible, setStatusReplaceModalVisible] = useState<boolean>(false);
 
 
   useEffect(() => {
@@ -112,6 +116,16 @@ export default function OrganizationProfileScreen({
 
   const onSavePressed = async () => {
 
+    if(statusesToDelete.length > 0){
+    setStatusReplaceModalVisible(true)
+    return 
+    }
+
+    saveSystemSettings();
+  };
+
+  const saveSystemSettings = async (statusReplacementMapper?:statusReplacementMapper) => {
+
     const newOrganization: IOrganization = {
       ...organizationInfo,
       system: {
@@ -127,10 +141,10 @@ export default function OrganizationProfileScreen({
     })
 
     await userAction.updateOrganizaitonInfo({
-      organization: newOrganization, statuses: newStatues, statusesToDelete: statusesToDelete
+      organization: newOrganization, statuses: newStatues, statusesToDelete: statusesToDelete, statusReplacementMapper:statusReplacementMapper
     })
     closeModal();
-  };
+  }
 
   const renderStatusesItem = ({ item }: { item: IStatus }) => {
     return (
@@ -159,6 +173,11 @@ export default function OrganizationProfileScreen({
       </View>
     );
   };
+
+  const onStatusReplaceModalConfirm = (statusReplacementMapper:statusReplacementMapper) => {
+    saveSystemSettings(statusReplacementMapper)
+    closeModal()
+  }
 
   return (
     <View style={styles.container}>
@@ -209,7 +228,6 @@ export default function OrganizationProfileScreen({
           renderItem={renderStatusesItem}
           keyExtractor={(item) => item._id}
         />
-
         <View style={styles.addStatusInputContainer} >
           <TextInput
             placeholder='Status descrpition'
@@ -229,6 +247,20 @@ export default function OrganizationProfileScreen({
       <TouchableOpacity style={styles.saveButton} onPress={onSavePressed}>
         <Text style={styles.saveButtonText}>Save Settings</Text>
       </TouchableOpacity>
+      <Modal
+        animationType='slide'
+        transparent={true}
+        visible={statusReplaceModalVisible}
+        onRequestClose={() => {
+          setStatusReplaceModalVisible(false);
+        }}
+        >
+            <StatusReplaceSelectionModal
+              statuses={statuses}
+              statusesToDelete={statusesToDelete}
+              onConfirm={onStatusReplaceModalConfirm}
+            />
+      </Modal>
     </View>
   );
 }
@@ -275,9 +307,10 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   statusItemContainer: {
-    width: '100%',
+    width: '90%',
     flexDirection: 'row',
     alignItems: 'center',
+    alignSelf: 'center',
     marginBottom: 8,
   },
   statusItemText: {

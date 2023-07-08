@@ -12,9 +12,6 @@ type ReportListProps = {
 export default function ReportList({ onPressed, onForwardMessagePress, report }: ReportListProps) {
   const { submissionDate, _id,form, status } = report;
 
-  
-
-
   return (
     <TouchableOpacity
       onPress={onPressed ? () => onPressed(report) : () => {}}

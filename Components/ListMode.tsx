@@ -5,10 +5,12 @@ import UpdateReportModal from "../Modals/UpdateReportModal"
 import React from "react"
 import { useSelector } from "react-redux"
 import { RootState } from "../redux/store"
+import SearchBar from "./SearchBar"
 
 export default function ListMode({ navigation }) {
 
     let reports: IReport[] = useSelector((state:RootState) => state.report.reports)
+    const [filtered, setFiltered] = React.useState<IReport[]>([])
     const [selectedReport, setSelectedReport] = React.useState<IReport>(null)
 
 
@@ -24,20 +26,34 @@ export default function ListMode({ navigation }) {
         navigation.navigate("ChatRoom", { report: report, complainantID: report.complainant._id })
     }
 
-    function renderItem({ item }: { item: IReport }) {
+    const renderItem  = ({ item }: { item: IReport }) => {
         return (
             <View style={{ width: "90%", alignSelf: "center" }}>
-                <ReportList onPressed={onReportPressed} report={item} key={item._id} onForwardMessagePress={onReportForwardPressed} />
+               <ReportList onPressed={onReportPressed} report={item} key={item._id} onForwardMessagePress={onReportForwardPressed} />
             </View>
+            )
+    }
+    const onSearchTextChanged = (text: string) => {
+        setFiltered(reports.filter((report) => {
+            return report.form.name.toLowerCase().includes(text.toLowerCase()) || report._id.toLowerCase().includes(text.toLowerCase()) || report.complainant.name.toLowerCase().includes(text.toLowerCase())
+        })
         )
-
     }
     return (
         <>
-        <View style={{flex: 1,marginBottom:20}}>
+        <View style={{flex: 1,marginBottom:20,alignItems:"center"}}>
+            <View
+                style={{
+                    paddingVertical: 10,
+                }}
+            >
+            <SearchBar
+                onSearchTextChanged={onSearchTextChanged}
+                />
+                </View>
             <FlatList
                 style={{ width: "100%"}}
-                data={reports}
+                data={filtered.length>0?filtered:reports}
                 scrollEnabled={true}
                 renderItem={renderItem}
             />

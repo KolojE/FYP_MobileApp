@@ -163,3 +163,31 @@ export async function getReportPhotos(): Promise<Array<string>> {
         errorHandler(err)
     }
 }
+
+export type ReprotElement = {
+    type: {
+        _id: string,
+        name: string,
+    }[],
+    status: {
+        _id: string,
+        desc: string,
+    }[],
+}
+
+export async function getReportElement({ includeType, includeStatus }: { includeType?: boolean, includeStatus?: boolean }): Promise<ReprotElement> {
+
+    try {
+        const res = await axios.get(`${api_url}/user/getReportElement`, {
+            params: {
+                type: includeType,
+                status: includeStatus
+            }
+        })
+
+        return res.data.element
+    }
+    catch (err) {
+        errorHandler(err);
+    }
+}

@@ -5,11 +5,15 @@ import { getAddressByCoordinates } from "../../api/user"
 import { useGroupedReports } from "./useGroupedReport"
 import { IReport } from "../../types/Models/Report"
 import { getReport } from "../../api/admin"
+import { AxiosError } from "axios"
 
 
 
 const useReportGroupedByLocation = () => {
-  const groupedReports = useGroupedReports()
+  const {
+    groupedReports,
+    loading
+  }= useGroupedReports()
   const [reportGroupedByLocation, setReportGroupedByLocation] = useState<ReportGroupedByStateAndCity>({})
   const [isLoading, setIsLoading] = useState<boolean>(false)
 
@@ -69,23 +73,35 @@ const useReportGroupedByLocation = () => {
 export const useAdminReport = (reportID:string) => {
 
   const [report, setReport] = useState<IReport>(null)
-  const [loading, setLoading] = useState<boolean>(false)
+  const [loading, setLoading] = useState<boolean>(true)
+  const [error, setError] = useState<string>(null)
 
   React.useEffect(
     () => {
-      const fetchReport = async () => {
-        setLoading(true)
-        const report: IReport = await getReport(reportID);
-        setReport(report)
-        setLoading(false)
+      try{
+
+        const fetchReport = async () => {
+          setLoading(true)
+          const report: IReport = await getReport(reportID);
+          setReport(report)
+          setLoading(false)
+        }
+        fetchReport()
+      }catch(e){
+        if(e instanceof AxiosError && e.response.status == 404){
+          setError("Report not found! Please Contact The System Admin")
+          setLoading(false)
+          return
+        }
+        setError("Something went wrong! Please try again later")
       }
-      fetchReport()
   },
   [reportID])
 
   return {
     report,
     loading,
+    error
   }
 }
 

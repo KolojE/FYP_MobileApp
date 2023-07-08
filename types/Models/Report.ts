@@ -32,6 +32,7 @@ export interface IReport {
         _id: string;
         name: string;
         color: string;
+        icon?: string;
         isDeleted: boolean;
     };
     comment?: {

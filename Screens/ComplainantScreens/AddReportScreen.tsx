@@ -5,6 +5,8 @@ import Title from "../../Components/Title";
 import React from "react";
 import { getForms } from "../../api/user";
 import IForm from "../../types/Models/Form";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { getContrastColor } from "../../utils/colors";
 
 export default function AddReportScreen({ navigation }) {
 
@@ -20,7 +22,15 @@ export default function AddReportScreen({ navigation }) {
   React.useEffect(() => {
     setReportFormElements((prev) => {
       return reportForms.map((reportForm, index) => {
-        return <ReportType color={reportForm.color} label={reportForm.name} formID={reportForm._id} image={null} navigation={navigation} key={index} />
+        return <ReportType
+         color={reportForm.color}
+          label={reportForm.name}
+           formID={reportForm._id}
+            image={<MaterialCommunityIcons
+              name={reportForm.icon as any?? "file-document-outline"}
+              size={50}
+              color={getContrastColor(reportForm.color)}
+             />} navigation={navigation} key={index} />
       })
     })
   }, [reportForms])

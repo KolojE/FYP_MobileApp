@@ -5,7 +5,7 @@ import { jwtTokenInterception } from "./interceptor/jwtTokenInterception";
 import errorHandler from "./errorHandler/axiosError";
 import IComplainant from "../types/Models/Complainant";
 import IUser from "../types/Models/User";
-import { ReportGroupedByType, updateOrganizaitonInfoArgs } from "../types/General";
+import { updateOrganizaitonInfoArgs } from "../types/General";
 import { IReport } from "../types/Models/Report";
 import * as FileSystem from 'expo-file-system';
 axios.interceptors.request.use(jwtTokenInterception);
@@ -15,6 +15,7 @@ export async function addNewForm(form: IForm) {
     try {
         const res = await axios.post(`${api_url}/admin/addForm`, {
             name: form.name,
+            icon: form.icon,
             color: form.color,
             activation: form.activation_Status,
             fields: form.fields
@@ -36,6 +37,7 @@ export async function updateForm(form: IForm) {
             name: form.name,
             activation: form.activation_Status,
             color: form.color,
+            icon: form.icon,
             fields: form.fields
         })
 
@@ -198,41 +200,15 @@ export async function downloadReportExcel({ sortBy, limit, dateRange, status, ty
 }
 
 
-export type ReprotElement = {
-    type: {
-        _id: string,
-        name: string,
-    }[],
-    status: {
-        _id: string,
-        desc: string,
-    }[],
-}
 
-export async function getReportElement({ includeType, includeStatus }: { includeType?: boolean, includeStatus?: boolean }): Promise<ReprotElement> {
-
-    try {
-        const res = await axios.get(`${api_url}/admin/getReportElement`, {
-            params: {
-                type: includeType,
-                status: includeStatus
-            }
-        })
-
-        return res.data.element
-    }
-    catch (err) {
-        errorHandler(err);
-    }
-}
-
-export async function updateCreateOrganizaitonInfoAndStatues({ organization, statuses, statusesToDelete }: updateOrganizaitonInfoArgs) {
+export async function updateCreateOrganizaitonInfoAndStatues({ organization, statuses, statusesToDelete,statusReplacementMapper }: updateOrganizaitonInfoArgs) {
 
     try {
         const res = await axios.post(`${api_url}/admin/updateOrganization`, {
             organization: organization,
             statuses: statuses,
             statusesToDelete: statusesToDelete,
+            statusReplacementMapper: statusReplacementMapper
         })
 
         return {

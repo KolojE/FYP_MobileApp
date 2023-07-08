@@ -1,6 +1,6 @@
-import { AntDesign, Entypo, Ionicons } from "@expo/vector-icons";
+import { AntDesign, Entypo, FontAwesome, FontAwesome5, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import React, { useEffect, useState } from "react";
-import { TextInput, View, StyleSheet, Text, Modal, BackHandler, TouchableOpacity, Alert } from "react-native";
+import { TextInput, View, StyleSheet, Text, Modal,  TouchableOpacity, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { FieldSelectionModal } from "../../Modals/FieldSelectionModal";
 import { FieldRenderer } from "../../utils/formHandler";
@@ -9,12 +9,17 @@ import { addNewForm, updateForm } from "../../api/admin";
 import { getForm } from "../../api/user";
 import { ColorPicker } from "react-native-color-picker";
 import { getContrastColor } from "../../utils/colors";
+import IconSelectionModal from "../../Modals/IconSelectionModal";
+import FormIcon from "../../Components/FormIcon";
 
 export function FormBuilderScreen({ route, navigation }) {
 
     const params = route.params;
 
+    const [iconSelectionModal, setIconSelectionModal] = useState(false);
+    
     const [addFieldModal, setAddFieldModal] = useState(false);
+    const [formIcon, setFormIcon] = useState('select');
     const [formFieldElements, setFormFieldElements] = useState([]);
     const [fields, setFields] = React.useState<Array<IField>>([]);
     const [formName, setFormName] = useState('');
@@ -27,16 +32,16 @@ export function FormBuilderScreen({ route, navigation }) {
         <FieldRenderer inputType={inputType.Map} label="Location" required={false} />,
     ]
 
-    
-    useEffect(() => {
 
+    useEffect(() => {
         if (params?.formID) {
             getForm(params.formID).then((res) => {
                 setFormName(res.name);
                 setFields(res.fields);
                 setFormColor(res.color);
+                setFormIcon(res.icon);
             }, (rej) => {
-                            });
+            });
         }
     }, [])
 
@@ -63,54 +68,58 @@ export function FormBuilderScreen({ route, navigation }) {
         }
     }
 
+    const onIconSelectModalPressed= () => {
+        setIconSelectionModal(true);
+    }
+
     useEffect(() => {
         const formFieldElements = fields.map((field, index) => (
-        <View
-            style={{
-                flexDirection: "row",
-                justifyContent: "space-between",
-                alignItems: "center",
-            }}>
-                <View 
+            <View
                 style={{
-                    flex: 15,
-                }}
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                }}>
+                <View
+                    style={{
+                        flex: 15,
+                    }}
                 >
-            <FieldRenderer key={index} inputType={field.inputType} label={field.label} options={field.options} required={field.required} />
+                    <FieldRenderer key={index} inputType={field.inputType} label={field.label} options={field.options} required={field.required} />
                 </View>
-            <TouchableOpacity onPress={() => {}}
-                style={{
-                    flex:1,
+                <TouchableOpacity onPress={() => { }}
+                    style={{
+                        flex: 1,
+                    }}
+                >
+                    <AntDesign name="delete" size={15} color="black" />
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => {
+                    onFieldUpPressed(index);
                 }}
-            >
-                <AntDesign name="delete" size={15} color="black" />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => {
-                onFieldUpPressed(index);
-            }}
-                style={{
-                    flex:1,
+                    style={{
+                        flex: 1,
+                    }}
+                >
+                    <AntDesign name="up" size={15} color="black" />
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => {
+                    onFieldDownPressed(index);
                 }}
-            >
-                <AntDesign name="up" size={15} color="black" />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => {
-                onFieldDownPressed(index);
-            }}
-                style={{
-                    flex:1,
-                }}
-            >
-                <AntDesign name="down" size={15} color="black" />
-            </TouchableOpacity>
-        </View>
+                    style={{
+                        flex: 1,
+                    }}
+                >
+                    <AntDesign name="down" size={15} color="black" />
+                </TouchableOpacity>
+            </View>
         ));
         setFormFieldElements(formFieldElements);
 
     }, [fields]);
 
     const handleAddField = (field) => {
-                setFields([...fields, field]);
+        setFields([...fields, field]);
     };
 
     const validateForm = () => {
@@ -121,19 +130,18 @@ export function FormBuilderScreen({ route, navigation }) {
     }
 
     const onSaveButtonClicked = () => {
-        if(!validateForm())
-        {
+        if (!validateForm()) {
             Alert.alert("Please enter a form name");
             return;
         }
 
         if (params?.formID) {
-            updateForm({ fields: fields, activation_Status: true, name: formName, _id: params.formID, color: formColor })
+            updateForm({ fields: fields, activation_Status: true, name: formName, _id: params.formID, color: formColor, icon: formIcon })
             navigation.navigate("dashBoard")
             return;
 
         }
-        addNewForm({ fields: fields, activation_Status: false, name: formName,color: formColor })
+        addNewForm({ fields: fields, activation_Status: false, name: formName, color: formColor,icon:formIcon })
         navigation.goBack()
     }
 
@@ -143,11 +151,17 @@ export function FormBuilderScreen({ route, navigation }) {
 
     const onColorPickerClicked = () => {
         setColorPickerModal(true);
-        }
+    }
 
     const onColorSelected = (color) => {
         setFormColor(color);
         setColorPickerModal(false);
+    }
+
+    const onIconSelected = (icon:string) => {
+        console.log(icon);
+        setFormIcon(icon);
+        setIconSelectionModal(false);
     }
 
     return (
@@ -161,6 +175,19 @@ export function FormBuilderScreen({ route, navigation }) {
                 </TouchableOpacity>
             </View>
             <View style={styles.form}>
+                <View
+                    style={{
+                        alignSelf: "center",
+                        alignItems: "center",
+                        width:50,
+                        height:50,
+                        marginBottom: 20,
+                    }}
+                >
+                    <FormIcon
+                        icon={formIcon}
+                    />
+                </View>
                 <View style={styles.formName}>
                     <TextInput
                         placeholder="Form Name"
@@ -168,15 +195,15 @@ export function FormBuilderScreen({ route, navigation }) {
                         value={formName}
                         onChangeText={setFormName}
                     />
-                        <TouchableOpacity onPress={onColorPickerClicked} 
+                    <TouchableOpacity onPress={onColorPickerClicked}
                         style={
-                            [styles.colorPickerButton,{
+                            [styles.colorPickerButton, {
                                 backgroundColor: formColor,
                             }]
                         }
-                        >
-                            <Ionicons name="color-palette" color={getContrastColor(formColor)} size={20} />
-                        </TouchableOpacity>
+                    >
+                        <Ionicons name="color-palette" color={getContrastColor(formColor)} size={20} />
+                    </TouchableOpacity>
                 </View>
                 <View>
                     <Text>Default Fields</Text>
@@ -200,14 +227,21 @@ export function FormBuilderScreen({ route, navigation }) {
                         backgroundColor: "#000000aa",
                     }}
                 >
-                <ColorPicker
-            style={styles.colorPicker}
-            onColorSelected={onColorSelected}
-                />
+                    <ColorPicker
+                        style={styles.colorPicker}
+                        onColorSelected={onColorSelected}
+                    />
                 </View>
             </Modal>
             <Modal transparent={true} visible={addFieldModal}>
                 <FieldSelectionModal setModal={setAddFieldModal} updateField={handleAddField} />
+            </Modal>
+            <Modal
+            visible={iconSelectionModal}
+            >
+                <IconSelectionModal
+                onIconPress={onIconSelected}
+                 />
             </Modal>
         </SafeAreaView>
     );
@@ -232,7 +266,7 @@ const styles = StyleSheet.create({
         marginBottom: 20,
         flexDirection: "row",
         alignItems: "center",
-        
+
     },
     formNameInput: {
         borderWidth: 1,
@@ -247,7 +281,7 @@ const styles = StyleSheet.create({
     saveButton: {
         marginRight: "auto",
     },
-    colorPickerButton:{
+    colorPickerButton: {
         width: 30,
         height: 30,
         borderRadius: 20,
@@ -255,7 +289,7 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
     },
-    colorPicker:{
+    colorPicker: {
         width: 300,
         height: 300,
     }

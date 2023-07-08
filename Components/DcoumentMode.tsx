@@ -107,7 +107,9 @@ export default function DocumentMode({ navigation }) {
                 style={{
                     margin: 10,
                     alignItems: "center",
-                }}>
+                }}
+                    key={`${state}`}
+                >
                 <TagSelector tagName={`${state}`} tagValue={`${state}`} onSelect={onStateSelect} key={`${state}`} />
             </View>
         )
@@ -120,6 +122,7 @@ export default function DocumentMode({ navigation }) {
                     margin: 10,
                     alignItems: "center",
                 }}
+                key={`${city}`}
             >
                 <TagSelector tagName={`${city}`} tagValue={`${city}`} onSelect={onCitySelect} key={`${city}}`} />
             </View>

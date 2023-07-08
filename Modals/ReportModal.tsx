@@ -1,10 +1,11 @@
 import React from "react";
-import { View, ScrollView, Text, StyleSheet, TouchableOpacity, Image, Modal, ActivityIndicator } from "react-native";
+import { View, ScrollView, Text, StyleSheet, TouchableOpacity, Image, Modal, ActivityIndicator, Alert } from "react-native";
 import { AntDesign, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { IReport } from "../types/Models/Report";
 import { detailRenderer } from "../utils/reportHandler";
 import { useReport } from "../utils/hooks/useReports";
+import FormIcon from "../Components/FormIcon";
 
 type ReportModalProps = {
     forwardButton?: boolean,
@@ -26,6 +27,7 @@ export default function ReportModal({
     const {
         report,
         loading,
+        error
     } = useReport(reportID);
 
     React.useEffect(() => {
@@ -42,6 +44,12 @@ export default function ReportModal({
 
     const onForwardButtonPressed = () => {
         onForwardPressed(report);
+    }
+
+    if(error) 
+    {
+        Alert.alert("Error", error);
+        closeModal();
     }
 
     return (
@@ -80,11 +88,7 @@ export default function ReportModal({
                                 >
                                 <View style={styles.detailValueContainer}>
                                     <Text style={styles.detailValue}>{report.form.name}</Text>
-                                    <MaterialCommunityIcons
-                                        name="waterfall"
-                                        size={20}
-                                        color="black"
-                                        />
+                                    <FormIcon icon={report.form.icon} size={24} />
                                         </View>
                                     {
                                         report.form.isDeleted &&

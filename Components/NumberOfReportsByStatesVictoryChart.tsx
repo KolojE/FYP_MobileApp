@@ -19,7 +19,6 @@ export default function NumberOfReportByStateVictoryChart({ victoryBarData }: Nu
 
     const colors = []
 
-
     const {
         victoryBar,
         legendData
@@ -40,7 +39,6 @@ export default function NumberOfReportByStateVictoryChart({ victoryBarData }: Nu
                     fill: color
                 })
             })
-
             victoryBar.push(<VictoryBar
             key={index}
                 colorScale={colors}

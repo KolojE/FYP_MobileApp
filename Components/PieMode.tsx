@@ -12,7 +12,9 @@ import MapViewWithReportMarker from "./MapViewWithReportMarker"
 export default function PieMode({ navigation }) {
 
     const {loading, reports}= useSelector((state: RootState) => state.report)
-    const groupedReports = useGroupedReports();
+    const {
+        groupedReports,
+    }= useGroupedReports();
     const victoryData = getGroupedReportInfoForVictory({groupedReport: groupedReports })
 
     const [selectedReport, setSelectedReport] = useState<IReport | null>(null)
