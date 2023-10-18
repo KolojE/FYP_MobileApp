@@ -42,10 +42,12 @@ export default function DocumentMode({ navigation }) {
             Object.keys(reportGroupedByLocation).forEach((state) => {
                 Object.keys(reportGroupedByLocation[state]).forEach((city) => {
 
+                    if(!stateCities.includes(city))
                     stateCities.push(city)
                     if (selectedCities.length > 0 && !selectedCities.includes(city)) {
                         return
                     }
+
                     reports.push(...reportGroupedByLocation[state][city].map((group) => group.reports).flat())
                                     
         })
@@ -58,7 +60,9 @@ export default function DocumentMode({ navigation }) {
 
         selectedStates.forEach((state) => {
             Object.keys(reportGroupedByLocation[state]).forEach((city) => {
-                stateCities.push(city)
+                    if(!stateCities.includes(city))
+                    stateCities.push(city)
+                    
                 if (selectedCities.length > 0 && !selectedCities.includes(city)) {
                     return
                 }
@@ -74,14 +78,12 @@ export default function DocumentMode({ navigation }) {
     const onStateSelect = (state, selected) => {
         if (selected) {
             setSelectedStates(prev => [...prev, state])
-        }
+            }
         else {
             setSelectedStates(prev => prev.filter((item) => item !== state))
-
             Object.keys(reportGroupedByLocation[state]).forEach((city) => {
                 setSelectedCities(prev => prev.filter((item) => item !== city))
             })
-
         }
     }
 

@@ -43,8 +43,6 @@ export default function StatusReplaceSelectionModal({ statuses, statusesToDelete
     const onStatusToReplaceTagSelected = (status: IStatus, selected: boolean) => {
         let statusMapCopy = { ...statusMap };
         selectedStatusToDelete?.forEach((statusToDelete) => {
-            console.log(statusToDelete.desc + " " + status.desc)
-            console.log(JSON.stringify(selectedStatusToDelete, null, 2))
             statusMapCopy[statusToDelete._id] = status._id;
         })
         setStatusMap(statusMapCopy);
@@ -186,6 +184,8 @@ export default function StatusReplaceSelectionModal({ statuses, statusesToDelete
                     alignItems: "center",
                     justifyContent: "center",
                     flexDirection: "row",
+                    width: "100%",
+                    flexWrap: "wrap",
                     padding: 10
                 }}
             >

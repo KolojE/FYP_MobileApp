@@ -1,9 +1,10 @@
 import { View, StyleSheet, Image, Text, TextInput, TouchableOpacity, Alert, Dimensions } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { useAuthAction } from "../actions/authAndRegAction";
 import { RootState } from "../redux/store";
 import { useSelector } from "react-redux";
+import { useFocusEffect } from "@react-navigation/native";
 
 
 export default function LoginScreen({ navigation }) {
@@ -13,14 +14,16 @@ export default function LoginScreen({ navigation }) {
     const [loginForm, setLoginForm] = useState({ identifier: "", password: "" });
     const login = useSelector((state: RootState) => state.authentication)
 
+    useFocusEffect(
+        useCallback(() => {
+            const tokenLogin = async () => {
+               await authAction.tokenLoginAction();
+            }
+            tokenLogin();
+        }, [])
+    )
 
     useEffect(() => {
-        const tokenLogin = () => {
-            authAction.tokenLoginAction();
-        }
-        tokenLogin();
-    }, []);
-        useEffect(() => {
         login.error && Alert.alert("Login Failed", login.error);
     }, [login])
 
@@ -37,7 +40,7 @@ export default function LoginScreen({ navigation }) {
     };
 
     const onLoginButtonPressed = () => {
-                authAction.loginAction({ identifier: loginForm.identifier, password: loginForm.password })
+        authAction.loginAction({ identifier: loginForm.identifier, password: loginForm.password })
     }
 
 
@@ -51,7 +54,7 @@ export default function LoginScreen({ navigation }) {
                     <Text style={styles.Title}>S.C.E - Safer, Cleaner ,Efficient</Text>
                 </View>
                 <View style={styles.loginContainer}>
-                    <TextInput style={styles.input} placeholder={"Email / Username"} onChangeText={handleEmailUsernameChange} />
+                    <TextInput style={styles.input} placeholder={"Email"} onChangeText={handleEmailUsernameChange} />
                     <TextInput style={styles.input} placeholder={"Password"} secureTextEntry onChangeText={handlePasswordChange} />
                     <TouchableOpacity style={{ ...styles.input, marginTop: 50, width: "50%", backgroundColor: "#4d8ef7", paddingTop: 10, paddingBottom: 10 }} onPress={onLoginButtonPressed}>
                         <Text style={{ fontWeight: "bold", textAlign: "center", color: "white" }}>Login</Text>

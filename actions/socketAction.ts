@@ -17,7 +17,9 @@ export const useSocketAction = () => {
 
         try {
             dispatch(socketStart());
+            if(!socket.hasListeners("receiveMessage")){
             await addOnMessageReceiveListener(chatAction.receiveMessageAction)
+            }
             getPendingMessages();
             dispatch(socketSuccess());
         } catch (err) {

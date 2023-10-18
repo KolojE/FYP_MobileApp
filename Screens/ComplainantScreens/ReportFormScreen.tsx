@@ -8,6 +8,7 @@ import { submitReport } from "../../api/complainant";
 import { reportSubmissionSchema } from "../../types/General";
 import { setItemAsync,getItemAsync, deleteItemAsync } from "expo-secure-store";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import FormIcon from "../../Components/FormIcon";
 
 
 type ReportFormScreenProps = {
@@ -23,6 +24,7 @@ export default function ReportFormScreen({ route, navigation }: ReportFormScreen
     const [defaultFields, setDefaultFields] = React.useState<IField[]>([]);
     const [fields, setFields] = React.useState<IField[]>([]);
     const [formName, setFormName] = React.useState("");
+    const [formIcon, setFormIcon] = React.useState("");
     const [report, setReport] = React.useState<reportSubmissionSchema>({});
     const [submitted, setSubmitted] = React.useState(false);
 
@@ -102,6 +104,7 @@ export default function ReportFormScreen({ route, navigation }: ReportFormScreen
         getForm(formID).then((res) => {
             setFormName(res.name);
             setFields(res.fields);
+            setFormIcon(res.icon)
             setDefaultFields(res.defaultFields);
         }, (rej) => {
                     });
@@ -168,6 +171,9 @@ export default function ReportFormScreen({ route, navigation }: ReportFormScreen
             </View>
             <ScrollView contentContainerStyle={styles.scrollView}>
                     <Text style={styles.title}>Report {formName}</Text>
+                    <FormIcon
+                    icon={formIcon}
+                    />
                 <View style={styles.formContainer}>
                     {defaultFieldElements}
                     <Text style={styles.detailsText}>Details</Text>

@@ -39,6 +39,7 @@ export async function tokenLogin(token:string):Promise<IUser>{
         return loginUser
     }
     catch(err){
+        securestore.deleteItemAsync("jwt");
         errorHandler(err)
     }
 }

@@ -6,19 +6,19 @@ import { IReport } from "../types/Models/Report";
 
 type emitSendMessageArgs = {
   receiverID: string;
-  forwardedReport?: IReport;
+  forwardedReport?: Pick<IReport, "_id" | "form" | "location">;
+  time: Date;
   message: string;
 };
 
-let socket: Socket = null;
 
 const getSocket = async () => {
+  let socket: Socket = null;
   const token = await secureStorage.getItemAsync("jwt");
   
   return new Promise<Socket>((resolve, reject) => {
     if (socket) {
       socket.connect();
-      ;
       resolve(socket);
     } else {
       socket = io(`${api_url}`, {
@@ -54,39 +54,33 @@ const getSocket = async () => {
   });
 };
 
-export function sendMessage({ receiverID, message, forwardedReport }: emitSendMessageArgs) {
-  if (!socket) throw new Error("Socket not initialized");
+export async function sendMessage({ receiverID, message, forwardedReport }: emitSendMessageArgs) {
+  const socket =await getSocket();
   socket.emit("sendMessage", receiverID, { message, forwardedReport }, (ack) => {
-    ;
-  });
+  })
 }
 
-export function getPendingMessages() {
+export async function getPendingMessages() {
+  const socket =await getSocket();
   socket.emit("getPendingMessages");
 }
 
-export function addOnMessageReceiveListener(callBack: onMessageReceiveCallback) {
-  ;
-
-  return new Promise((resolve, reject) => {
-    try {
-      resolve(
+export async function addOnMessageReceiveListener(callBack: onMessageReceiveCallback) {
+  const socket =await getSocket();
         socket.on("receiveMessage", (...args) => {
           const [senderID, message] = args;
-          ;
-          callBack({ senderID: senderID, message: message.message, forwardedReport: message.forwardedReport });
+          callBack({ senderID: senderID, message: message.message, forwardedReport: message.forwardedReport, time: message.time });
         })
-      );
-    } catch (err) {
-      reject(err);
-    }
-  });
 }
 
-export function disconnectSocket() {
+export async function disconnectSocket() {
+  getSocket().then((socket) => {
   socket.disconnect();
   socket.removeAllListeners();
-  socket = null;
+  },
+  (err) => {
+    throw err;
+  })
   ;
 }
 

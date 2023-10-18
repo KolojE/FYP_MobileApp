@@ -7,12 +7,17 @@ import ForwardRerpot from "./ForwardReport";
 type ChatBubleProps = {
     receive: boolean,
     reportForward?: IReport,
+    time: Date,
     onForwardMessagePress: (report:IReport) => void,
     msg: string,
 }
 
-export default function ChatBuble({ receive, msg,reportForward,onForwardMessagePress}: ChatBubleProps) {
-    ;
+export default function ChatBuble({ receive, msg,reportForward,time,onForwardMessagePress}: ChatBubleProps) {
+    const hours = time.getHours();
+    const minutes = time.getMinutes();
+    
+    // Format the time string
+    const timeString = `${hours}:${minutes}`;
     const isReceive = receive ? 10 : "auto"
     const color = receive ? "white" : "#80ff88"
     return (
@@ -30,7 +35,9 @@ export default function ChatBuble({ receive, msg,reportForward,onForwardMessageP
                 </Text>
             </View>
             <Text style={{ fontSize: 8, marginBottom: 5, marginLeft: isReceive, marginRight: 10 }}>
-                12:00
+                {
+                    timeString
+                }
             </Text>
         </View>
     )

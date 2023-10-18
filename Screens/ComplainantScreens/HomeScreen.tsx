@@ -19,6 +19,7 @@ import { RootState } from "../../redux/store";
 import { useSelector } from "react-redux";
 import { useReports } from "../../utils/hooks/useReports";
 import { filterOptions } from "../../types/General";
+import { useFocusEffect } from "@react-navigation/native";
 
 export default function HomeScreen({ navigation }) {
   const [profileModal, setProfileModal] = React.useState(false);
@@ -36,6 +37,9 @@ export default function HomeScreen({ navigation }) {
   }= useReports({
     filter: filter,
   })
+
+
+  
 
 
   const onCloseModalPressed = () => {

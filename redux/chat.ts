@@ -6,6 +6,7 @@ type chats = {
         chatLog: {
             msg: string,
             forwardedReport?: IReport,
+            time?: string,
             receive?: boolean
         }[],
         unRead: boolean
@@ -32,15 +33,15 @@ const chatSlice = createSlice({
             state.error = null
         },
         addMessage: (state, action) => {
-            const { receiverID, msg, receive,forwardedReport } = action.payload
+            const { receiverID, msg, receive,forwardedReport,time } = action.payload
             if (!state.chat[receiverID]) {
                 state.chat[receiverID] = {
-                    chatLog: [{ msg, receive,forwardedReport}]
+                    chatLog: [{ msg, receive,forwardedReport,time}]
                     , unRead: true
                 }
             }
             else {
-                state.chat[receiverID].chatLog.push({ msg, receive,forwardedReport  })
+                state.chat[receiverID].chatLog.push({ msg, receive,forwardedReport,time  })
                 state.chat[receiverID].unRead = true
             }
         },

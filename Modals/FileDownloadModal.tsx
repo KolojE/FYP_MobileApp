@@ -23,15 +23,6 @@ const FileDownloadModal = ({ visible, onClose, onFileTypeSelect }) => {
           >
             <Text style={styles.fileTypeButtonText}>Excel</Text>
           </TouchableOpacity>
-          <TouchableOpacity
-            style={[
-              styles.fileTypeButton,
-              selectedFileType === "pdf" && styles.selectedFileTypeButton,
-            ]}
-            onPress={() => handleFileTypeSelect("pdf")}
-          >
-            <Text style={styles.fileTypeButtonText}>PDF</Text>
-          </TouchableOpacity>
           <TouchableOpacity style={styles.closeButton} onPress={onClose}>
             <Text style={styles.closeButtonText}>Close</Text>
           </TouchableOpacity>

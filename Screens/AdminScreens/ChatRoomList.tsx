@@ -10,6 +10,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
 import ChatRoom from "../../Components/ChatRoom";
 import { IReport } from "../../types/Models/Report";
+import { chatDBInit } from "../../sqlite/sqlite";
 
 export default function ChatRoomList({route,navigation}) {
     const [chatRoomModal, setChatRoomModal] = React.useState<boolean>(false);
@@ -91,7 +92,7 @@ React.useEffect(()=>{
             </Modal>
 
             <View style={{ position: "absolute", bottom: "3%", right: "6%", zIndex: 1 }}>
-                <TouchableOpacity onPress={() => { setSelectMemberModal(true) }}>
+                <TouchableOpacity onPress={() => { setSelectMemberModal(true);}}>
                     <AntDesign name="pluscircle" size={50} style={{ color: "#4d49f5" }} />
                 </TouchableOpacity>
             </View>

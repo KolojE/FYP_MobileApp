@@ -3,7 +3,6 @@ import { View, Text, TouchableOpacity } from "react-native";
 
 
 export default function ReportType({navigation,label,color,image,formID}) {
-  console.log(formID)
   return (
     <View style={{ width: 150 }}>
       <TouchableOpacity style={{ width: 120 }} onPress={() => { navigation.navigate("reportForm",{formID}) }}>

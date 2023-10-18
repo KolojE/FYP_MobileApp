@@ -1,15 +1,17 @@
 import { Octicons, Ionicons, FontAwesome, FontAwesome5, MaterialCommunityIcons } from "@expo/vector-icons";
-import React from "react";
+import React, { useEffect } from "react";
 import { View, StyleSheet, Image, Text, TouchableOpacity, TextInput } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import IconTextInput from "../Components/IconTextInput";
-import { useRegistrationAction } from "../actions/authAndRegAction";
+import { useGetOrganizationAction, useRegistrationAction } from "../actions/authAndRegAction";
 import { RegistrationCredentials } from "../types/General";
-import {Dimensions} from 'react-native'; 
+import { Dimensions } from 'react-native';
+import { Alert } from "react-native";
+import { AxiosError } from "axios";
 
 const { height } = Dimensions.get('window');
 
-export default function RegisterScreen() {
+export default function RegisterScreen({navigation}) {
     const [registrationForm, setRegistrationForm] = React.useState<RegistrationCredentials>({
         name: "",
         email: "",
@@ -17,10 +19,26 @@ export default function RegisterScreen() {
         organization: {
             ID: "",
         }
-
     })
+    const [organizationName, setOrganizationName] = React.useState<string>(null);
 
     const registrationAction = useRegistrationAction();
+
+    const organizationAction = useGetOrganizationAction();
+
+    useEffect(() => {
+
+            const getOrganizationNameAsync = async () => {
+                const res = await organizationAction.getOrganizationInfo(registrationForm.organization.ID);
+                setOrganizationName(res.name);
+            }
+            getOrganizationNameAsync().catch((err)=>{
+                setOrganizationName("Organization Name")
+            });
+
+    }, [
+        registrationForm.organization.ID
+    ])
 
     const onNameChange = (text: string) => {
         setRegistrationForm(prev => ({ ...prev, name: text }));
@@ -42,8 +60,23 @@ export default function RegisterScreen() {
         setRegistrationForm(prev => ({ ...prev, organization: { ID: text } }));
     }
 
-    function onRegistrationButtonPressed() {
-        registrationAction.registrationAction(registrationForm);
+    async function onRegistrationButtonPressed() {
+        try{
+
+            await registrationAction.registrationAction(registrationForm)
+            Alert.alert("Success","Registration Successful");
+            navigation.navigate("Login");
+        }
+        catch(err)
+        {
+            if(err instanceof AxiosError && err.response.status == 409)
+            {
+                Alert.alert("Email exists","Email Already Exists");
+                return;
+            }
+            Alert.alert("Error","Registration Failed Please Try Again");
+        }
+    
     }
 
     return (
@@ -53,12 +86,12 @@ export default function RegisterScreen() {
             </View>
             <View style={styles.RegisterContainer}>
                 <Text style={styles.Title}>Registration</Text>
-                <IconTextInput icon={<Ionicons name="person" style={styles.Icon} />} placeholder="User Name" viewContainerStyle={styles.IconTextInput} editable={true} onTextChange={onNameChange} textInputStyle={{ fontSize: 16 }}  />
+                <IconTextInput icon={<Ionicons name="person" style={styles.Icon} />} placeholder="User Name" viewContainerStyle={styles.IconTextInput} editable={true} onTextChange={onNameChange} textInputStyle={{ fontSize: 16 }} />
                 <IconTextInput icon={<FontAwesome name="envelope" style={styles.Icon} />} placeholder="Email" viewContainerStyle={styles.IconTextInput} editable={true} onTextChange={onEmailChange} />
-                <IconTextInput icon={<FontAwesome5 name="key" style={styles.Icon} />} placeholder="Password" viewContainerStyle={styles.IconTextInput} editable={true} onTextChange={onPasswordChange} />
-                <IconTextInput icon={<FontAwesome5 name="key" style={styles.Icon} />} placeholder="Confirm Password" viewContainerStyle={styles.IconTextInput} editable={true} onTextChange={onConfirmPasswordChange}  />
+                <IconTextInput icon={<FontAwesome5 name="key" style={styles.Icon} />} placeholder="Password" secret viewContainerStyle={styles.IconTextInput} editable={true} onTextChange={onPasswordChange} />
+                <IconTextInput icon={<FontAwesome5 name="key" style={styles.Icon} />} placeholder="Confirm Password" secret viewContainerStyle={styles.IconTextInput} editable={true} onTextChange={onConfirmPasswordChange} />
                 <IconTextInput icon={<MaterialCommunityIcons name="form-textbox-password" style={styles.Icon} />} placeholder="Organization ID" viewContainerStyle={styles.IconTextInput} editable={undefined} onTextChange={onOrganizationIDChange} />
-                <IconTextInput icon={<Octicons name="organization" style={styles.Icon} />} placeholder="Organization Name" viewContainerStyle={{ ...styles.IconTextInput, height: "15%", backgroundColor: "#b5b3b3" }} editable={false} />
+                <IconTextInput icon={<Octicons name="organization" style={styles.Icon} />} placeholder={organizationName ?? "Organization Name"} viewContainerStyle={{ ...styles.IconTextInput, height: "15%", backgroundColor: "#b5b3b3" }} editable={false} />
                 <TouchableOpacity style={{ ...styles.input, marginTop: "2%", width: "50%", backgroundColor: "#4d8ef7", paddingTop: 10, paddingBottom: 10 }} onPress={() => { onRegistrationButtonPressed() }}>
                     <Text style={{ fontWeight: "bold", textAlign: "center", color: "white" }}>Register</Text>
                 </TouchableOpacity>

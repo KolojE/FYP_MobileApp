@@ -4,7 +4,7 @@ module.exports = {
     extra: {
       apiUrl: process.env.API_URL,
       "eas":{
-        "projectId": "f4dc222f-a17a-4e14-b865-37503cde552a"
+        "projectId": "63e55b95-fee5-4f68-a114-05c84849eea7"
       }
     },
     android: {

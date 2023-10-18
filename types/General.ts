@@ -58,12 +58,13 @@ export type ReportGroupedByStateAndCity = {
     }
 } 
 
-export type onMessageReceiveCallback = ({ senderID, message,forwardedReport }) => void
+export type onMessageReceiveCallback = ({ senderID, message,time,forwardedReport }) => void
 
 export type sendMessageArgs = {
     receiverID: string,
     forwardedReport?:  Pick<IReport,"_id"|"form"|"location">,
     message: string,
+    time:Date,
 }
 
 export type fieldScema= string | { La: number, Lo:number} | Date | string[]

@@ -68,6 +68,13 @@ export function FormBuilderScreen({ route, navigation }) {
         }
     }
 
+    const onDeleteFieldPressed = (index) => {
+        const newFields = [...fields];
+        newFields.splice(index, 1);
+        setFields(newFields);
+        setFormFieldElements([])
+    }
+
     const onIconSelectModalPressed= () => {
         setIconSelectionModal(true);
     }
@@ -87,7 +94,9 @@ export function FormBuilderScreen({ route, navigation }) {
                 >
                     <FieldRenderer key={index} inputType={field.inputType} label={field.label} options={field.options} required={field.required} />
                 </View>
-                <TouchableOpacity onPress={() => { }}
+                <TouchableOpacity onPress={() => {
+                    onDeleteFieldPressed(index);
+                 }}
                     style={{
                         flex: 1,
                     }}
@@ -159,7 +168,6 @@ export function FormBuilderScreen({ route, navigation }) {
     }
 
     const onIconSelected = (icon:string) => {
-        console.log(icon);
         setFormIcon(icon);
         setIconSelectionModal(false);
     }
@@ -186,6 +194,8 @@ export function FormBuilderScreen({ route, navigation }) {
                 >
                     <FormIcon
                         icon={formIcon}
+                        onPress={onIconSelectModalPressed}
+
                     />
                 </View>
                 <View style={styles.formName}>

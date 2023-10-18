@@ -60,7 +60,7 @@ function TextInputField({ setReport, _id, label, required, report }: FieldRender
         <View style={styles.container}>
             <Text style={styles.label}>{label + (required ? " *" : "")}</Text>
             <View style={styles.inputContainer}>
-                <TextInput style={styles.input} value={value} onChangeText={onTextChange} />
+                <TextInput style={styles.input} value={value} onChangeText={onTextChange} placeholder="Type Something..." />
             </View>
         </View>
     );
@@ -70,7 +70,7 @@ function TextInputField({ setReport, _id, label, required, report }: FieldRender
 function DateInputField({ setReport, _id, label, required, report }: FieldRendererProps) {
 
 
-    const [date, setDate] = React.useState<Date>(new Date());
+    const [date, setDate] = React.useState<Date>();
     const [datePicker, setDatePicker] = React.useState<boolean>(false);
 
     React.useEffect(() => {
@@ -97,6 +97,7 @@ function DateInputField({ setReport, _id, label, required, report }: FieldRender
                         style={styles.input}
                         editable={false}
                         value={date ? date.toDateString() : " "}
+                        placeholder="Select Date..."
                     />
                 </View>
             </TouchableOpacity>
@@ -115,7 +116,7 @@ function DateInputField({ setReport, _id, label, required, report }: FieldRender
 
 function TimeInputField({ setReport, _id, label, required, report }: FieldRendererProps) {
 
-    const [time, setTime] = React.useState<Date>(new Date());
+    const [time, setTime] = React.useState<Date>();
     const [datePicker, setDatePicker] = React.useState<boolean>(false);
     React.useEffect(() => {
         if (report?.[_id]) { setTime && setTime(new Date(report[_id] as string)); }
@@ -139,6 +140,7 @@ function TimeInputField({ setReport, _id, label, required, report }: FieldRender
                         style={styles.input}
                         editable={false}
                         value={time ? time.toTimeString() : " "}
+                        placeholder="Select Time..."
                     />
                 </View>
             </TouchableOpacity>
@@ -160,7 +162,7 @@ function MapInputField({ setReport, _id, label, required, report }: FieldRendere
 
     const [locationPicker, setLocationPicker] = React.useState<boolean>(false);
     const [value, setValue] = React.useState<{ Lo: number, La: number }>();
-    const [address, setAddress] = React.useState<string>("");
+    const [address, setAddress] = React.useState<string>();
     React.useEffect(() => {
 
         if (report?.[_id]) {
@@ -176,7 +178,7 @@ function MapInputField({ setReport, _id, label, required, report }: FieldRendere
             setAddressAsync().then(() => {
 
             }, () => {
-                setAddress("Location..")
+                setAddress(undefined)
             })
         } catch (err) {
             console.error(err)
@@ -196,7 +198,8 @@ function MapInputField({ setReport, _id, label, required, report }: FieldRendere
                     <TextInput
                         style={styles.input}
                         editable={false}
-                        value={address}
+                        value={address?.length ? address : ""}
+                        placeholder="Select Location..."
                     />
                 </View>
             </TouchableOpacity>

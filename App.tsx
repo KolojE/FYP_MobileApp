@@ -1,5 +1,5 @@
-import React, { useEffect } from "react";
-import { NavigationContainer, StackActions } from "@react-navigation/native";
+import React from "react";
+import { NavigationContainer} from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { Provider, useSelector } from "react-redux";
 import store, { RootState } from "./redux/store";
@@ -8,9 +8,11 @@ import store, { RootState } from "./redux/store";
 import LoginScreen from "./Screens/LoginScreen";
 import LandingScreen from "./Screens/LandingScreen";
 import RegisterScreen from "./Screens/RegisterScreen";
-import * as FileSystem from "expo-file-system";
+import { LogBox } from "react-native";
 const Stack = createNativeStackNavigator();
 
+
+LogBox.ignoreAllLogs()
 export default function App() {
   return (
     <Provider store={store}>
@@ -36,7 +38,9 @@ export function AppContent() {
                 </Stack.Screen>
                 <Stack.Screen name="Register">
                   {(props) => (
-                    <RegisterScreen />
+                    <RegisterScreen
+                      {...props}
+                    />
                   )}
                 </Stack.Screen>
               </>

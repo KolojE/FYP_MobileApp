@@ -13,6 +13,11 @@ type ChatRoomProps = {
 }
 
 export default function ChatRoom({ user, lastMessage,lastMessageReceived, time, onPressed }: ChatRoomProps) {
+    const hours = time.getHours();
+    const minutes = time.getMinutes();
+    
+    // Format the time string
+    const timeString = `${hours}:${minutes}`;
     return (
         <TouchableOpacity onPress={() => { onPressed(user) }} style={{ paddingTop: 10, paddingBottom: 10, width: "100%", flexDirection: "row" }}>
             <View style={{ flex: 1, paddingLeft: 10, justifyContent: "center" }}>
@@ -27,7 +32,7 @@ export default function ChatRoom({ user, lastMessage,lastMessageReceived, time, 
                 <Text style={{ fontSize: 12 }}>{lastMessageReceived? lastMessage:"You: "+lastMessage}</Text>
             </View>
             <View style={{ marginRight: "5%" }}>
-                <Text style={{ marginLeft: "auto" }}>{time.toLocaleTimeString()}</Text>
+                <Text style={{ marginLeft: "auto" }}>{`${timeString}`}</Text>
             </View>
         </TouchableOpacity>
     )

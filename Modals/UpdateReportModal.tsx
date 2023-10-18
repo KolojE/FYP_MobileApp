@@ -148,12 +148,6 @@ export default function UpdateReportModal({
               </Text>
             </View>
             <View style={styles.detailRow}>
-              <Text style={styles.detailLabel}>Updated By</Text>
-              <Text style={styles.detailValue}>
-                {"N/A"}
-              </Text>
-            </View>
-            <View style={styles.detailRow}>
               <Text style={styles.detailLabel}>Updates Comment</Text>
               <TextInput
                 style={styles.commentInput}

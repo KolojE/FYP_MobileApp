@@ -50,11 +50,12 @@ export default function ChatScreen({ onChatRoomClose, unSelectedUser, selectedUs
       ToastAndroid.show("Message cannot be empty", ToastAndroid.SHORT)
       return
     }
-    await chatAction.sendMessageAction({
+    chatAction.sendMessageAction({
       message: message, receiverID: selectedUser._id, forwardedReport: report ? {
         _id: report?._id,
         form: report?.form,
-      } : null
+      } : null,
+      time:new Date()
     })
     setMessage("")
     delete params?.report
@@ -77,6 +78,7 @@ export default function ChatScreen({ onChatRoomClose, unSelectedUser, selectedUs
       msg={item.msg}
       receive={item.receive}
       reportForward={item.forwardedReport}
+      time={new Date(item.time)}
       onForwardMessagePress={onForwardedReportPressed}
     />
   }

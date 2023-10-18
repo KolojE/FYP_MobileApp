@@ -3,7 +3,7 @@ import * as secureStore from "expo-secure-store";
 import { AxiosError } from "axios";
 import { loginStart, loginSuccess, loginFailure, logout, loginError } from "../redux/authentication";
 import { login, tokenLogin } from "../api/authentication";
-import { registration } from "../api/registration";
+import { getOrganization, registration } from "../api/registration";
 import { registrationFailure, registrationStart, registrationSuccess } from "../redux/registration";
 import { LoginCredentials, RegistrationCredentials } from "../types/General";
 import { useSocketAction } from "./socketAction";
@@ -24,6 +24,7 @@ export const useAuthAction = () => {
       await userAcion.fetchUserInfoAction();
       dispatch(loginSuccess(user));
       await socketActions.establishConnection();
+      await chatActions.retrieveAllChatAction();
       if (user.role === "admin") {
         complainantActions.getComplainants();
       }
@@ -46,12 +47,12 @@ export const useAuthAction = () => {
       socketActions.disconnect();
       dispatch(logout());
     } catch (err) {
-      ;
     }
   };
 
   const tokenLoginAction = async () => {
     const token = await secureStore.getItemAsync("jwt");
+
     dispatch(loginStart());
     
     if (!token) {
@@ -62,8 +63,8 @@ export const useAuthAction = () => {
     const user = await tokenLogin(token);
     dispatch(loginSuccess(user));
     await userAcion.fetchUserInfoAction();
-    socketActions.establishConnection();
-    chatActions.retrieveAllChatAction();
+    await socketActions.establishConnection();
+    await chatActions.retrieveAllChatAction();
 
     if (user.role === "admin") {
       complainantActions.getComplainants();
@@ -87,6 +88,7 @@ export const useRegistrationAction = () => {
       dispatch(registrationSuccess(null));
     } catch (err) {
       dispatch(registrationFailure(err.message));
+      throw err;
     }
   };
 
@@ -95,4 +97,14 @@ export const useRegistrationAction = () => {
   };
 };
 
+export const useGetOrganizationAction= () => {
+
+  const getOrganizationInfo =  async (ID: string) => {
+      return await getOrganization(ID);
+  }
+
+  return {
+    getOrganizationInfo,
+  }
+}
 

@@ -7,26 +7,23 @@ import { chatDBInit } from "../sqlite/sqlite";
 
 
 const chatDB = chatDBInit()
-
 export const useChatAction = () => {
     const dispatch = useDispatch();
-    const sendMessageAction = async ({ message, receiverID,forwardedReport}: sendMessageArgs) => {
+    const sendMessageAction = async ({ message, receiverID, forwardedReport,time }: sendMessageArgs) => {
         try {
             dispatch(startSendingMessage())
-            chatDB.insertMessage({ chatId: receiverID, message, receive: false,forwardedReport })
-            await sendMessage({ message, receiverID,forwardedReport});
-            dispatch(addMessage({ msg: message, receiverID, receive: false,forwardedReport }));
+            chatDB.insertMessage({ chatId: receiverID, message, receive: false, forwardedReport,time})
+            await sendMessage({ message, receiverID, forwardedReport,time});
+            dispatch(addMessage({ msg: message, receiverID, receive: false, forwardedReport,time:time.toLocaleString() }));
         } catch (err) {
             dispatch(sendMessageError(err.message))
         }
     }
 
-    const receiveMessageAction = async ({ message, senderID,forwardedReport }) => {
+    const receiveMessageAction = ({ message, senderID, forwardedReport,time }) => {
         try {
-            dispatch(addMessage({ msg: message, receiverID: senderID, receive: true,forwardedReport:forwardedReport }));
-            chatDB.insertMessage({ chatId: senderID, message:message, receive: true,forwardedReport:forwardedReport })
-            chatDB.getAllMessages(senderID, (row) => {
-                            })
+            dispatch(addMessage({ msg: message, receiverID: senderID, receive: true, forwardedReport: forwardedReport,time:time}));
+            chatDB.insertMessage({ chatId: senderID, message: message, receive: true, forwardedReport: forwardedReport,time:time})
             dispatch(receiveMessageSuccess())
         } catch (err) {
             dispatch(receiveMessageError(err.message))
@@ -42,21 +39,20 @@ export const useChatAction = () => {
         const chatDB = chatDBInit()
         const chats = {}
         chatDB.getAllChats((rows) => {
-                        
             rows.forEach((row) => {
-                                if (!chats[row.chatId]) {
+                if (!chats[row.chatId]) {
                     chats[row.chatId] = {
-                        chatLog: [{ msg: row.message, receive: JSON.parse(row.receive), forwardedReport:JSON.parse(row.forwardedReport??null) }],
+                        chatLog: [{ msg: row.message, receive: JSON.parse(row.receive), forwardedReport: JSON.parse(row.forwardedReport ?? null),time:new Date(row.time).toLocaleString() }],
                         unRead: true
                     }
                 }
                 else {
-                    chats[row.chatId].chatLog.push({ msg: row.message, receive: JSON.parse(row.receive) })
+                    chats[row.chatId].chatLog.push({ msg: row.message, receive: JSON.parse(row.receive),time:new Date(row.time).toLocaleString(),forwardedReport: JSON.parse(row.forwardedReport ?? null) })
                     chats[row.chatId].unRead = true
                 }
             }
             )
-                    dispatch(retrieveAllChat(chats))
+            dispatch(retrieveAllChat(chats))
         }
         )
 
