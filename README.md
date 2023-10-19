@@ -36,6 +36,7 @@ The purpose of this project is to create an automated reporting system that aims
 - Redux
 - OpenStreetMap (OSM)
 - [Nominatim](https://wiki.openstreetmap.org/wiki/Nominatim)
+- Socket.io
 
 ## getting started
 Before Setting Up The Application Please Setup the Backend First
