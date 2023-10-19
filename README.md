@@ -23,6 +23,7 @@ The purpose of this project is to create an automated reporting system that aims
 - Report the environmental incident.
 - Track submitted report status.
 - Update system setting.
+- Report form customization.
 - Review incident report.
 - Incident report analysis.
 - Generate summary report.
